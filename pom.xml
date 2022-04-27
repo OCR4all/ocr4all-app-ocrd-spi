@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+   The Project Object Model (POM) build file for ocr4all app ocr-d service providers project.
+
+   Author: Herbert Baier (herbert.baier@uni-wuerzburg.de)
+   Date: 29.03.2022
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<groupId>de.uni-wuerzburg.zpd</groupId>
+	<artifactId>ocr4all-app-ocrd-spi</artifactId>
+	<packaging>jar</packaging>
+	<version>1.0-SNAPSHOT</version>
+	<name>ocr4all app ocr-d spi</name>
+	<url>http://www.ocr4all.org</url>
+	<description>ocr4all application ocr-d service providers</description>
+
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
+		<maven.compiler.source>11</maven.compiler.source>
+		<maven.compiler.target>11</maven.compiler.target>
+		
+		<org.apache.maven.plugins.maven-source-plugin-version>3.2.0</org.apache.maven.plugins.maven-source-plugin-version>
+	</properties>
+
+	<dependencies>
+		<!-- ocr4all application service provider interface -->
+		<dependency>
+			<groupId>de.uni-wuerzburg.zpd</groupId>
+			<artifactId>ocr4all-app-spi</artifactId>
+			<version>1.0-SNAPSHOT</version>
+			<scope>provided</scope>
+		</dependency>
+		
+		<!-- https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-databind -->
+		<dependency>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-databind</artifactId>
+			<version>2.12.1</version>
+			<scope>provided</scope>
+		</dependency>
+	</dependencies>
+     
+    <build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-source-plugin</artifactId>
+				<version>${org.apache.maven.plugins.maven-source-plugin-version}</version>
+				<executions>
+					<execution>
+						<id>attach-sources</id>
+						<goals>
+							<goal>jar</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-javadoc-plugin</artifactId>
+				<version>${org.apache.maven.plugins.maven-source-plugin-version}</version>
+				<executions>
+					<execution>
+						<id>attach-javadocs</id>
+						<goals>
+							<goal>jar</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
+
+</project>
