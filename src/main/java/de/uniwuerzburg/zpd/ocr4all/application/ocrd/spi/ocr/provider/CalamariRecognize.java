@@ -1,5 +1,5 @@
 /**
- * File:     Calamari.java
+ * File:     CalamariRecognize.java
  * Package:  de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.ocr.provider
  * 
  * Author:   Herbert Baier (herbert.baier@uni-wuerzburg.de)
@@ -8,7 +8,6 @@
 package de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.ocr.provider;
 
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -19,6 +18,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.OCRDServiceProviderWorker;
 import de.uniwuerzburg.zpd.ocr4all.application.spi.OpticalCharacterRecognitionServiceProvider;
+import de.uniwuerzburg.zpd.ocr4all.application.spi.core.CoreProcessorServiceProvider;
 import de.uniwuerzburg.zpd.ocr4all.application.spi.core.ProcessServiceProvider;
 import de.uniwuerzburg.zpd.ocr4all.application.spi.env.ConfigurationServiceProvider;
 import de.uniwuerzburg.zpd.ocr4all.application.spi.env.Framework;
@@ -35,10 +35,10 @@ import de.uniwuerzburg.zpd.ocr4all.application.spi.model.argument.SelectArgument
 import de.uniwuerzburg.zpd.ocr4all.application.spi.model.argument.StringArgument;
 
 /**
- * Defines service providers for ocr-d Calamari. This processor only operates on
- * the text line level and so needs a line segmentation (and by extension a
- * binarized image) as its input. The following properties of the service
- * provider collection <b>ocr-d</b> override the local default settings
+ * Defines service providers for ocr-d Calamari recognize. This processor only
+ * operates on the text line level and so needs a line segmentation (and by
+ * extension a binarized image) as its input. The following properties of the
+ * service provider collection <b>ocr-d</b> override the local default settings
  * (<b>key</b>: <i>default value</i>):
  * <ul>
  * <li>uid: &lt;effective system user ID. -1 if not defined&gt;</li>
@@ -47,22 +47,29 @@ import de.uniwuerzburg.zpd.ocr4all.application.spi.model.argument.StringArgument
  * <li>opt-resources: resources</li>
  * <li>docker-image: ocrd/all:maximum</li>
  * <li>docker-resources: /usr/local/share/ocrd-resources</li>
+ * <li>calamari-recognize-id: ocrd-calamari-recognize</li>
+ * <li>calamari-recognize-description: ocr-d calamari recognize processor</li>
  * </ul>
  *
  * @author <a href="mailto:herbert.baier@uni-wuerzburg.de">Herbert Baier</a>
  * @version 1.0
  * @since 1.8
  */
-public class Calamari extends OCRDServiceProviderWorker implements OpticalCharacterRecognitionServiceProvider {
+public class CalamariRecognize extends OCRDServiceProviderWorker implements OpticalCharacterRecognitionServiceProvider {
 	/**
 	 * The prefix of the message keys in the resource bundle.
 	 */
-	private static final String messageKeyPrefix = "ocr.calamari.";
+	private static final String messageKeyPrefix = "ocr.calamari.recognize.";
 
 	/**
 	 * The Calamari default model.
 	 */
 	private static final String defaultModel = "fraktur_historical";
+
+	/**
+	 * The Calamari default voter algorithm.
+	 */
+	private static final String defaultVoterAlgorithm = "confidence_voter_default_ctc";
 
 	/**
 	 * Defines service provider collection with keys and default values. Collection
@@ -73,7 +80,8 @@ public class Calamari extends OCRDServiceProviderWorker implements OpticalCharac
 	 * @since 1.8
 	 */
 	private enum ServiceProviderCollection implements Framework.ServiceProviderCollectionKey {
-		models("calamari-models", "calamari/models");
+		processorIdentifier("calamari-recognize-id", "ocrd-calamari-recognize"),
+		processorDescription("calamari-recognize-description", "ocr-d calamari recognize processor");
 
 		/**
 		 * The key.
@@ -129,7 +137,6 @@ public class Calamari extends OCRDServiceProviderWorker implements OpticalCharac
 		public String getDefaultValue() {
 			return defaultValue;
 		}
-
 	}
 
 	/**
@@ -140,8 +147,7 @@ public class Calamari extends OCRDServiceProviderWorker implements OpticalCharac
 	 * @since 1.8
 	 */
 	private enum Field {
-		model("model"), voter, levelTextEquivalence("level-text-equivalence"),
-		glyphConfidenceCutoff("glyph-confidence-cutoff");
+		model, voter, levelTextEquivalence("level-text-equivalence"), glyphConfidenceCutoff("glyph-confidence-cutoff");
 
 		/**
 		 * The name.
@@ -217,11 +223,11 @@ public class Calamari extends OCRDServiceProviderWorker implements OpticalCharac
 	}
 
 	/**
-	 * Default constructor for a service provider for ocr-d Calamari.
+	 * Default constructor for a service provider for ocr-d Calamari recognize.
 	 * 
 	 * @since 1.8
 	 */
-	public Calamari() {
+	public CalamariRecognize() {
 		super(messageKeyPrefix);
 	}
 
@@ -230,11 +236,11 @@ public class Calamari extends OCRDServiceProviderWorker implements OpticalCharac
 	 * 
 	 * @see
 	 * de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.OCRDServiceProviderWorker#
-	 * processorName()
+	 * processorIdentifier()
 	 */
 	@Override
-	protected String processorName() {
-		return "ocrd-calamari-recognize";
+	protected Framework.ServiceProviderCollectionKey processorIdentifier() {
+		return ServiceProviderCollection.processorIdentifier;
 	}
 
 	/*
@@ -245,8 +251,8 @@ public class Calamari extends OCRDServiceProviderWorker implements OpticalCharac
 	 * processorDescription()
 	 */
 	@Override
-	protected String processorDescription() {
-		return "ocr-d calamari recognize processor";
+	protected Framework.ServiceProviderCollectionKey processorDescription() {
+		return ServiceProviderCollection.processorDescription;
 	}
 
 	/*
@@ -309,20 +315,7 @@ public class Calamari extends OCRDServiceProviderWorker implements OpticalCharac
 	}
 
 	/**
-	 * Returns the opt models path.
-	 * 
-	 * @param configuration The service provider configuration.
-	 * @param target        The target.
-	 * @return The opt models path.
-	 * @since 1.8
-	 */
-	private Path getOptModelsPath(ConfigurationServiceProvider configuration, Target target) {
-		return Paths.get(getOptResources(configuration, target).toString(),
-				Framework.getValue(configuration, ServiceProviderCollection.models));
-	}
-
-	/**
-	 * Returns the Calamari models. The hidden file names in the opt models path,
+	 * Returns the Calamari models. The hidden directories in the opt models path,
 	 * this means staring with a dot, are ignored.
 	 * 
 	 * @param configuration The service provider configuration.
@@ -333,23 +326,11 @@ public class Calamari extends OCRDServiceProviderWorker implements OpticalCharac
 	private List<String> getModels(ConfigurationServiceProvider configuration, Target target) {
 		List<String> models = new ArrayList<>();
 
-		for (Path path : getDirectories(getOptModelsPath(configuration, target)))
+		for (Path path : getDirectories(getOptResources(configuration, target)))
 			if (!path.getFileName().toString().startsWith("."))
 				models.add(path.getFileName().toString());
 
 		return models;
-	}
-
-	/**
-	 * Returns the docker models path.
-	 * 
-	 * @param configuration The service provider configuration.
-	 * @return The docker models path.
-	 * @since 1.8
-	 */
-	private Path getDockerModelsPath(ConfigurationServiceProvider configuration) {
-		return Paths.get(getDockerResources(configuration).toString(),
-				Framework.getValue(configuration, ServiceProviderCollection.models));
 	}
 
 	/*
@@ -365,7 +346,7 @@ public class Calamari extends OCRDServiceProviderWorker implements OpticalCharac
 		return getModels(configuration, target).isEmpty()
 				? new Premise(Premise.State.warn,
 						locale -> getString(locale, "no.models.available",
-								new Object[] { getOptModelsPath(configuration, target).toString() }))
+								new Object[] { getOptResources(configuration, target).toString() }))
 				: (configuration.isSystemCommandAvailable(SystemCommand.Type.docker) ? new Premise()
 						: new Premise(Premise.State.block, locale -> getMessage(locale, "no.command.docker")));
 	}
@@ -379,17 +360,12 @@ public class Calamari extends OCRDServiceProviderWorker implements OpticalCharac
 	 */
 	@Override
 	public Model getModel(ConfigurationServiceProvider configuration, Target target) {
-		// Use processor argument to set the default values
-		ProcessorArgument argument = processorArgumentFactory(configuration);
+		ProcessorArgument argument = new ProcessorArgument();
 
 		// The models
 		final List<SelectField.Item> models = new ArrayList<SelectField.Item>();
-		final String dockerModelsPath = getDockerModelsPath(configuration).toString();
-		for (String model : getModels(configuration, target)) {
-			final String modelPath = Paths.get(dockerModelsPath, model).normalize().toString();
-
-			models.add(new SelectField.Option(modelPath.equals(argument.getModel()), modelPath, locale -> model));
-		}
+		for (String model : getModels(configuration, target))
+			models.add(new SelectField.Option(model.equals(argument.getModel()), model, locale -> model));
 
 		if (models.isEmpty())
 			models.add(new SelectField.Option(false, "empty", locale -> getString(locale, "model.empty")));
@@ -424,56 +400,7 @@ public class Calamari extends OCRDServiceProviderWorker implements OpticalCharac
 	 */
 	@Override
 	public ProcessServiceProvider.Processor newProcessor() {
-		return new ProcessServiceProvider.Processor() {
-			/**
-			 * True if the processor was canceled.
-			 */
-			private boolean isCanceled = false;
-
-			/**
-			 * The callback interface for processor updates.
-			 */
-			private ProcessServiceProvider.Processor.Callback callback;
-
-			/**
-			 * The framework.
-			 */
-			private Framework framework;
-
-			/**
-			 * The processor standard output.
-			 */
-			private StringBuffer standardOutput = new StringBuffer();
-
-			/**
-			 * The processor standard error.
-			 */
-			private StringBuffer standardError = new StringBuffer();
-
-			/**
-			 * Callback method for updated standard output.
-			 * 
-			 * @param message The message.
-			 * @since 1.8
-			 */
-			private void updatedStandardOutput(String message) {
-				standardOutput.append(framework.formatLogMessage(message));
-
-				callback.updatedStandardOutput(standardOutput.toString());
-			}
-
-			/**
-			 * Callback method for updated standard error.
-			 * 
-			 * @param message The current message.
-			 * @since 1.8
-			 */
-			private void updatedStandardError(String message) {
-				standardError.append(framework.formatLogMessage(message));
-
-				callback.updatedStandardError(standardError.toString());
-			}
-
+		return new CoreProcessorServiceProvider() {
 			/*
 			 * (non-Javadoc)
 			 * 
@@ -485,14 +412,7 @@ public class Calamari extends OCRDServiceProviderWorker implements OpticalCharac
 			 */
 			@Override
 			public State execute(Callback callback, Framework framework, ModelArgument modelArgument) {
-				this.callback = callback;
-				this.framework = framework;
-
-				callback.updatedProgress(0);
-
-				updatedStandardOutput("Start spi '" + processorName() + "'.");
-
-				if (isCanceled)
+				if (!initialize(getProcessorIdentifier(framework), callback, framework))
 					return ProcessServiceProvider.Processor.State.canceled;
 
 				/*
@@ -505,7 +425,7 @@ public class Calamari extends OCRDServiceProviderWorker implements OpticalCharac
 				/*
 				 * Processor arguments
 				 */
-				ProcessorArgument processorArgument = processorArgumentFactory(framework.getConfiguration());
+				ProcessorArgument processorArgument = new ProcessorArgument();
 
 				/*
 				 * Model parameter
@@ -532,7 +452,7 @@ public class Calamari extends OCRDServiceProviderWorker implements OpticalCharac
 					}
 
 				/*
-				 * voter algorithm parameter
+				 * Voter algorithm parameter
 				 */
 				if (availableArguments.remove(Field.voter.getName()))
 					try {
@@ -602,42 +522,11 @@ public class Calamari extends OCRDServiceProviderWorker implements OpticalCharac
 				/*
 				 * Runs the processor
 				 */
-				return run(framework, true, processorArgument, availableArguments, () -> isCanceled,
+				return run(framework, true, processorArgument, availableArguments, () -> isCanceled(), () -> complete(),
 						message -> updatedStandardOutput(message), message -> updatedStandardError(message),
 						progress -> callback.updatedProgress(progress), 0.01F);
 			}
-
-			/*
-			 * (non-Javadoc)
-			 * 
-			 * @see
-			 * de.uniwuerzburg.zpd.ocr4all.application.spi.ProcessServiceProvider.Processor#
-			 * cancel()
-			 */
-			@Override
-			public void cancel() {
-				isCanceled = true;
-			}
-
 		};
-	}
-
-	/**
-	 * Returns the processor arguments with default values for given service
-	 * provider configuration.
-	 * 
-	 * @param configuration The service provider configuration.
-	 * @return The processor arguments with default values.
-	 * @since 1.8
-	 */
-	private ProcessorArgument processorArgumentFactory(ConfigurationServiceProvider configuration) {
-		final Path dockerModelsPath = getDockerModelsPath(configuration);
-
-		// Use processor argument to set the default values
-		ProcessorArgument argument = new ProcessorArgument();
-		argument.setModel(Paths.get(dockerModelsPath.toString(), defaultModel).normalize().toString());
-
-		return argument;
 	}
 
 	/**
@@ -652,12 +541,12 @@ public class Calamari extends OCRDServiceProviderWorker implements OpticalCharac
 		 * The model.
 		 */
 		@JsonProperty("checkpoint_dir")
-		private String model = null;
+		private String model = defaultModel;
 
 		/**
 		 * The voter algorithm.
 		 */
-		private String voter = "confidence_voter_default_ctc";
+		private String voter = defaultVoterAlgorithm;
 
 		/**
 		 * The level of text equivalence.
