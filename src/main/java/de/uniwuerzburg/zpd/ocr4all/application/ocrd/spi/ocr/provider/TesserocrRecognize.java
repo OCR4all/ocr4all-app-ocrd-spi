@@ -16,6 +16,7 @@ import java.util.Optional;
 import java.util.Set;
 
 import com.fasterxml.jackson.annotation.JsonGetter;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.OCRDServiceProviderWorker;
@@ -1049,37 +1050,43 @@ public class TesserocrRecognize extends OCRDServiceProviderWorker
 		 * The character white list.
 		 */
 		@JsonProperty("char_whitelist")
-		private String characterWhiteList = "";
+		@JsonInclude(JsonInclude.Include.NON_NULL)
+		private String characterWhiteList = null;
 
 		/**
 		 * The character black list.
 		 */
 		@JsonProperty("char_blacklist")
-		private String characterBlackList = "";
+		@JsonInclude(JsonInclude.Include.NON_NULL)
+		private String characterBlackList = null;
 
 		/**
 		 * The character unblack list.
 		 */
 		@JsonProperty("char_unblacklist")
-		private String characterUnblackList = "";
+		@JsonInclude(JsonInclude.Include.NON_NULL)
+		private String characterUnblackList = null;
 
 		/**
 		 * The Tesseract parameters.
 		 */
 		@JsonProperty("tesseract_parameters")
-		private String tesseractParameters = "{}";
+		@JsonInclude(JsonInclude.Include.NON_NULL)
+		private String tesseractParameters = null;
 
 		/**
 		 * The xpath parameters.
 		 */
 		@JsonProperty("xpath_parameters")
-		private String xpathParameters = "{}";
+		@JsonInclude(JsonInclude.Include.NON_NULL)
+		private String xpathParameters = null;
 
 		/**
 		 * The xpath model.
 		 */
 		@JsonProperty("xpath_model")
-		private String xpathModel = "{}";
+		@JsonInclude(JsonInclude.Include.NON_NULL)
+		private String xpathModel = null;
 
 		/**
 		 * Returns the model.

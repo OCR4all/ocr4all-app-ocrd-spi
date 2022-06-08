@@ -409,10 +409,11 @@ public abstract class OCRDServiceProviderWorker {
 
 		if (isResources) {
 			Path optResources = getOptResources(framework);
+			Path dockerResources = getDockerResources(framework);
 
 			if (Files.isDirectory(optResources))
-				processorArguments.addAll(Arrays.asList("-v",
-						optResources.toString() + ":" + framework.getValue(ServiceProviderCollection.dockerResources)));
+				processorArguments
+						.addAll(Arrays.asList("-v", optResources.toString() + ":" + dockerResources.toString()));
 		}
 
 		processorArguments.addAll(Arrays.asList("-v", framework.getProcessorWorkspace().toString() + ":/data", "-w",
