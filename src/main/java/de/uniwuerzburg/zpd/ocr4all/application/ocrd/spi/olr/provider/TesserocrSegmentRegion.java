@@ -16,6 +16,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.OCRDServiceProviderWorker;
 import de.uniwuerzburg.zpd.ocr4all.application.spi.OpticalLayoutRecognitionServiceProvider;
+import de.uniwuerzburg.zpd.ocr4all.application.spi.core.CoreProcessorServiceProvider;
 import de.uniwuerzburg.zpd.ocr4all.application.spi.core.ProcessServiceProvider;
 import de.uniwuerzburg.zpd.ocr4all.application.spi.env.ConfigurationServiceProvider;
 import de.uniwuerzburg.zpd.ocr4all.application.spi.env.Framework;
@@ -36,7 +37,13 @@ import de.uniwuerzburg.zpd.ocr4all.application.spi.model.argument.ModelArgument;
  * <ul>
  * <li>uid: &lt;effective system user ID. -1 if not defined&gt;</li>
  * <li>gid: &lt;effective system group ID. -1 if not defined&gt;</li>
+ * <li>opt-folder: ocr-d</li>
+ * <li>opt-resources: resources</li>
  * <li>docker-image: ocrd/all:maximum</li>
+ * <li>docker-resources: /usr/local/share/ocrd-resources</li>
+ * <li>tesserocr-segment-region-id: ocrd-tesserocr-segment-region</li>
+ * <li>tesserocr-segment-region-description: ocr-d tesserocr segment region
+ * processor</li>
  * </ul>
  *
  * @author <a href="mailto:herbert.baier@uni-wuerzburg.de">Herbert Baier</a>
@@ -49,6 +56,74 @@ public class TesserocrSegmentRegion extends OCRDServiceProviderWorker
 	 * The prefix of the message keys in the resource bundle.
 	 */
 	private static final String messageKeyPrefix = "olr.tesseract.segment.region.";
+
+	/**
+	 * Defines service provider collection with keys and default values. Collection
+	 * blank values are not allowed and their values are trimmed.
+	 *
+	 * @author <a href="mailto:herbert.baier@uni-wuerzburg.de">Herbert Baier</a>
+	 * @version 1.0
+	 * @since 1.8
+	 */
+	private enum ServiceProviderCollection implements Framework.ServiceProviderCollectionKey {
+		processorIdentifier("tesserocr-segment-region-id", "ocrd-tesserocr-segment-region"),
+		processorDescription("tesserocr-segment-region-description", "ocr-d tesserocr segment region processor");
+
+		/**
+		 * The key.
+		 */
+		private final String key;
+
+		/**
+		 * The default value.
+		 */
+		private final String defaultValue;
+
+		/**
+		 * Creates a service provider collection with a key and default value.
+		 * 
+		 * @param key          The key.
+		 * @param defaultValue The default value.
+		 * @since 1.8
+		 */
+		private ServiceProviderCollection(String key, String defaultValue) {
+			this.key = key;
+			this.defaultValue = defaultValue;
+		}
+
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see de.uniwuerzburg.zpd.ocr4all.application.spi.env.Framework.
+		 * ServiceProviderCollectionKey#getName()
+		 */
+		@Override
+		public String getName() {
+			return collectionName;
+		}
+
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see de.uniwuerzburg.zpd.ocr4all.application.spi.env.Framework.
+		 * ServiceProviderCollectionKey#getKey()
+		 */
+		@Override
+		public String getKey() {
+			return key;
+		}
+
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see de.uniwuerzburg.zpd.ocr4all.application.spi.env.Framework.
+		 * ServiceProviderCollectionKey#getDefaultValue()
+		 */
+		@Override
+		public String getDefaultValue() {
+			return defaultValue;
+		}
+	}
 
 	/**
 	 * Defines fields.
@@ -113,11 +188,11 @@ public class TesserocrSegmentRegion extends OCRDServiceProviderWorker
 	 * 
 	 * @see
 	 * de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.OCRDServiceProviderWorker#
-	 * processorName()
+	 * processorIdentifier()
 	 */
 	@Override
-	protected String processorName() {
-		return "ocrd-tesserocr-segment-region";
+	protected Framework.ServiceProviderCollectionKey processorIdentifier() {
+		return ServiceProviderCollection.processorIdentifier;
 	}
 
 	/*
@@ -128,8 +203,8 @@ public class TesserocrSegmentRegion extends OCRDServiceProviderWorker
 	 * processorDescription()
 	 */
 	@Override
-	protected String processorDescription() {
-		return "ocr-d tesserocr segment region processor";
+	protected Framework.ServiceProviderCollectionKey processorDescription() {
+		return ServiceProviderCollection.processorDescription;
 	}
 
 	/*
@@ -250,56 +325,7 @@ public class TesserocrSegmentRegion extends OCRDServiceProviderWorker
 	 */
 	@Override
 	public ProcessServiceProvider.Processor newProcessor() {
-		return new ProcessServiceProvider.Processor() {
-			/**
-			 * True if the processor was canceled.
-			 */
-			private boolean isCanceled = false;
-
-			/**
-			 * The callback interface for processor updates.
-			 */
-			private ProcessServiceProvider.Processor.Callback callback;
-
-			/**
-			 * The framework.
-			 */
-			private Framework framework;
-
-			/**
-			 * The processor standard output.
-			 */
-			private StringBuffer standardOutput = new StringBuffer();
-
-			/**
-			 * The processor standard error.
-			 */
-			private StringBuffer standardError = new StringBuffer();
-
-			/**
-			 * Callback method for updated standard output.
-			 * 
-			 * @param message The message.
-			 * @since 1.8
-			 */
-			private void updatedStandardOutput(String message) {
-				standardOutput.append(framework.formatLogMessage(message));
-
-				callback.updatedStandardOutput(standardOutput.toString());
-			}
-
-			/**
-			 * Callback method for updated standard error.
-			 * 
-			 * @param message The current message.
-			 * @since 1.8
-			 */
-			private void updatedStandardError(String message) {
-				standardError.append(framework.formatLogMessage(message));
-
-				callback.updatedStandardError(standardError.toString());
-			}
-
+		return new CoreProcessorServiceProvider() {
 			/*
 			 * (non-Javadoc)
 			 * 
@@ -311,14 +337,7 @@ public class TesserocrSegmentRegion extends OCRDServiceProviderWorker
 			 */
 			@Override
 			public State execute(Callback callback, Framework framework, ModelArgument modelArgument) {
-				this.callback = callback;
-				this.framework = framework;
-
-				callback.updatedProgress(0);
-
-				updatedStandardOutput("Start spi '" + processorName() + "'.");
-
-				if (isCanceled)
+				if (!initialize(getProcessorIdentifier(framework), callback, framework))
 					return ProcessServiceProvider.Processor.State.canceled;
 
 				/*
@@ -478,23 +497,10 @@ public class TesserocrSegmentRegion extends OCRDServiceProviderWorker
 				/*
 				 * Runs the processor
 				 */
-				return run(framework, processorArgument, availableArguments, () -> isCanceled,
+				return run(framework, processorArgument, availableArguments, () -> isCanceled(), () -> complete(),
 						message -> updatedStandardOutput(message), message -> updatedStandardError(message),
 						progress -> callback.updatedProgress(progress), 0.01F);
 			}
-
-			/*
-			 * (non-Javadoc)
-			 * 
-			 * @see
-			 * de.uniwuerzburg.zpd.ocr4all.application.spi.ProcessServiceProvider.Processor#
-			 * cancel()
-			 */
-			@Override
-			public void cancel() {
-				isCanceled = true;
-			}
-
 		};
 	}
 

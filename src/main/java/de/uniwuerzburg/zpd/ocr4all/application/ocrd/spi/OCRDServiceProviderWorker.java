@@ -167,20 +167,68 @@ public abstract class OCRDServiceProviderWorker {
 	}
 
 	/**
-	 * Returns the processor name.
+	 * Returns the service provider collection with key and default value for
+	 * processor identifier.
 	 * 
-	 * @return The processor name.
+	 * @return The service provider collection with key and default value for
+	 *         processor identifier.
 	 * @since 1.8
 	 */
-	protected abstract String processorName();
+	protected abstract Framework.ServiceProviderCollectionKey processorIdentifier();
+
+	/**
+	 * Returns the processor identifier.
+	 * 
+	 * @param configuration The service provider configuration.
+	 * @return The processor identifier.
+	 * @since 1.8
+	 */
+	protected String getProcessorIdentifier(ConfigurationServiceProvider configuration) {
+		return configuration == null ? null : Framework.getValue(configuration, processorIdentifier());
+	}
+
+	/**
+	 * Returns the processor identifier.
+	 * 
+	 * @param framework The framework.
+	 * @return The processor identifier.
+	 * @since 1.8
+	 */
+	protected String getProcessorIdentifier(Framework framework) {
+		return framework == null ? null : getProcessorIdentifier(framework.getConfiguration());
+	}
+
+	/**
+	 * Returns the service provider collection with key and default value for
+	 * processor description.
+	 * 
+	 * @return The service provider collection with key and default value for
+	 *         processor description.
+	 * @since 1.8
+	 */
+	protected abstract Framework.ServiceProviderCollectionKey processorDescription();
 
 	/**
 	 * Returns the processor description.
 	 * 
+	 * @param configuration The service provider configuration.
 	 * @return The processor description.
 	 * @since 1.8
 	 */
-	protected abstract String processorDescription();
+	protected String getProcessorDescription(ConfigurationServiceProvider configuration) {
+		return configuration == null ? null : Framework.getValue(configuration, processorDescription());
+	}
+
+	/**
+	 * Returns the processor description.
+	 * 
+	 * @param framework The framework.
+	 * @return The processor description.
+	 * @since 1.8
+	 */
+	protected String getProcessorDescription(Framework framework) {
+		return framework == null ? null : getProcessorDescription(framework.getConfiguration());
+	}
 
 	/**
 	 * Returns the resource bundle using the specified locale.
@@ -361,15 +409,16 @@ public abstract class OCRDServiceProviderWorker {
 
 		if (isResources) {
 			Path optResources = getOptResources(framework);
+			Path dockerResources = getDockerResources(framework);
 
 			if (Files.isDirectory(optResources))
-				processorArguments.addAll(Arrays.asList("-v",
-						optResources.toString() + ":" + framework.getValue(ServiceProviderCollection.dockerResources)));
+				processorArguments
+						.addAll(Arrays.asList("-v", optResources.toString() + ":" + dockerResources.toString()));
 		}
 
 		processorArguments.addAll(Arrays.asList("-v", framework.getProcessorWorkspace().toString() + ":/data", "-w",
-				"/data", "--", framework.getValue(ServiceProviderCollection.dockerImage), processorName(), "-I",
-				metsFileGroup.getInput(), "-O", metsFileGroup.getOutput()));
+				"/data", "--", framework.getValue(ServiceProviderCollection.dockerImage),
+				getProcessorIdentifier(framework), "-I", metsFileGroup.getInput(), "-O", metsFileGroup.getOutput()));
 
 		if (arguments != null)
 			processorArguments.addAll(Arrays.asList("-p", objectMapper.writeValueAsString(arguments)));
@@ -398,29 +447,6 @@ public abstract class OCRDServiceProviderWorker {
 	}
 
 	/**
-	 * Returns the files walking the file tree rooted at a given starting folder.
-	 * 
-	 * @param folder    The starting folder.
-	 * @param extension If non null, filter the files with this extension. The upper
-	 *                  and lower case does not matter.
-	 * @return The files walking the file tree rooted at a given starting folder.
-	 * @throws IOException Throws if an I/O error is thrown when accessing the
-	 *                     starting file.
-	 * @since 1.8
-	 */
-	protected static List<Path> getFiles(Path folder, String extension) throws IOException {
-		final String fileExtension = extension == null || extension.isBlank() ? null
-				: "." + extension.toLowerCase().trim();
-
-		try (Stream<Path> walk = Files.walk(folder)) {
-			return walk.filter(p -> {
-				return !Files.isDirectory(p)
-						&& (fileExtension == null || p.toString().toLowerCase().endsWith(fileExtension));
-			}).collect(Collectors.toList());
-		}
-	}
-
-	/**
 	 * Runs the ocr-d processor without resources folder.
 	 * 
 	 * @param framework            The framework.
@@ -428,7 +454,8 @@ public abstract class OCRDServiceProviderWorker {
 	 * @param unnecessaryArguments The unnecessary processor arguments. Null or
 	 *                             empty means that there are no unnecessary
 	 *                             processor arguments.
-	 * @param event                The callback for processor events.
+	 * @param runningState         The callback for processor running state.
+	 * @param execution            The callback for processor execution.
 	 * @param standardOutput       The callback for standard output.
 	 * @param standardError        The callback for standard error.
 	 * @param progress             The callback for progress.
@@ -437,11 +464,11 @@ public abstract class OCRDServiceProviderWorker {
 	 * @since 1.8
 	 */
 	protected ProcessServiceProvider.Processor.State run(Framework framework, Object arguments,
-			Set<String> unnecessaryArguments, ProcessorEvent event, Message standardOutput, Message standardError,
-			Progress progress, float baseProgress) {
+			Set<String> unnecessaryArguments, ProcessorRunningState runningState, ProcessorExecution execution,
+			Message standardOutput, Message standardError, Progress progress, float baseProgress) {
 
-		return run(framework, false, arguments, unnecessaryArguments, event, standardOutput, standardError, progress,
-				baseProgress);
+		return run(framework, false, arguments, unnecessaryArguments, runningState, execution, standardOutput,
+				standardError, progress, baseProgress);
 	}
 
 	/**
@@ -453,7 +480,8 @@ public abstract class OCRDServiceProviderWorker {
 	 * @param unnecessaryArguments The unnecessary processor arguments. Null or
 	 *                             empty means that there are no unnecessary
 	 *                             processor arguments.
-	 * @param event                The callback for processor events.
+	 * @param runningState         The callback for processor running state.
+	 * @param execution            The callback for processor execution.
 	 * @param standardOutput       The callback for standard output.
 	 * @param standardError        The callback for standard error.
 	 * @param progress             The callback for progress.
@@ -462,8 +490,8 @@ public abstract class OCRDServiceProviderWorker {
 	 * @since 1.8
 	 */
 	protected ProcessServiceProvider.Processor.State run(Framework framework, boolean isResources, Object arguments,
-			Set<String> unnecessaryArguments, ProcessorEvent event, Message standardOutput, Message standardError,
-			Progress progress, float baseProgress) {
+			Set<String> unnecessaryArguments, ProcessorRunningState runningState, ProcessorExecution execution,
+			Message standardOutput, Message standardError, Progress progress, float baseProgress) {
 		try {
 			standardOutput.update("Using processor parameters " + objectMapper.writeValueAsString(arguments) + ".");
 		} catch (JsonProcessingException ex) {
@@ -473,7 +501,7 @@ public abstract class OCRDServiceProviderWorker {
 		if (unnecessaryArguments != null && !unnecessaryArguments.isEmpty())
 			standardOutput.update("Ignored unnecessary parameters: " + unnecessaryArguments + ".");
 
-		if (event.isCanceled())
+		if (runningState.isCanceled())
 			return ProcessServiceProvider.Processor.State.canceled;
 
 		progress.update(baseProgress);
@@ -509,19 +537,20 @@ public abstract class OCRDServiceProviderWorker {
 			updateProcessorMessages(preprocess, standardOutput, standardError);
 
 			if (preprocess.getExitValue() != 0) {
-				standardError.update("Cannot run " + processorDescription() + ".");
+				standardError.update("Cannot run " + getProcessorDescription(framework) + ".");
 
 				return ProcessServiceProvider.Processor.State.interrupted;
 			}
 		} catch (IOException e) {
 			updateProcessorMessages(preprocess, standardOutput, standardError);
 
-			standardError.update("troubles running " + processorDescription() + " - " + e.getMessage() + ".");
+			standardError
+					.update("troubles running " + getProcessorDescription(framework) + " - " + e.getMessage() + ".");
 
 			return ProcessServiceProvider.Processor.State.interrupted;
 		}
 
-		if (event.isCanceled())
+		if (runningState.isCanceled())
 			return ProcessServiceProvider.Processor.State.canceled;
 
 		progress.update(0.097F);
@@ -538,8 +567,8 @@ public abstract class OCRDServiceProviderWorker {
 									.collect(Collectors.joining("\n")).getBytes());
 				}
 		} catch (IOException e) {
-			standardError
-					.update("troubles updating " + processorDescription() + " xml files - " + e.getMessage() + ".");
+			standardError.update(
+					"troubles updating " + getProcessorDescription(framework) + " xml files - " + e.getMessage() + ".");
 
 			return ProcessServiceProvider.Processor.State.interrupted;
 		}
@@ -553,13 +582,13 @@ public abstract class OCRDServiceProviderWorker {
 					framework.getOutput(), StandardCopyOption.REPLACE_EXISTING);
 
 		} catch (IOException e) {
-			standardError.update("troubles moving " + processorDescription()
+			standardError.update("troubles moving " + getProcessorDescription(framework)
 					+ " output directory to snapshot sandbox - " + e.getMessage() + ".");
 
 			return ProcessServiceProvider.Processor.State.interrupted;
 		}
 
-		if (event.isCanceled())
+		if (runningState.isCanceled())
 			return ProcessServiceProvider.Processor.State.canceled;
 
 		progress.update(0.099F);
@@ -572,16 +601,13 @@ public abstract class OCRDServiceProviderWorker {
 							"=\"" + processorWorkspaceRelativePath.toString() + "/")).collect(Collectors.joining("\n"))
 							.getBytes());
 		} catch (IOException e) {
-			standardError
-					.update("troubles updating " + processorDescription() + " mets file - " + e.getMessage() + ".");
+			standardError.update(
+					"troubles updating " + getProcessorDescription(framework) + " mets file - " + e.getMessage() + ".");
 
 			return ProcessServiceProvider.Processor.State.interrupted;
 		}
 
-		progress.update(1F);
-		standardOutput.update(processorName() + " completed.");
-
-		return ProcessServiceProvider.Processor.State.completed;
+		return execution.complete();
 	}
 
 	/**
@@ -631,7 +657,7 @@ public abstract class OCRDServiceProviderWorker {
 	 * @since 1.8
 	 */
 	protected Path getOptResources(ConfigurationServiceProvider configuration, Target target) {
-		return getOptFolder(configuration, target, ServiceProviderCollection.optResources);
+		return getOptFolder(configuration, target, ServiceProviderCollection.optResources, processorIdentifier());
 	}
 
 	/**
@@ -653,7 +679,65 @@ public abstract class OCRDServiceProviderWorker {
 	 * @since 1.8
 	 */
 	protected Path getDockerResources(ConfigurationServiceProvider configuration) {
-		return Paths.get(Framework.getValue(configuration, ServiceProviderCollection.dockerResources)).normalize();
+		return Paths.get(Framework.getValue(configuration, ServiceProviderCollection.dockerResources),
+				Framework.getValue(configuration, processorIdentifier())).normalize();
+	}
+
+	/**
+	 * Returns the files walking the file tree rooted at a given starting folder.
+	 * 
+	 * @param folder    The starting folder.
+	 * @param extension If non null, filter the files with this extension. The upper
+	 *                  and lower case does not matter.
+	 * @return The files walking the file tree rooted at a given starting folder.
+	 * @throws IOException Throws if an I/O error is thrown when accessing the
+	 *                     starting file.
+	 * @since 1.8
+	 */
+	protected static List<Path> getFiles(Path folder, String extension) throws IOException {
+		return getFiles(folder, Integer.MAX_VALUE, extension);
+	}
+
+	/**
+	 * Returns the files from the top-level folder.
+	 * 
+	 * @param folder    The starting folder.
+	 * @param extension If non null, filter the files with this extension. The upper
+	 *                  and lower case does not matter.
+	 * @return The files walking the file tree rooted at a given starting folder.
+	 * @throws IOException Throws if an I/O error is thrown when accessing the
+	 *                     starting file.
+	 * @since 1.8
+	 */
+	protected static List<Path> getFilesTopLevelFolder(Path folder, String extension) throws IOException {
+		return getFiles(folder, 1, extension);
+	}
+
+	/**
+	 * Returns the files walking the file tree rooted at a given starting folder.
+	 * 
+	 * @param folder    The starting folder.
+	 * @param maxDepth  The maximum number of directory levels to visit. A value of
+	 *                  0 means that only the starting file is visited. A value of
+	 *                  {@link Integer#MAX_VALUE} may be used to indicate that all
+	 *                  levels should be visited.
+	 * @param extension If non null, filter the files with this extension. The upper
+	 *                  and lower case does not matter.
+	 * @return The files walking the file tree rooted at a given starting folder.
+	 * @throws IOException Throws if an I/O error is thrown when accessing the
+	 *                     starting file.
+	 * @since 1.8
+	 */
+	protected static List<Path> getFiles(Path folder, int maxDepth, String extension) throws IOException {
+		final String fileExtension = extension == null || extension.isBlank() ? null
+				: "." + extension.toLowerCase().trim();
+
+		try (Stream<Path> walk = Files.walk(folder, maxDepth)) {
+			return walk.filter(p -> {
+				return !Files.isDirectory(p)
+						&& (fileExtension == null || p.toString().toLowerCase().endsWith(fileExtension));
+			}).collect(Collectors.toList());
+		}
 	}
 
 	/**
@@ -664,7 +748,7 @@ public abstract class OCRDServiceProviderWorker {
 	 *         returns an empty list.
 	 * @since 1.8
 	 */
-	public static List<Path> getDirectories(Path folder) {
+	protected static List<Path> getDirectories(Path folder) {
 		try {
 			return Files.list(folder).filter(file -> Files.isDirectory(file)).collect(Collectors.toList());
 		} catch (Exception e) {
@@ -709,21 +793,39 @@ public abstract class OCRDServiceProviderWorker {
 	}
 
 	/**
-	 * Defines callback for processor events.
+	 * Defines callback for processor running state.
 	 *
 	 * @author <a href="mailto:herbert.baier@uni-wuerzburg.de">Herbert Baier</a>
 	 * @version 1.0
 	 * @since 1.8
 	 */
 	@FunctionalInterface
-	protected interface ProcessorEvent {
+	protected interface ProcessorRunningState {
 		/**
-		 * Returns true if the was canceled.
+		 * Returns true if the processor was canceled.
 		 * 
-		 * @return True if the was canceled.
+		 * @return True if the processor was canceled.
 		 * @since 1.8
 		 */
 		public boolean isCanceled();
+	}
+
+	/**
+	 * Defines callback for processor execution.
+	 *
+	 * @author <a href="mailto:herbert.baier@uni-wuerzburg.de">Herbert Baier</a>
+	 * @version 1.0
+	 * @since 1.8
+	 */
+	@FunctionalInterface
+	protected interface ProcessorExecution {
+		/**
+		 * Completes the execution of the processor.
+		 * 
+		 * @return The process execution state completed.
+		 * @since 1.8
+		 */
+		public ProcessServiceProvider.Processor.State complete();
 	}
 
 	/**
