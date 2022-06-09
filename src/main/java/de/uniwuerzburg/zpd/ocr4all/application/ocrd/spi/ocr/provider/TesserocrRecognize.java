@@ -448,7 +448,7 @@ public class TesserocrRecognize extends OCRDServiceProviderWorker
 						locale -> getString(locale, "auto.model"),
 						locale -> getString(locale, "auto.model.description"), false),
 				new SelectField(Field.tesseractEngine.getName(), locale -> getString(locale, "engine"),
-						locale -> getString(locale, "engine.description"), false, models, false),
+						locale -> getString(locale, "engine.description"), false, tesseractEngines, false),
 				new IntegerField(Field.dpi.getName(), argument.getDpi(), locale -> getString(locale, "dpi"),
 						locale -> getString(locale, "dpi.description"), null, 1, -1, null, locale -> "pt", false),
 				new IntegerField(Field.padding.getName(), argument.getPadding(), locale -> getString(locale, "padding"),
