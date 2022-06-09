@@ -152,7 +152,7 @@ public class TesserocrRecognize extends OCRDServiceProviderWorker
 	 * @since 1.8
 	 */
 	private enum Field {
-		model, autoModel("auto-model"), tesseractEngine("tesseract-engine"), dpi, padding,
+		models, autoModel("auto-model"), tesseractEngine("tesseract-engine"), dpi, padding,
 		segmentationLevel("segmentation-level"), textEquivLevel("text-equiv-level"),
 		overwriteSegments("overwrite-segments"), overwriteText("overwrite-text"), shrinkPolygons("shrink-polygons"),
 		blockPolygons("block-polygons"), findTables("find-tables"), findStaves("find-staves"),
@@ -420,10 +420,10 @@ public class TesserocrRecognize extends OCRDServiceProviderWorker
 		// The models
 		final List<SelectField.Item> models = new ArrayList<SelectField.Item>();
 		for (String model : getModels(configuration, target))
-			models.add(new SelectField.Option(model.equals(argument.getModel()), model, locale -> model));
+			models.add(new SelectField.Option(model.equals(argument.getModels()), model, locale -> model));
 
 		if (models.isEmpty())
-			models.add(new SelectField.Option(false, "empty", locale -> getString(locale, "model.empty")));
+			models.add(new SelectField.Option(false, "empty", locale -> getString(locale, "models.empty")));
 
 		// The levels
 		final List<SelectField.Item> segmentationLevels = new ArrayList<SelectField.Item>();
@@ -442,8 +442,8 @@ public class TesserocrRecognize extends OCRDServiceProviderWorker
 					locale -> getString(locale, "engine." + engine.name())));
 
 		return new Model(
-				new SelectField(Field.model.getName(), locale -> getString(locale, "model"),
-						locale -> getString(locale, "model.description"), true, models, false),
+				new SelectField(Field.models.getName(), locale -> getString(locale, "models"),
+						locale -> getString(locale, "models.description"), true, models, false),
 				new BooleanField(Field.autoModel.getName(), argument.isAutoModel(),
 						locale -> getString(locale, "auto.model"),
 						locale -> getString(locale, "auto.model.description"), false),
@@ -540,10 +540,10 @@ public class TesserocrRecognize extends OCRDServiceProviderWorker
 				/*
 				 * Model parameter
 				 */
-				if (availableArguments.remove(Field.model.getName()))
+				if (availableArguments.remove(Field.models.getName()))
 					try {
 						final SelectArgument argument = modelArgument.getArgument(SelectArgument.class,
-								Field.model.getName());
+								Field.models.getName());
 						if (argument.getValues().isPresent()) {
 							StringBuffer buffer = new StringBuffer();
 
@@ -555,10 +555,10 @@ public class TesserocrRecognize extends OCRDServiceProviderWorker
 								buffer.append(value);
 							}
 
-							processorArgument.setModel(buffer.toString());
+							processorArgument.setModels(buffer.toString());
 						}
 					} catch (ClassCastException e) {
-						updatedStandardError("The argument '" + Field.model.getName() + "' is not of selection type.");
+						updatedStandardError("The argument '" + Field.models.getName() + "' is not of selection type.");
 
 						return ProcessServiceProvider.Processor.State.interrupted;
 					}
@@ -959,9 +959,10 @@ public class TesserocrRecognize extends OCRDServiceProviderWorker
 	 */
 	public static class ProcessorArgument {
 		/**
-		 * The model.
+		 * The models.
 		 */
-		private String model = defaultModel;
+		@JsonProperty("model")
+		private String models = defaultModel;
 
 		/**
 		 * True if auto model.
@@ -1089,23 +1090,23 @@ public class TesserocrRecognize extends OCRDServiceProviderWorker
 		private String xpathModel = null;
 
 		/**
-		 * Returns the model.
+		 * Returns the models.
 		 *
-		 * @return The model.
+		 * @return The models.
 		 * @since 1.8
 		 */
-		public String getModel() {
-			return model;
+		public String getModels() {
+			return models;
 		}
 
 		/**
-		 * Set the model.
+		 * Set the models.
 		 *
-		 * @param model The model to set.
+		 * @param models The models to set.
 		 * @since 1.8
 		 */
-		public void setModel(String model) {
-			this.model = model;
+		public void setModels(String models) {
+			this.models = models;
 		}
 
 		/**
