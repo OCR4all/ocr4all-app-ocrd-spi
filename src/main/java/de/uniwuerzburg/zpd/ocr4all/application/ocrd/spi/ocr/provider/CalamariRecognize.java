@@ -79,7 +79,7 @@ public class CalamariRecognize extends OCRDServiceProviderWorker implements Opti
 	 * @version 1.0
 	 * @since 1.8
 	 */
-	private enum ServiceProviderCollection implements Framework.ServiceProviderCollectionKey {
+	private enum ServiceProviderCollection implements ConfigurationServiceProvider.ServiceProviderCollectionKey {
 		processorIdentifier("calamari-recognize-id", "ocrd-calamari-recognize"),
 		processorDescription("calamari-recognize-description", "ocr-d calamari recognize processor");
 
@@ -239,7 +239,7 @@ public class CalamariRecognize extends OCRDServiceProviderWorker implements Opti
 	 * processorIdentifier()
 	 */
 	@Override
-	protected Framework.ServiceProviderCollectionKey processorIdentifier() {
+	protected ConfigurationServiceProvider.ServiceProviderCollectionKey processorIdentifier() {
 		return ServiceProviderCollection.processorIdentifier;
 	}
 
@@ -251,7 +251,7 @@ public class CalamariRecognize extends OCRDServiceProviderWorker implements Opti
 	 * processorDescription()
 	 */
 	@Override
-	protected Framework.ServiceProviderCollectionKey processorDescription() {
+	protected ConfigurationServiceProvider.ServiceProviderCollectionKey processorDescription() {
 		return ServiceProviderCollection.processorDescription;
 	}
 
@@ -337,12 +337,11 @@ public class CalamariRecognize extends OCRDServiceProviderWorker implements Opti
 	 * (non-Javadoc)
 	 * 
 	 * @see
-	 * de.uniwuerzburg.zpd.ocr4all.application.spi.ServiceProvider#getPremise(de.
-	 * uniwuerzburg.zpd.ocr4all.application.spi.ConfigurationServiceProvider,
-	 * de.uniwuerzburg.zpd.ocr4all.application.spi.Target)
+	 * de.uniwuerzburg.zpd.ocr4all.application.spi.core.ServiceProvider#getPremise(
+	 * de.uniwuerzburg.zpd.ocr4all.application.spi.env.Target)
 	 */
 	@Override
-	public Premise getPremise(ConfigurationServiceProvider configuration, Target target) {
+	public Premise getPremise(Target target) {
 		return getModels(configuration, target).isEmpty()
 				? new Premise(Premise.State.warn,
 						locale -> getString(locale, "no.models.available",
@@ -354,12 +353,12 @@ public class CalamariRecognize extends OCRDServiceProviderWorker implements Opti
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see de.uniwuerzburg.zpd.ocr4all.application.spi.ServiceProvider#getModel(de.
-	 * uniwuerzburg.zpd.ocr4all.application.spi.ConfigurationServiceProvider,
-	 * de.uniwuerzburg.zpd.ocr4all.application.spi.Target)
+	 * @see
+	 * de.uniwuerzburg.zpd.ocr4all.application.spi.core.ServiceProvider#getModel(de.
+	 * uniwuerzburg.zpd.ocr4all.application.spi.env.Target)
 	 */
 	@Override
-	public Model getModel(ConfigurationServiceProvider configuration, Target target) {
+	public Model getModel(Target target) {
 		ProcessorArgument argument = new ProcessorArgument();
 
 		// The models

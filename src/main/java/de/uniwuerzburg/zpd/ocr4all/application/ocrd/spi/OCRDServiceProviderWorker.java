@@ -28,6 +28,7 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import de.uniwuerzburg.zpd.ocr4all.application.spi.core.ProcessServiceProvider;
+import de.uniwuerzburg.zpd.ocr4all.application.spi.core.ServiceProvider;
 import de.uniwuerzburg.zpd.ocr4all.application.spi.env.ConfigurationServiceProvider;
 import de.uniwuerzburg.zpd.ocr4all.application.spi.env.Framework;
 import de.uniwuerzburg.zpd.ocr4all.application.spi.env.SystemCommand;
@@ -51,7 +52,7 @@ import de.uniwuerzburg.zpd.ocr4all.application.spi.util.SystemProcess;
  * @version 1.0
  * @since 1.8
  */
-public abstract class OCRDServiceProviderWorker {
+public abstract class OCRDServiceProviderWorker implements ServiceProvider {
 	/**
 	 * The base name of the resource bundle, a fully qualified class name.
 	 */
@@ -78,7 +79,7 @@ public abstract class OCRDServiceProviderWorker {
 	 * @version 1.0
 	 * @since 1.8
 	 */
-	private enum ServiceProviderCollection implements Framework.ServiceProviderCollectionKey {
+	private enum ServiceProviderCollection implements ConfigurationServiceProvider.ServiceProviderCollectionKey {
 		uid("uid", null), gid("gid", null), optFolder("opt-folder", "ocr-d"),
 		optResources("opt-resources", "resources"), dockerImage("docker-image", "ocrd/all:maximum"),
 		dockerResources("docker-resources", "/usr/local/share/ocrd-resources");
@@ -146,6 +147,11 @@ public abstract class OCRDServiceProviderWorker {
 	protected final String resourceBundleKeyPrefix;
 
 	/**
+	 * The configuration.
+	 */
+	protected ConfigurationServiceProvider configuration;
+
+	/**
 	 * Creates an ocr-d service provider worker.
 	 * 
 	 * @since 1.8
@@ -174,7 +180,19 @@ public abstract class OCRDServiceProviderWorker {
 	 *         processor identifier.
 	 * @since 1.8
 	 */
-	protected abstract Framework.ServiceProviderCollectionKey processorIdentifier();
+	protected abstract ConfigurationServiceProvider.ServiceProviderCollectionKey processorIdentifier();
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * de.uniwuerzburg.zpd.ocr4all.application.spi.core.ServiceProvider#initialize(
+	 * de.uniwuerzburg.zpd.ocr4all.application.spi.env.ConfigurationServiceProvider)
+	 */
+	@Override
+	public void initialize(ConfigurationServiceProvider configuration) {
+		this.configuration = configuration;
+	}
 
 	/**
 	 * Returns the processor identifier.
@@ -184,7 +202,8 @@ public abstract class OCRDServiceProviderWorker {
 	 * @since 1.8
 	 */
 	protected String getProcessorIdentifier(ConfigurationServiceProvider configuration) {
-		return configuration == null ? null : Framework.getValue(configuration, processorIdentifier());
+		return configuration == null ? null
+				: ConfigurationServiceProvider.getValue(configuration, processorIdentifier());
 	}
 
 	/**
@@ -195,7 +214,7 @@ public abstract class OCRDServiceProviderWorker {
 	 * @since 1.8
 	 */
 	protected String getProcessorIdentifier(Framework framework) {
-		return framework == null ? null : getProcessorIdentifier(framework.getConfiguration());
+		return framework == null ? null : getProcessorIdentifier(configuration);
 	}
 
 	/**
@@ -206,7 +225,7 @@ public abstract class OCRDServiceProviderWorker {
 	 *         processor description.
 	 * @since 1.8
 	 */
-	protected abstract Framework.ServiceProviderCollectionKey processorDescription();
+	protected abstract ConfigurationServiceProvider.ServiceProviderCollectionKey processorDescription();
 
 	/**
 	 * Returns the processor description.
@@ -216,7 +235,8 @@ public abstract class OCRDServiceProviderWorker {
 	 * @since 1.8
 	 */
 	protected String getProcessorDescription(ConfigurationServiceProvider configuration) {
-		return configuration == null ? null : Framework.getValue(configuration, processorDescription());
+		return configuration == null ? null
+				: ConfigurationServiceProvider.getValue(configuration, processorDescription());
 	}
 
 	/**
@@ -227,7 +247,7 @@ public abstract class OCRDServiceProviderWorker {
 	 * @since 1.8
 	 */
 	protected String getProcessorDescription(Framework framework) {
-		return framework == null ? null : getProcessorDescription(framework.getConfiguration());
+		return framework == null ? null : getProcessorDescription(configuration);
 	}
 
 	/**
@@ -367,8 +387,7 @@ public abstract class OCRDServiceProviderWorker {
 	 * @since 1.8
 	 */
 	protected SystemProcess getDockerProcess(Framework framework) {
-		String dockerCommand = framework.getConfiguration().getSystemCommand(SystemCommand.Type.docker).getCommand()
-				.toString();
+		String dockerCommand = configuration.getSystemCommand(SystemCommand.Type.docker).getCommand().toString();
 
 		return new SystemProcess(framework.getProcessorWorkspace(), dockerCommand);
 	}
@@ -388,12 +407,12 @@ public abstract class OCRDServiceProviderWorker {
 	protected List<String> getProcessorArguments(Framework framework, boolean isResources, Object arguments,
 			MetsFileGroup metsFileGroup) throws JsonProcessingException {
 		// Get the effective system user/group id
-		String uid = framework.getValue(ServiceProviderCollection.uid);
+		String uid = configuration.getValue(ServiceProviderCollection.uid);
 		if (uid == null && framework.isUID())
 			uid = "" + framework.getUID();
 
 		if (uid != null) {
-			String gid = framework.getValue(ServiceProviderCollection.gid);
+			String gid = configuration.getValue(ServiceProviderCollection.gid);
 			if (gid == null && framework.isGID())
 				gid = "" + framework.getGID();
 
@@ -417,7 +436,7 @@ public abstract class OCRDServiceProviderWorker {
 		}
 
 		processorArguments.addAll(Arrays.asList("-v", framework.getProcessorWorkspace().toString() + ":/data", "-w",
-				"/data", "--", framework.getValue(ServiceProviderCollection.dockerImage),
+				"/data", "--", configuration.getValue(ServiceProviderCollection.dockerImage),
 				getProcessorIdentifier(framework), "-I", metsFileGroup.getInput(), "-O", metsFileGroup.getOutput()));
 
 		if (arguments != null)
@@ -620,17 +639,18 @@ public abstract class OCRDServiceProviderWorker {
 	 * @since 1.8
 	 */
 	private Path getOptFolder(ConfigurationServiceProvider configuration, Target target,
-			Framework.ServiceProviderCollectionKey... folders) {
+			ConfigurationServiceProvider.ServiceProviderCollectionKey... folders) {
 		if (configuration == null || target == null || target.getOpt() == null)
 			return null;
 
 		Path optPath = Paths
-				.get(target.getOpt().toString(), Framework.getValue(configuration, ServiceProviderCollection.optFolder))
+				.get(target.getOpt().toString(),
+						ConfigurationServiceProvider.getValue(configuration, ServiceProviderCollection.optFolder))
 				.normalize();
 
 		Path subPath = optPath;
-		for (Framework.ServiceProviderCollectionKey folder : folders)
-			subPath = Paths.get(subPath.toString(), Framework.getValue(configuration, folder));
+		for (ConfigurationServiceProvider.ServiceProviderCollectionKey folder : folders)
+			subPath = Paths.get(subPath.toString(), ConfigurationServiceProvider.getValue(configuration, folder));
 
 		subPath = subPath.normalize();
 
@@ -645,7 +665,7 @@ public abstract class OCRDServiceProviderWorker {
 	 * @since 1.8
 	 */
 	protected Path getOptResources(Framework framework) {
-		return framework == null ? null : getOptResources(framework.getConfiguration(), framework.getTarget());
+		return framework == null ? null : getOptResources(configuration, framework.getTarget());
 	}
 
 	/**
@@ -668,7 +688,7 @@ public abstract class OCRDServiceProviderWorker {
 	 * @since 1.8
 	 */
 	protected Path getDockerResources(Framework framework) {
-		return framework == null ? null : getDockerResources(framework.getConfiguration());
+		return framework == null ? null : getDockerResources(configuration);
 	}
 
 	/**
@@ -679,8 +699,10 @@ public abstract class OCRDServiceProviderWorker {
 	 * @since 1.8
 	 */
 	protected Path getDockerResources(ConfigurationServiceProvider configuration) {
-		return Paths.get(Framework.getValue(configuration, ServiceProviderCollection.dockerResources),
-				Framework.getValue(configuration, processorIdentifier())).normalize();
+		return Paths
+				.get(ConfigurationServiceProvider.getValue(configuration, ServiceProviderCollection.dockerResources),
+						ConfigurationServiceProvider.getValue(configuration, processorIdentifier()))
+				.normalize();
 	}
 
 	/**
