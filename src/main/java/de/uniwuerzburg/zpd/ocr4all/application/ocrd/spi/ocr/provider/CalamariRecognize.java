@@ -79,7 +79,7 @@ public class CalamariRecognize extends OCRDServiceProviderWorker implements Opti
 	 * @version 1.0
 	 * @since 1.8
 	 */
-	private enum ServiceProviderCollection implements ConfigurationServiceProvider.ServiceProviderCollectionKey {
+	private enum ServiceProviderCollection implements ConfigurationServiceProvider.CollectionKey {
 		processorIdentifier("calamari-recognize-id", "ocrd-calamari-recognize"),
 		processorDescription("calamari-recognize-description", "ocr-d calamari recognize processor");
 
@@ -239,7 +239,7 @@ public class CalamariRecognize extends OCRDServiceProviderWorker implements Opti
 	 * processorIdentifier()
 	 */
 	@Override
-	protected ConfigurationServiceProvider.ServiceProviderCollectionKey processorIdentifier() {
+	protected ConfigurationServiceProvider.CollectionKey processorIdentifier() {
 		return ServiceProviderCollection.processorIdentifier;
 	}
 
@@ -251,7 +251,7 @@ public class CalamariRecognize extends OCRDServiceProviderWorker implements Opti
 	 * processorDescription()
 	 */
 	@Override
-	protected ConfigurationServiceProvider.ServiceProviderCollectionKey processorDescription() {
+	protected ConfigurationServiceProvider.CollectionKey processorDescription() {
 		return ServiceProviderCollection.processorDescription;
 	}
 

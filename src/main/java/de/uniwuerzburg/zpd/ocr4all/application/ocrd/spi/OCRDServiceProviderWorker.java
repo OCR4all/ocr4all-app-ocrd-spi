@@ -79,7 +79,7 @@ public abstract class OCRDServiceProviderWorker implements ServiceProvider {
 	 * @version 1.0
 	 * @since 1.8
 	 */
-	private enum ServiceProviderCollection implements ConfigurationServiceProvider.ServiceProviderCollectionKey {
+	private enum ServiceProviderCollection implements ConfigurationServiceProvider.CollectionKey {
 		uid("uid", null), gid("gid", null), optFolder("opt-folder", "ocr-d"),
 		optResources("opt-resources", "resources"), dockerImage("docker-image", "ocrd/all:maximum"),
 		dockerResources("docker-resources", "/usr/local/share/ocrd-resources");
@@ -180,7 +180,7 @@ public abstract class OCRDServiceProviderWorker implements ServiceProvider {
 	 *         processor identifier.
 	 * @since 1.8
 	 */
-	protected abstract ConfigurationServiceProvider.ServiceProviderCollectionKey processorIdentifier();
+	protected abstract ConfigurationServiceProvider.CollectionKey processorIdentifier();
 
 	/*
 	 * (non-Javadoc)
@@ -225,7 +225,7 @@ public abstract class OCRDServiceProviderWorker implements ServiceProvider {
 	 *         processor description.
 	 * @since 1.8
 	 */
-	protected abstract ConfigurationServiceProvider.ServiceProviderCollectionKey processorDescription();
+	protected abstract ConfigurationServiceProvider.CollectionKey processorDescription();
 
 	/**
 	 * Returns the processor description.
@@ -639,7 +639,7 @@ public abstract class OCRDServiceProviderWorker implements ServiceProvider {
 	 * @since 1.8
 	 */
 	private Path getOptFolder(ConfigurationServiceProvider configuration, Target target,
-			ConfigurationServiceProvider.ServiceProviderCollectionKey... folders) {
+			ConfigurationServiceProvider.CollectionKey... folders) {
 		if (configuration == null || target == null || target.getOpt() == null)
 			return null;
 
@@ -649,7 +649,7 @@ public abstract class OCRDServiceProviderWorker implements ServiceProvider {
 				.normalize();
 
 		Path subPath = optPath;
-		for (ConfigurationServiceProvider.ServiceProviderCollectionKey folder : folders)
+		for (ConfigurationServiceProvider.CollectionKey folder : folders)
 			subPath = Paths.get(subPath.toString(), ConfigurationServiceProvider.getValue(configuration, folder));
 
 		subPath = subPath.normalize();

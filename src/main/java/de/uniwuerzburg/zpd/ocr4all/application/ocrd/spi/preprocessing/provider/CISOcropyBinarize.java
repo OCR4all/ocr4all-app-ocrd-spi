@@ -68,7 +68,7 @@ public class CISOcropyBinarize extends OCRDServiceProviderWorker implements Prep
 	 * @version 1.0
 	 * @since 1.8
 	 */
-	private enum ServiceProviderCollection implements ConfigurationServiceProvider.ServiceProviderCollectionKey {
+	private enum ServiceProviderCollection implements ConfigurationServiceProvider.CollectionKey {
 		processorIdentifier("cis-ocropy-binarize-id", "ocrd-cis-ocropy-binarize"),
 		processorDescription("cis-ocropy-binarize-description", "ocr-d cis ocropy binarize processor");
 
@@ -299,7 +299,7 @@ public class CISOcropyBinarize extends OCRDServiceProviderWorker implements Prep
 	 * processorIdentifier()
 	 */
 	@Override
-	protected ConfigurationServiceProvider.ServiceProviderCollectionKey processorIdentifier() {
+	protected ConfigurationServiceProvider.CollectionKey processorIdentifier() {
 		return ServiceProviderCollection.processorIdentifier;
 	}
 
@@ -311,7 +311,7 @@ public class CISOcropyBinarize extends OCRDServiceProviderWorker implements Prep
 	 * processorDescription()
 	 */
 	@Override
-	protected ConfigurationServiceProvider.ServiceProviderCollectionKey processorDescription() {
+	protected ConfigurationServiceProvider.CollectionKey processorDescription() {
 		return ServiceProviderCollection.processorDescription;
 	}
 

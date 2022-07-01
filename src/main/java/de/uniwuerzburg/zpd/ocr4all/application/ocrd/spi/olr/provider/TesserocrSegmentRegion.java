@@ -65,7 +65,7 @@ public class TesserocrSegmentRegion extends OCRDServiceProviderWorker
 	 * @version 1.0
 	 * @since 1.8
 	 */
-	private enum ServiceProviderCollection implements ConfigurationServiceProvider.ServiceProviderCollectionKey {
+	private enum ServiceProviderCollection implements ConfigurationServiceProvider.CollectionKey {
 		processorIdentifier("tesserocr-segment-region-id", "ocrd-tesserocr-segment-region"),
 		processorDescription("tesserocr-segment-region-description", "ocr-d tesserocr segment region processor");
 
@@ -191,7 +191,7 @@ public class TesserocrSegmentRegion extends OCRDServiceProviderWorker
 	 * processorIdentifier()
 	 */
 	@Override
-	protected ConfigurationServiceProvider.ServiceProviderCollectionKey processorIdentifier() {
+	protected ConfigurationServiceProvider.CollectionKey processorIdentifier() {
 		return ServiceProviderCollection.processorIdentifier;
 	}
 
@@ -203,7 +203,7 @@ public class TesserocrSegmentRegion extends OCRDServiceProviderWorker
 	 * processorDescription()
 	 */
 	@Override
-	protected ConfigurationServiceProvider.ServiceProviderCollectionKey processorDescription() {
+	protected ConfigurationServiceProvider.CollectionKey processorDescription() {
 		return ServiceProviderCollection.processorDescription;
 	}
 

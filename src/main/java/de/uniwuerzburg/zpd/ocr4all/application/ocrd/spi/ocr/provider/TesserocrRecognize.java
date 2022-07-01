@@ -83,7 +83,7 @@ public class TesserocrRecognize extends OCRDServiceProviderWorker
 	 * @version 1.0
 	 * @since 1.8
 	 */
-	private enum ServiceProviderCollection implements ConfigurationServiceProvider.ServiceProviderCollectionKey {
+	private enum ServiceProviderCollection implements ConfigurationServiceProvider.CollectionKey {
 		processorIdentifier("tesserocr-recognize-id", "ocrd-tesserocr-recognize"),
 		processorDescription("tesserocr-recognize-description", "ocr-d tesserocr recognize processor");
 
@@ -286,7 +286,7 @@ public class TesserocrRecognize extends OCRDServiceProviderWorker
 	 * processorIdentifier()
 	 */
 	@Override
-	protected ConfigurationServiceProvider.ServiceProviderCollectionKey processorIdentifier() {
+	protected ConfigurationServiceProvider.CollectionKey processorIdentifier() {
 		return ServiceProviderCollection.processorIdentifier;
 	}
 
@@ -298,7 +298,7 @@ public class TesserocrRecognize extends OCRDServiceProviderWorker
 	 * processorDescription()
 	 */
 	@Override
-	protected ConfigurationServiceProvider.ServiceProviderCollectionKey processorDescription() {
+	protected ConfigurationServiceProvider.CollectionKey processorDescription() {
 		return ServiceProviderCollection.processorDescription;
 	}
 

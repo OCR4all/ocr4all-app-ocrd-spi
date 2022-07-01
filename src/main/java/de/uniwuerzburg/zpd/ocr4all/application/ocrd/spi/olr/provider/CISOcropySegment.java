@@ -69,7 +69,7 @@ public class CISOcropySegment extends OCRDServiceProviderWorker implements Optic
 	 * @version 1.0
 	 * @since 1.8
 	 */
-	private enum ServiceProviderCollection implements ConfigurationServiceProvider.ServiceProviderCollectionKey {
+	private enum ServiceProviderCollection implements ConfigurationServiceProvider.CollectionKey {
 		processorIdentifier("cis-ocropy-segment-id", "ocrd-cis-ocropy-segment"),
 		processorDescription("cis-ocropy-segment-description", "ocr-d cis ocropy segment processor");
 
@@ -234,7 +234,7 @@ public class CISOcropySegment extends OCRDServiceProviderWorker implements Optic
 	 * processorIdentifier()
 	 */
 	@Override
-	protected ConfigurationServiceProvider.ServiceProviderCollectionKey processorIdentifier() {
+	protected ConfigurationServiceProvider.CollectionKey processorIdentifier() {
 		return ServiceProviderCollection.processorIdentifier;
 	}
 
@@ -246,7 +246,7 @@ public class CISOcropySegment extends OCRDServiceProviderWorker implements Optic
 	 * processorDescription()
 	 */
 	@Override
-	protected ConfigurationServiceProvider.ServiceProviderCollectionKey processorDescription() {
+	protected ConfigurationServiceProvider.CollectionKey processorDescription() {
 		return ServiceProviderCollection.processorDescription;
 	}
 
