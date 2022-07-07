@@ -411,7 +411,7 @@ public class CalamariRecognize extends OCRDServiceProviderWorker implements Opti
 			 */
 			@Override
 			public State execute(Callback callback, Framework framework, ModelArgument modelArgument) {
-				if (!initialize(getProcessorIdentifier(framework), callback, framework))
+				if (!initialize(getProcessorIdentifier(), callback, framework))
 					return ProcessServiceProvider.Processor.State.canceled;
 
 				/*

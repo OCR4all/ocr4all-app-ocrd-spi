@@ -186,7 +186,7 @@ public abstract class OCRDServiceProviderWorker extends ServiceProviderCore {
 	 */
 	@Override
 	public String getProvider() {
-		return "ocr-d/docker";
+		return "ocr-d/docker/" + getProcessorIdentifier();
 	}
 
 	/**
@@ -196,20 +196,8 @@ public abstract class OCRDServiceProviderWorker extends ServiceProviderCore {
 	 * @return The processor identifier.
 	 * @since 1.8
 	 */
-	protected String getProcessorIdentifier(ConfigurationServiceProvider configuration) {
-		return configuration == null ? null
-				: ConfigurationServiceProvider.getValue(configuration, processorIdentifier());
-	}
-
-	/**
-	 * Returns the processor identifier.
-	 * 
-	 * @param framework The framework.
-	 * @return The processor identifier.
-	 * @since 1.8
-	 */
-	protected String getProcessorIdentifier(Framework framework) {
-		return framework == null ? null : getProcessorIdentifier(configuration);
+	protected String getProcessorIdentifier() {
+		return ConfigurationServiceProvider.getValue(configuration, processorIdentifier());
 	}
 
 	/**
@@ -431,8 +419,8 @@ public abstract class OCRDServiceProviderWorker extends ServiceProviderCore {
 		}
 
 		processorArguments.addAll(Arrays.asList("-v", framework.getProcessorWorkspace().toString() + ":/data", "-w",
-				"/data", "--", configuration.getValue(ServiceProviderCollection.dockerImage),
-				getProcessorIdentifier(framework), "-I", metsFileGroup.getInput(), "-O", metsFileGroup.getOutput()));
+				"/data", "--", configuration.getValue(ServiceProviderCollection.dockerImage), getProcessorIdentifier(),
+				"-I", metsFileGroup.getInput(), "-O", metsFileGroup.getOutput()));
 
 		if (arguments != null)
 			processorArguments.addAll(Arrays.asList("-p", objectMapper.writeValueAsString(arguments)));

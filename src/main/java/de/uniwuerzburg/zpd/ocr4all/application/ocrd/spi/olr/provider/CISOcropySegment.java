@@ -410,7 +410,7 @@ public class CISOcropySegment extends OCRDServiceProviderWorker implements Optic
 			 */
 			@Override
 			public State execute(Callback callback, Framework framework, ModelArgument modelArgument) {
-				if (!initialize(getProcessorIdentifier(framework), callback, framework))
+				if (!initialize(getProcessorIdentifier(), callback, framework))
 					return ProcessServiceProvider.Processor.State.canceled;
 
 				/*
