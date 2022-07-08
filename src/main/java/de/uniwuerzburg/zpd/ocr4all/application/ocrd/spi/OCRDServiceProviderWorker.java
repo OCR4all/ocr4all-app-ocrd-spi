@@ -147,7 +147,7 @@ public abstract class OCRDServiceProviderWorker extends ServiceProviderCore {
 	protected final String resourceBundleKeyPrefix;
 
 	/**
-	 * Creates an ocr-d service provider worker.
+	 * Default constructor for an ocr-d service provider worker.
 	 * 
 	 * @since 1.8
 	 */
@@ -167,16 +167,6 @@ public abstract class OCRDServiceProviderWorker extends ServiceProviderCore {
 		this.resourceBundleKeyPrefix = resourceBundleKeyPrefix == null ? "" : resourceBundleKeyPrefix.trim();
 	}
 
-	/**
-	 * Returns the service provider collection with key and default value for
-	 * processor identifier.
-	 * 
-	 * @return The service provider collection with key and default value for
-	 *         processor identifier.
-	 * @since 1.8
-	 */
-	protected abstract ConfigurationServiceProvider.CollectionKey processorIdentifier();
-
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -188,6 +178,16 @@ public abstract class OCRDServiceProviderWorker extends ServiceProviderCore {
 	public String getProvider() {
 		return "ocr-d/docker/" + getProcessorIdentifier();
 	}
+
+	/**
+	 * Returns the service provider collection with key and default value for
+	 * processor identifier.
+	 * 
+	 * @return The service provider collection with key and default value for
+	 *         processor identifier.
+	 * @since 1.8
+	 */
+	protected abstract ConfigurationServiceProvider.CollectionKey processorIdentifier();
 
 	/**
 	 * Returns the processor identifier.
@@ -213,24 +213,11 @@ public abstract class OCRDServiceProviderWorker extends ServiceProviderCore {
 	/**
 	 * Returns the processor description.
 	 * 
-	 * @param configuration The service provider configuration.
 	 * @return The processor description.
 	 * @since 1.8
 	 */
-	protected String getProcessorDescription(ConfigurationServiceProvider configuration) {
-		return configuration == null ? null
-				: ConfigurationServiceProvider.getValue(configuration, processorDescription());
-	}
-
-	/**
-	 * Returns the processor description.
-	 * 
-	 * @param framework The framework.
-	 * @return The processor description.
-	 * @since 1.8
-	 */
-	protected String getProcessorDescription(Framework framework) {
-		return framework == null ? null : getProcessorDescription(configuration);
+	protected String getProcessorDescription() {
+		return ConfigurationServiceProvider.getValue(configuration, processorDescription());
 	}
 
 	/**
@@ -539,15 +526,14 @@ public abstract class OCRDServiceProviderWorker extends ServiceProviderCore {
 			updateProcessorMessages(preprocess, standardOutput, standardError);
 
 			if (preprocess.getExitValue() != 0) {
-				standardError.update("Cannot run " + getProcessorDescription(framework) + ".");
+				standardError.update("Cannot run " + getProcessorDescription() + ".");
 
 				return ProcessServiceProvider.Processor.State.interrupted;
 			}
 		} catch (IOException e) {
 			updateProcessorMessages(preprocess, standardOutput, standardError);
 
-			standardError
-					.update("troubles running " + getProcessorDescription(framework) + " - " + e.getMessage() + ".");
+			standardError.update("troubles running " + getProcessorDescription() + " - " + e.getMessage() + ".");
 
 			return ProcessServiceProvider.Processor.State.interrupted;
 		}
@@ -569,8 +555,8 @@ public abstract class OCRDServiceProviderWorker extends ServiceProviderCore {
 									.collect(Collectors.joining("\n")).getBytes());
 				}
 		} catch (IOException e) {
-			standardError.update(
-					"troubles updating " + getProcessorDescription(framework) + " xml files - " + e.getMessage() + ".");
+			standardError
+					.update("troubles updating " + getProcessorDescription() + " xml files - " + e.getMessage() + ".");
 
 			return ProcessServiceProvider.Processor.State.interrupted;
 		}
@@ -584,7 +570,7 @@ public abstract class OCRDServiceProviderWorker extends ServiceProviderCore {
 					framework.getOutput(), StandardCopyOption.REPLACE_EXISTING);
 
 		} catch (IOException e) {
-			standardError.update("troubles moving " + getProcessorDescription(framework)
+			standardError.update("troubles moving " + getProcessorDescription()
 					+ " output directory to snapshot sandbox - " + e.getMessage() + ".");
 
 			return ProcessServiceProvider.Processor.State.interrupted;
@@ -603,8 +589,8 @@ public abstract class OCRDServiceProviderWorker extends ServiceProviderCore {
 							"=\"" + processorWorkspaceRelativePath.toString() + "/")).collect(Collectors.joining("\n"))
 							.getBytes());
 		} catch (IOException e) {
-			standardError.update(
-					"troubles updating " + getProcessorDescription(framework) + " mets file - " + e.getMessage() + ".");
+			standardError
+					.update("troubles updating " + getProcessorDescription() + " mets file - " + e.getMessage() + ".");
 
 			return ProcessServiceProvider.Processor.State.interrupted;
 		}
