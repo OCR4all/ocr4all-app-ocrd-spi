@@ -350,16 +350,39 @@ public abstract class OCRDServiceProviderWorker extends ServiceProviderCore {
 	}
 
 	/**
+	 * Returns the docker process with working directory of the current Java
+	 * process.
+	 * 
+	 * @return The docker process with working directory of the current Java
+	 *         process.
+	 * @since 1.8
+	 */
+	protected SystemProcess getDockerProcess() {
+		return getDockerProcess(null);
+	}
+
+	/**
 	 * Returns the docker process.
 	 * 
-	 * @param framework The framework.
+	 * @param framework The framework. If null, uses the working directory of the
+	 *                  current Java process.
 	 * @return The docker process.
 	 * @since 1.8
 	 */
 	protected SystemProcess getDockerProcess(Framework framework) {
 		String dockerCommand = configuration.getSystemCommand(SystemCommand.Type.docker).getCommand().toString();
 
-		return new SystemProcess(framework.getProcessorWorkspace(), dockerCommand);
+		return new SystemProcess(framework == null ? null : framework.getProcessorWorkspace(), dockerCommand);
+	}
+
+	/**
+	 * Returns the docker image.
+	 * 
+	 * @return The docker image.
+	 * @since 1.8
+	 */
+	protected String getDockerImage() {
+		return configuration.getValue(ServiceProviderCollection.dockerImage);
 	}
 
 	/**
@@ -406,8 +429,8 @@ public abstract class OCRDServiceProviderWorker extends ServiceProviderCore {
 		}
 
 		processorArguments.addAll(Arrays.asList("-v", framework.getProcessorWorkspace().toString() + ":/data", "-w",
-				"/data", "--", configuration.getValue(ServiceProviderCollection.dockerImage), getProcessorIdentifier(),
-				"-I", metsFileGroup.getInput(), "-O", metsFileGroup.getOutput()));
+				"/data", "--", getDockerImage(), getProcessorIdentifier(), "-I", metsFileGroup.getInput(), "-O",
+				metsFileGroup.getOutput()));
 
 		if (arguments != null)
 			processorArguments.addAll(Arrays.asList("-p", objectMapper.writeValueAsString(arguments)));
@@ -512,26 +535,26 @@ public abstract class OCRDServiceProviderWorker extends ServiceProviderCore {
 
 		final MetsFileGroup metsFileGroup = new MetsFileGroup(framework);
 
-		SystemProcess preprocess = null;
+		SystemProcess process = null;
 		try {
 			List<String> processorArguments = getProcessorArguments(framework, isResources, arguments, metsFileGroup);
 
-			preprocess = getDockerProcess(framework);
+			process = getDockerProcess(framework);
 
-			standardOutput.update("Execute docker process '" + preprocess.getCommand() + "' with parameters: "
+			standardOutput.update("Execute docker process '" + process.getCommand() + "' with parameters: "
 					+ processorArguments + ".");
 
-			preprocess.execute(processorArguments);
+			process.execute(processorArguments);
 
-			updateProcessorMessages(preprocess, standardOutput, standardError);
+			updateProcessorMessages(process, standardOutput, standardError);
 
-			if (preprocess.getExitValue() != 0) {
+			if (process.getExitValue() != 0) {
 				standardError.update("Cannot run " + getProcessorDescription() + ".");
 
 				return ProcessServiceProvider.Processor.State.interrupted;
 			}
 		} catch (IOException e) {
-			updateProcessorMessages(preprocess, standardOutput, standardError);
+			updateProcessorMessages(process, standardOutput, standardError);
 
 			standardError.update("troubles running " + getProcessorDescription() + " - " + e.getMessage() + ".");
 

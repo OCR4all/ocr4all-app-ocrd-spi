@@ -21,6 +21,7 @@ import de.uniwuerzburg.zpd.ocr4all.application.spi.env.ConfigurationServiceProvi
  * properties of the service provider collection <b>ocr-d</b> override the local
  * default settings (<b>key</b>: <i>default value</i>):
  * <ul>
+ * <li>json: -J</li>
  * <li>uid: &lt;effective system user ID. -1 if not defined&gt;</li>
  * <li>gid: &lt;effective system group ID. -1 if not defined&gt;</li>
  * <li>opt-folder: ocr-d</li>
@@ -165,14 +166,13 @@ public class CalamariRecognizeJSON extends OCRDServiceProviderWorkerJSON
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * de.uniwuerzburg.zpd.ocr4all.application.core.spi.provider.ServiceProvider#
+	 * @see de.uniwuerzburg.zpd.ocr4all.application.spi.core.ServiceProvider#
 	 * getDescription(java.util.Locale)
 	 */
 	@Override
 	public Optional<String> getDescription(Locale locale) {
 		// TODO Auto-generated method stub
-		return null;
+		return super.getDescription(locale);
 	}
 
 	/*
