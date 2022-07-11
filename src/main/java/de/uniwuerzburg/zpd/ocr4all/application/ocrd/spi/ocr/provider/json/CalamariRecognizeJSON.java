@@ -8,7 +8,6 @@
 package de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.ocr.provider.json;
 
 import java.util.Locale;
-import java.util.Optional;
 
 import de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.OCRDServiceProviderWorkerJSON;
 import de.uniwuerzburg.zpd.ocr4all.application.spi.OpticalCharacterRecognitionServiceProvider;
@@ -161,18 +160,6 @@ public class CalamariRecognizeJSON extends OCRDServiceProviderWorkerJSON
 	@Override
 	public float getVersion() {
 		return 1.0F;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see de.uniwuerzburg.zpd.ocr4all.application.spi.core.ServiceProvider#
-	 * getDescription(java.util.Locale)
-	 */
-	@Override
-	public Optional<String> getDescription(Locale locale) {
-		// TODO Auto-generated method stub
-		return super.getDescription(locale);
 	}
 
 	/*

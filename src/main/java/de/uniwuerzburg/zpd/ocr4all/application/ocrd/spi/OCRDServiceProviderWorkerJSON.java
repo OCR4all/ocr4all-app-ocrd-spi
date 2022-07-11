@@ -10,6 +10,8 @@ package de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi;
 import java.security.ProviderException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Locale;
+import java.util.Optional;
 
 import de.uniwuerzburg.zpd.ocr4all.application.spi.env.ConfigurationServiceProvider;
 import de.uniwuerzburg.zpd.ocr4all.application.spi.util.SystemProcess;
@@ -161,6 +163,29 @@ public abstract class OCRDServiceProviderWorkerJSON extends OCRDServiceProviderW
 				jsonDescription = message.trim();
 		} else
 			throw new ProviderException(process.getStandardError().trim());
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see de.uniwuerzburg.zpd.ocr4all.application.spi.core.ServiceProvider#
+	 * getDescription(java.util.Locale)
+	 */
+	@Override
+	public Optional<String> getDescription(Locale locale) {
+		// TODO Auto-generated method stub
+		return super.getDescription(locale);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * de.uniwuerzburg.zpd.ocr4all.application.spi.core.ServiceProvider#getAdvice()
+	 */
+	@Override
+	public String getAdvice() {
+		return jsonDescription;
 	}
 
 }
