@@ -65,7 +65,7 @@ public class TesserocrSegmentRegion extends OCRDServiceProviderWorker
 	 * @version 1.0
 	 * @since 1.8
 	 */
-	private enum ServiceProviderCollection implements Framework.ServiceProviderCollectionKey {
+	private enum ServiceProviderCollection implements ConfigurationServiceProvider.CollectionKey {
 		processorIdentifier("tesserocr-segment-region-id", "ocrd-tesserocr-segment-region"),
 		processorDescription("tesserocr-segment-region-description", "ocr-d tesserocr segment region processor");
 
@@ -191,7 +191,7 @@ public class TesserocrSegmentRegion extends OCRDServiceProviderWorker
 	 * processorIdentifier()
 	 */
 	@Override
-	protected Framework.ServiceProviderCollectionKey processorIdentifier() {
+	protected ConfigurationServiceProvider.CollectionKey processorIdentifier() {
 		return ServiceProviderCollection.processorIdentifier;
 	}
 
@@ -203,7 +203,7 @@ public class TesserocrSegmentRegion extends OCRDServiceProviderWorker
 	 * processorDescription()
 	 */
 	@Override
-	protected Framework.ServiceProviderCollectionKey processorDescription() {
+	protected ConfigurationServiceProvider.CollectionKey processorDescription() {
 		return ServiceProviderCollection.processorDescription;
 	}
 
@@ -270,12 +270,11 @@ public class TesserocrSegmentRegion extends OCRDServiceProviderWorker
 	 * (non-Javadoc)
 	 * 
 	 * @see
-	 * de.uniwuerzburg.zpd.ocr4all.application.spi.ServiceProvider#getPremise(de.
-	 * uniwuerzburg.zpd.ocr4all.application.spi.ConfigurationServiceProvider,
-	 * de.uniwuerzburg.zpd.ocr4all.application.spi.Target)
+	 * de.uniwuerzburg.zpd.ocr4all.application.spi.core.ServiceProvider#getPremise(
+	 * de.uniwuerzburg.zpd.ocr4all.application.spi.env.Target)
 	 */
 	@Override
-	public Premise getPremise(ConfigurationServiceProvider configuration, Target target) {
+	public Premise getPremise(Target target) {
 		return configuration.isSystemCommandAvailable(SystemCommand.Type.docker) ? new Premise()
 				: new Premise(Premise.State.block, locale -> getMessage(locale, "no.command.docker"));
 	}
@@ -283,12 +282,12 @@ public class TesserocrSegmentRegion extends OCRDServiceProviderWorker
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see de.uniwuerzburg.zpd.ocr4all.application.spi.ServiceProvider#getModel(de.
-	 * uniwuerzburg.zpd.ocr4all.application.spi.ConfigurationServiceProvider,
-	 * de.uniwuerzburg.zpd.ocr4all.application.spi.Target)
+	 * @see
+	 * de.uniwuerzburg.zpd.ocr4all.application.spi.core.ServiceProvider#getModel(de.
+	 * uniwuerzburg.zpd.ocr4all.application.spi.env.Target)
 	 */
 	@Override
-	public Model getModel(ConfigurationServiceProvider configuration, Target target) {
+	public Model getModel(Target target) {
 		// Use processor argument to set the default values
 		ProcessorArgument argument = new ProcessorArgument();
 
@@ -337,7 +336,7 @@ public class TesserocrSegmentRegion extends OCRDServiceProviderWorker
 			 */
 			@Override
 			public State execute(Callback callback, Framework framework, ModelArgument modelArgument) {
-				if (!initialize(getProcessorIdentifier(framework), callback, framework))
+				if (!initialize(getProcessorIdentifier(), callback, framework))
 					return ProcessServiceProvider.Processor.State.canceled;
 
 				/*
