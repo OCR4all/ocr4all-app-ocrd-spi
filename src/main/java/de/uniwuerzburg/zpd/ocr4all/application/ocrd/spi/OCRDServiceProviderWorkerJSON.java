@@ -13,6 +13,10 @@ import java.util.Arrays;
 import java.util.Locale;
 import java.util.Optional;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import de.uniwuerzburg.zpd.ocr4all.application.spi.env.ConfigurationServiceProvider;
 import de.uniwuerzburg.zpd.ocr4all.application.spi.util.SystemProcess;
 
@@ -104,9 +108,19 @@ public abstract class OCRDServiceProviderWorkerJSON extends OCRDServiceProviderW
 	}
 
 	/**
-	 * The ocr-d service provider description as json.
+	 * The ocr-d JSON processor description.
 	 */
-	protected String jsonDescription = null;
+	protected String jsonProcessorDescription = null;
+
+	/**
+	 * The service provider description.
+	 */
+	private String description = null;
+
+	/**
+	 * The service provider parameters.
+	 */
+	private JsonNode parameters = null;
 
 	/**
 	 * Default constructor for an ocr-d service provider worker with JSON support.
@@ -156,13 +170,51 @@ public abstract class OCRDServiceProviderWorkerJSON extends OCRDServiceProviderW
 			throw new ProviderException(e.getMessage());
 		}
 
-		if (process.getExitValue() == 0) {
-			String message = process.getStandardOutput();
+		if (process.getExitValue() == 0)
+			initializeJSON(process.getStandardOutput());
+		else
+			throw new ProviderException(
+					process.getStandardError().trim() + " (process exit code " + process.getExitValue() + ")");
+	}
 
-			if (!message.isBlank())
-				jsonDescription = message.trim();
-		} else
-			throw new ProviderException(process.getStandardError().trim());
+	/**
+	 * Initializes the provider using the JSON processor description.
+	 * 
+	 * @param json The JSON processor description.
+	 * @since 1.8
+	 */
+	private void initializeJSON(String json) throws ProviderException {
+		if (!json.isBlank()) {
+			jsonProcessorDescription = json.trim();
+
+			ObjectMapper mapper = new ObjectMapper();
+			try {
+				final JsonNode root = mapper.readTree(jsonProcessorDescription);
+
+				description = getText(root.get("description"));
+				parameters = root.get("parameters");
+
+			} catch (JsonProcessingException e) {
+				throw new ProviderException("could not parse JSON processor description - " + e.getMessage());
+			}
+		}
+	}
+
+	/**
+	 * Returns the JSON text of the given node.
+	 * 
+	 * @param node The JSON node.
+	 * @return The JSON text of the given node. Null if the node is null or it is a
+	 *         container.
+	 * @since 1.8
+	 */
+	public static String getText(final JsonNode node) {
+		if (node == null || node.isContainerNode())
+			return null;
+		else {
+			return node.asText();
+		}
+
 	}
 
 	/*
@@ -173,8 +225,7 @@ public abstract class OCRDServiceProviderWorkerJSON extends OCRDServiceProviderW
 	 */
 	@Override
 	public Optional<String> getDescription(Locale locale) {
-		// TODO Auto-generated method stub
-		return super.getDescription(locale);
+		return description == null ? super.getDescription(locale) : Optional.of(description);
 	}
 
 	/*
@@ -185,7 +236,7 @@ public abstract class OCRDServiceProviderWorkerJSON extends OCRDServiceProviderW
 	 */
 	@Override
 	public String getAdvice() {
-		return jsonDescription;
+		return jsonProcessorDescription == null ? null : "JSON processor description:\n" + jsonProcessorDescription;
 	}
 
 }
