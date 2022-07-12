@@ -1,5 +1,5 @@
 /**
- * File:     CalamariRecognizeJSON.java
+ * File:     JsonCalamariRecognize.java
  * Package:  de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.ocr.provider.json
  * 
  * Author:   Herbert Baier (herbert.baier@uni-wuerzburg.de)
@@ -9,7 +9,7 @@ package de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.ocr.provider.json;
 
 import java.util.Locale;
 
-import de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.OCRDServiceProviderWorkerJSON;
+import de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.JsonOCRDServiceProviderWorker;
 import de.uniwuerzburg.zpd.ocr4all.application.spi.OpticalCharacterRecognitionServiceProvider;
 import de.uniwuerzburg.zpd.ocr4all.application.spi.env.ConfigurationServiceProvider;
 
@@ -35,7 +35,7 @@ import de.uniwuerzburg.zpd.ocr4all.application.spi.env.ConfigurationServiceProvi
  * @version 1.0
  * @since 1.8
  */
-public class CalamariRecognizeJSON extends OCRDServiceProviderWorkerJSON
+public class JsonCalamariRecognize extends JsonOCRDServiceProviderWorker
 		implements OpticalCharacterRecognitionServiceProvider {
 	/**
 	 * Defines service provider collection with keys and default values. Collection
@@ -111,7 +111,7 @@ public class CalamariRecognizeJSON extends OCRDServiceProviderWorkerJSON
 	 * 
 	 * @since 1.8
 	 */
-	public CalamariRecognizeJSON() {
+	public JsonCalamariRecognize() {
 		super();
 	}
 
