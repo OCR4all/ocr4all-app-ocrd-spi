@@ -1,12 +1,13 @@
 /**
- * File:     JsonCalamariRecognize.java
+ * File:     JsonTesserocrRecognize.java
  * Package:  de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.ocr.provider.json
  * 
  * Author:   Herbert Baier (herbert.baier@uni-wuerzburg.de)
- * Date:     08.07.2022
+ * Date:     13.07.2022
  */
 package de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.ocr.provider.json;
 
+import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -23,11 +24,9 @@ import de.uniwuerzburg.zpd.ocr4all.application.spi.model.SelectField;
 import de.uniwuerzburg.zpd.ocr4all.application.spi.model.StringField;
 
 /**
- * Defines service providers for ocr-d Calamari recognize with JSON support.
- * This processor only operates on the text line level and so needs a line
- * segmentation (and by extension a binarized image) as its input. The following
- * properties of the service provider collection <b>ocr-d</b> override the local
- * default settings (<b>key</b>: <i>default value</i>):
+ * Defines service providers for ocr-d Tesserocr recognize with JSON support.
+ * The following properties of the service provider collection <b>ocr-d</b>
+ * override the local default settings (<b>key</b>: <i>default value</i>):
  * <ul>
  * <li>json: -J</li>
  * <li>uid: &lt;effective system user ID. -1 if not defined&gt;</li>
@@ -36,8 +35,8 @@ import de.uniwuerzburg.zpd.ocr4all.application.spi.model.StringField;
  * <li>opt-resources: resources</li>
  * <li>docker-image: ocrd/all:maximum</li>
  * <li>docker-resources: /usr/local/share/ocrd-resources</li>
- * <li>calamari-recognize-json-id: ocrd-calamari-recognize</li>
- * <li>calamari-recognize-json-description: ocr-d calamari recognize processor
+ * <li>tesserocr-recognize-json-id: ocrd-tesserocr-recognize</li>
+ * <li>tesserocr-recognize-json-description: ocr-d tesserocr recognize processor
  * (json)</li>
  * </ul>
  *
@@ -45,12 +44,17 @@ import de.uniwuerzburg.zpd.ocr4all.application.spi.model.StringField;
  * @version 1.0
  * @since 1.8
  */
-public class JsonCalamariRecognize extends JsonOCRDServiceProviderWorker
+public class JsonTesserocrRecognize extends JsonOCRDServiceProviderWorker
 		implements OpticalCharacterRecognitionServiceProvider {
 	/**
 	 * The service provider name;
 	 */
-	private static final String name = "Calamari recognize (JSON)";
+	private static final String name = "Tesserocr recognize (JSON)";
+
+	/**
+	 * The Tesseract default model extension.
+	 */
+	private static final String defaultModelExtension = "traineddata";
 
 	/**
 	 * Defines service provider collection with keys and default values. Collection
@@ -61,8 +65,8 @@ public class JsonCalamariRecognize extends JsonOCRDServiceProviderWorker
 	 * @since 1.8
 	 */
 	private enum ServiceProviderCollection implements ConfigurationServiceProvider.CollectionKey {
-		processorIdentifier("calamari-recognize-json-id", "ocrd-calamari-recognize"),
-		processorDescription("calamari-recognize-json-description", "ocr-d calamari recognize processor (json)");
+		processorIdentifier("tesserocr-recognize-json-id", "ocrd-tesserocr-recognize"),
+		processorDescription("tesserocr-recognize-json-description", "ocr-d tesserocr recognize processor (json)");
 
 		/**
 		 * The key.
@@ -121,12 +125,12 @@ public class JsonCalamariRecognize extends JsonOCRDServiceProviderWorker
 	}
 
 	/**
-	 * Default constructor for a service provider for ocr-d Calamari recognize with
+	 * Default constructor for a service provider for ocr-d Tesserocr recognize with
 	 * JSON support.
 	 * 
 	 * @since 1.8
 	 */
-	public JsonCalamariRecognize() {
+	public JsonTesserocrRecognize() {
 		super(name);
 	}
 
@@ -173,11 +177,11 @@ public class JsonCalamariRecognize extends JsonOCRDServiceProviderWorker
 	 */
 	@Override
 	public int getIndex() {
-		return 1000;
+		return 1100;
 	}
 
 	/**
-	 * Returns the Calamari models. The hidden directories in the opt models path,
+	 * Returns the Tesserocr models. The hidden file names in the opt models path,
 	 * this means staring with a dot, are ignored.
 	 * 
 	 * @param configuration The service provider configuration.
@@ -188,9 +192,17 @@ public class JsonCalamariRecognize extends JsonOCRDServiceProviderWorker
 	private List<String> getModels(ConfigurationServiceProvider configuration, Target target) {
 		List<String> models = new ArrayList<>();
 
-		for (Path path : getDirectories(getOptResources(configuration, target)))
-			if (!path.getFileName().toString().startsWith("."))
-				models.add(path.getFileName().toString());
+		try {
+			for (Path path : getFilesTopLevelFolder(getOptResources(configuration, target), defaultModelExtension)) {
+				String model = path.getFileName().toString();
+
+				// Removes from model name the default extension
+				if (!model.startsWith("."))
+					models.add(model.substring(0, model.length() - defaultModelExtension.length() - 1));
+			}
+		} catch (IOException e) {
+			// Nothing to do
+		}
 
 		Collections.sort(models, String.CASE_INSENSITIVE_ORDER);
 
@@ -252,7 +264,7 @@ public class JsonCalamariRecognize extends JsonOCRDServiceProviderWorker
 		};
 
 		Hashtable<String, ModelFieldCallback> callbacks = new Hashtable<>();
-		callbacks.put("checkpoint_dir", modelsCallback);
+		callbacks.put("model", modelsCallback);
 
 		return callbacks;
 	}

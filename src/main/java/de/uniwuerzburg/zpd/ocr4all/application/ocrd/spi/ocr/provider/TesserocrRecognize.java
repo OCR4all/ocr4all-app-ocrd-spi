@@ -10,6 +10,7 @@ package de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.ocr.provider;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
@@ -384,6 +385,8 @@ public class TesserocrRecognize extends OCRDServiceProviderWorker
 		} catch (IOException e) {
 			// Nothing to do
 		}
+		
+		Collections.sort(models, String.CASE_INSENSITIVE_ORDER);
 
 		return models;
 	}

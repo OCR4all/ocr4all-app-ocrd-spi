@@ -10,17 +10,23 @@ package de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi;
 import java.security.ProviderException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import de.uniwuerzburg.zpd.ocr4all.application.spi.core.ProcessServiceProvider;
 import de.uniwuerzburg.zpd.ocr4all.application.spi.env.ConfigurationServiceProvider;
+import de.uniwuerzburg.zpd.ocr4all.application.spi.env.Premise;
+import de.uniwuerzburg.zpd.ocr4all.application.spi.env.SystemCommand;
 import de.uniwuerzburg.zpd.ocr4all.application.spi.env.Target;
 import de.uniwuerzburg.zpd.ocr4all.application.spi.model.BooleanField;
 import de.uniwuerzburg.zpd.ocr4all.application.spi.model.DecimalField;
@@ -50,7 +56,7 @@ import de.uniwuerzburg.zpd.ocr4all.application.spi.util.SystemProcess;
  * @version 1.0
  * @since 1.8
  */
-public abstract class JsonOCRDServiceProviderWorker extends OCRDServiceProviderWorker {
+public abstract class JsonOCRDServiceProviderWorker extends OCRDServiceProviderWorker implements ProcessServiceProvider {
 	/**
 	 * Defines service provider collection with keys and default values. Collection
 	 * blank values are not allowed and their values are trimmed.
@@ -120,6 +126,11 @@ public abstract class JsonOCRDServiceProviderWorker extends OCRDServiceProviderW
 	}
 
 	/**
+	 * The service provider name.
+	 */
+	private final String name;
+
+	/**
 	 * The ocr-d JSON processor description.
 	 */
 	protected String jsonProcessorDescription = null;
@@ -139,8 +150,8 @@ public abstract class JsonOCRDServiceProviderWorker extends OCRDServiceProviderW
 	 * 
 	 * @since 1.8
 	 */
-	public JsonOCRDServiceProviderWorker() {
-		super();
+	public JsonOCRDServiceProviderWorker(String name) {
+		this(null, name);
 	}
 
 	/**
@@ -149,8 +160,10 @@ public abstract class JsonOCRDServiceProviderWorker extends OCRDServiceProviderW
 	 * @param resourceBundleKeyPrefix The prefix of the keys in the resource bundle.
 	 * @since 1.8
 	 */
-	public JsonOCRDServiceProviderWorker(String resourceBundleKeyPrefix) {
+	public JsonOCRDServiceProviderWorker(String resourceBundleKeyPrefix, String name) {
 		super(resourceBundleKeyPrefix);
+
+		this.name = name;
 	}
 
 	/*
@@ -163,6 +176,18 @@ public abstract class JsonOCRDServiceProviderWorker extends OCRDServiceProviderW
 	@Override
 	public String getProvider() {
 		return super.getProvider() + "/json";
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * de.uniwuerzburg.zpd.ocr4all.application.spi.core.ServiceProvider#getName(java
+	 * .util.Locale)
+	 */
+	@Override
+	public String getName(Locale locale) {
+		return name;
 	}
 
 	/*
@@ -254,12 +279,69 @@ public abstract class JsonOCRDServiceProviderWorker extends OCRDServiceProviderW
 	 * (non-Javadoc)
 	 * 
 	 * @see
+	 * de.uniwuerzburg.zpd.ocr4all.application.spi.core.ServiceProvider#getPremise(
+	 * de.uniwuerzburg.zpd.ocr4all.application.spi.env.Target)
+	 */
+	@Override
+	public Premise getPremise(Target target) {
+		return configuration.isSystemCommandAvailable(SystemCommand.Type.docker) ? new Premise()
+				: new Premise(Premise.State.block, locale -> "The required 'docker' command is not available.");
+	}
+
+	/**
+	 * Implementing subclasses that require special initialization on model fields
+	 * can override this method to implement their logic. This method is called each
+	 * time, when the model is required.
+	 * 
+	 * @param target The target. Null if the model is generic, this means, it should
+	 *               not depend on a target.
+	 * @return The model fields that need to be handled. The key is the field
+	 *         argument and the value the desired field handler.
+	 * @since 1.8
+	 */
+	protected Hashtable<String, ModelFieldCallback> getModelCallback(Target target) {
+		return null;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
 	 * de.uniwuerzburg.zpd.ocr4all.application.spi.core.ServiceProvider#getModel(de.
 	 * uniwuerzburg.zpd.ocr4all.application.spi.env.Target)
 	 */
 	@Override
 	public Model getModel(Target target) {
-		return modelFactory == null ? null : modelFactory.getModel();
+		return modelFactory == null ? null : modelFactory.getModel(getModelCallback(target));
+	}
+
+	/* (non-Javadoc)
+	 * @see de.uniwuerzburg.zpd.ocr4all.application.spi.core.ProcessServiceProvider#newProcessor()
+	 */
+	@Override
+	public Processor newProcessor() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	
+	/**
+	 * A functional interface that allows implementing classes to handle model
+	 * fields.
+	 *
+	 * @author <a href="mailto:herbert.baier@uni-wuerzburg.de">Herbert Baier</a>
+	 * @version 1.0
+	 * @since 1.8
+	 */
+	@FunctionalInterface
+	protected interface ModelFieldCallback {
+		/**
+		 * Handles the field.
+		 * 
+		 * @param field The field to handle.
+		 * @return The handled field. Null if the field should be removed.
+		 * @since 1.8
+		 */
+		public Field<?> handle(Field<?> field);
 	}
 
 	/**
@@ -271,6 +353,11 @@ public abstract class JsonOCRDServiceProviderWorker extends OCRDServiceProviderW
 	 */
 	protected static class ModelFactory {
 		/**
+		 * the JSON content type.
+		 */
+		private static final String jsonContentType = "application/json";
+
+		/**
 		 * Defines JSON parameter fields.
 		 *
 		 * @author <a href="mailto:herbert.baier@uni-wuerzburg.de">Herbert Baier</a>
@@ -278,7 +365,7 @@ public abstract class JsonOCRDServiceProviderWorker extends OCRDServiceProviderW
 		 * @since 1.8
 		 */
 		private enum JsonParameterFiel {
-			type, description, def("default"), enumeration("enum"), format;
+			type, description, def("default"), enumeration("enum"), format, contentType("content-type");
 
 			/**
 			 * The name.
@@ -351,7 +438,7 @@ public abstract class JsonOCRDServiceProviderWorker extends OCRDServiceProviderW
 					return false;
 
 				for (JsonNode item : fieldNode)
-					if (!isText(item))
+					if (!item.isTextual())
 						return false;
 
 				return true;
@@ -370,8 +457,12 @@ public abstract class JsonOCRDServiceProviderWorker extends OCRDServiceProviderW
 				if (isEnumeration(node)) {
 					List<String> enumeration = new ArrayList<>();
 
-					for (JsonNode item : getFieldNode(node))
-						enumeration.add(asText(item));
+					for (JsonNode item : getFieldNode(node)) {
+						String text = item.asText();
+
+						if (text != null)
+							enumeration.add(text);
+					}
 
 					return enumeration;
 
@@ -403,9 +494,9 @@ public abstract class JsonOCRDServiceProviderWorker extends OCRDServiceProviderW
 			 */
 			public String asObject(final JsonNode node) {
 				if (isObject(node)) {
-					String text = getFieldNode(node).asText();
+					String text = getFieldNode(node).toString();
 
-					return text == null || "{}".equals(text.replaceAll("[\\s]", "")) ? null : text;
+					return "{}".equals(text.replaceAll("[\\s]", "")) ? null : text;
 				} else
 					return null;
 			}
@@ -481,7 +572,7 @@ public abstract class JsonOCRDServiceProviderWorker extends OCRDServiceProviderW
 			public boolean isDecimal(final JsonNode node) {
 				JsonNode fieldNode = getFieldNode(node);
 
-				return fieldNode != null && fieldNode.isFloat();
+				return fieldNode != null && (fieldNode.isDouble() || fieldNode.isInt());
 			}
 
 			/**
@@ -655,7 +746,7 @@ public abstract class JsonOCRDServiceProviderWorker extends OCRDServiceProviderW
 			 * @since 1.8
 			 */
 			public static JsonFieldNumberFormat getFormat(JsonNode node) {
-				String name = JsonParameterFiel.type.asText(node);
+				String name = JsonParameterFiel.format.asText(node);
 
 				if (name != null && !name.isBlank()) {
 					name = name.trim().toLowerCase();
@@ -673,6 +764,11 @@ public abstract class JsonOCRDServiceProviderWorker extends OCRDServiceProviderW
 		 * The model fields.
 		 */
 		private final List<Field<?>> fields = new ArrayList<>();
+
+		/**
+		 * The JSON processor parameters of type object.
+		 */
+		private final Set<String> jsonTypeObjectProcessorParameters = new HashSet<>();
 
 		/**
 		 * Creates a model factory.
@@ -706,14 +802,22 @@ public abstract class JsonOCRDServiceProviderWorker extends OCRDServiceProviderW
 		/**
 		 * Returns the model.
 		 * 
+		 * @param modelFieldCallbacks The model fields that need to be handled. The key
+		 *                            is the field argument and the value the desired
+		 *                            field handler.
 		 * @return The model.
 		 * @since 1.8
 		 */
-		public Model getModel() {
+		public Model getModel(Hashtable<String, ModelFieldCallback> modelFieldCallbacks) {
 			List<Entry> entries = new ArrayList<>();
 
-			for (Field<?> field : fields)
-				entries.add(field);
+			for (Field<?> field : fields) {
+				if (modelFieldCallbacks != null && modelFieldCallbacks.containsKey(field.getArgument()))
+					field = modelFieldCallbacks.get(field.getArgument()).handle(field);
+
+				if (field != null)
+					entries.add(field);
+			}
 
 			return new Model(entries);
 		}
@@ -752,10 +856,11 @@ public abstract class JsonOCRDServiceProviderWorker extends OCRDServiceProviderW
 						if (item != null)
 							items.add(new SelectField.Option(item.equals(value), item, null));
 
-					return new SelectField(parameter, locale -> parameter, locale -> description, true, items, false);
+					return new SelectField(parameter, locale -> parameter, locale -> description, false, items, false);
 				} else
-					return new StringField(parameter, JsonParameterFiel.def.asText(node), locale -> parameter,
-							locale -> description, null, false);
+					return new StringField(parameter, JsonParameterFiel.def.asText(node),
+							JsonParameterFiel.contentType.asText(node), locale -> parameter, locale -> description,
+							null, false);
 			case number:
 				JsonFieldNumberFormat format = JsonFieldNumberFormat.getFormat(node);
 				if (format == null) {
@@ -784,8 +889,10 @@ public abstract class JsonOCRDServiceProviderWorker extends OCRDServiceProviderW
 						JsonParameterFiel.def.isBoolean(node) ? JsonParameterFiel.def.asBoolean(node) : null,
 						locale -> parameter, locale -> description, false);
 			case object:
-				return new StringField(parameter, JsonParameterFiel.def.asObject(node), locale -> parameter,
-						locale -> description, null, false);
+				jsonTypeObjectProcessorParameters.add(parameter);
+
+				return new StringField(parameter, JsonParameterFiel.def.asObject(node), jsonContentType,
+						locale -> parameter, locale -> description, null, false);
 			default:
 				throw new ProviderException(
 						"the type '" + type.getName() + "' for parameter '" + parameter + "' is not implemented.");
