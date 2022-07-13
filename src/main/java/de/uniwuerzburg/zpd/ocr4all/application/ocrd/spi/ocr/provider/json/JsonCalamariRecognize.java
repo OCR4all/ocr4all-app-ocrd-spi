@@ -15,6 +15,7 @@ import java.util.List;
 
 import de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.JsonOCRDServiceProviderWorker;
 import de.uniwuerzburg.zpd.ocr4all.application.spi.OpticalCharacterRecognitionServiceProvider;
+import de.uniwuerzburg.zpd.ocr4all.application.spi.core.CoreProcessorServiceProvider;
 import de.uniwuerzburg.zpd.ocr4all.application.spi.env.ConfigurationServiceProvider;
 import de.uniwuerzburg.zpd.ocr4all.application.spi.env.Premise;
 import de.uniwuerzburg.zpd.ocr4all.application.spi.env.Target;
@@ -127,7 +128,7 @@ public class JsonCalamariRecognize extends JsonOCRDServiceProviderWorker
 	 * @since 1.8
 	 */
 	public JsonCalamariRecognize() {
-		super(name);
+		super(name, true);
 	}
 
 	/*
@@ -221,7 +222,7 @@ public class JsonCalamariRecognize extends JsonOCRDServiceProviderWorker
 	 * application.spi.env.Target)
 	 */
 	@Override
-	protected Hashtable<String, ModelFieldCallback> getModelCallback(Target target) {
+	protected Hashtable<String, ModelFieldCallback> getModelCallbacks(Target target) {
 		// The models
 		ModelFieldCallback modelsCallback = new ModelFieldCallback() {
 			/*
@@ -255,6 +256,19 @@ public class JsonCalamariRecognize extends JsonOCRDServiceProviderWorker
 		callbacks.put("checkpoint_dir", modelsCallback);
 
 		return callbacks;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.
+	 * JsonOCRDServiceProviderWorker#getProcessorCallbacks(de.uniwuerzburg.zpd.
+	 * ocr4all.application.spi.core.CoreProcessorServiceProvider)
+	 */
+	@Override
+	protected Hashtable<String, ModelArgumentCallback> getProcessorCallbacks(CoreProcessorServiceProvider processor) {
+		// TODO Auto-generated method stub
+		return super.getProcessorCallbacks(processor);
 	}
 
 }

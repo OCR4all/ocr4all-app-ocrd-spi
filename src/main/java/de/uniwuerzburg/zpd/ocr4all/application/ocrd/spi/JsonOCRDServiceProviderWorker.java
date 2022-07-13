@@ -22,9 +22,12 @@ import java.util.Set;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
+import de.uniwuerzburg.zpd.ocr4all.application.spi.core.CoreProcessorServiceProvider;
 import de.uniwuerzburg.zpd.ocr4all.application.spi.core.ProcessServiceProvider;
 import de.uniwuerzburg.zpd.ocr4all.application.spi.env.ConfigurationServiceProvider;
+import de.uniwuerzburg.zpd.ocr4all.application.spi.env.Framework;
 import de.uniwuerzburg.zpd.ocr4all.application.spi.env.Premise;
 import de.uniwuerzburg.zpd.ocr4all.application.spi.env.SystemCommand;
 import de.uniwuerzburg.zpd.ocr4all.application.spi.env.Target;
@@ -36,6 +39,13 @@ import de.uniwuerzburg.zpd.ocr4all.application.spi.model.IntegerField;
 import de.uniwuerzburg.zpd.ocr4all.application.spi.model.Model;
 import de.uniwuerzburg.zpd.ocr4all.application.spi.model.SelectField;
 import de.uniwuerzburg.zpd.ocr4all.application.spi.model.StringField;
+import de.uniwuerzburg.zpd.ocr4all.application.spi.model.argument.Argument;
+import de.uniwuerzburg.zpd.ocr4all.application.spi.model.argument.BooleanArgument;
+import de.uniwuerzburg.zpd.ocr4all.application.spi.model.argument.DecimalArgument;
+import de.uniwuerzburg.zpd.ocr4all.application.spi.model.argument.IntegerArgument;
+import de.uniwuerzburg.zpd.ocr4all.application.spi.model.argument.ModelArgument;
+import de.uniwuerzburg.zpd.ocr4all.application.spi.model.argument.SelectArgument;
+import de.uniwuerzburg.zpd.ocr4all.application.spi.model.argument.StringArgument;
 import de.uniwuerzburg.zpd.ocr4all.application.spi.util.SystemProcess;
 
 /**
@@ -56,7 +66,8 @@ import de.uniwuerzburg.zpd.ocr4all.application.spi.util.SystemProcess;
  * @version 1.0
  * @since 1.8
  */
-public abstract class JsonOCRDServiceProviderWorker extends OCRDServiceProviderWorker implements ProcessServiceProvider {
+public abstract class JsonOCRDServiceProviderWorker extends OCRDServiceProviderWorker
+		implements ProcessServiceProvider {
 	/**
 	 * Defines service provider collection with keys and default values. Collection
 	 * blank values are not allowed and their values are trimmed.
@@ -131,6 +142,11 @@ public abstract class JsonOCRDServiceProviderWorker extends OCRDServiceProviderW
 	private final String name;
 
 	/**
+	 * The service provider name.
+	 */
+	private final boolean isResources;
+
+	/**
 	 * The ocr-d JSON processor description.
 	 */
 	protected String jsonProcessorDescription = null;
@@ -146,24 +162,41 @@ public abstract class JsonOCRDServiceProviderWorker extends OCRDServiceProviderW
 	private ModelFactory modelFactory = null;
 
 	/**
-	 * Default constructor for an ocr-d service provider worker with JSON support.
+	 * Creates an ocr-d service provider worker with JSON support and without
+	 * resources.
 	 * 
+	 * @param name        The service provider name.
+	 * @param isResources True if resources folder is required.
 	 * @since 1.8
 	 */
 	public JsonOCRDServiceProviderWorker(String name) {
-		this(null, name);
+		this(name, false);
+	}
+
+	/**
+	 * Creates an ocr-d service provider worker with JSON support.
+	 * 
+	 * @param name        The service provider name.
+	 * @param isResources True if resources folder is required.
+	 * @since 1.8
+	 */
+	public JsonOCRDServiceProviderWorker(String name, boolean isResources) {
+		this(null, name, isResources);
 	}
 
 	/**
 	 * Creates an ocr-d service provider worker with JSON support.
 	 * 
 	 * @param resourceBundleKeyPrefix The prefix of the keys in the resource bundle.
+	 * @param name                    The service provider name.
+	 * @param isResources             True if resources folder is required.
 	 * @since 1.8
 	 */
-	public JsonOCRDServiceProviderWorker(String resourceBundleKeyPrefix, String name) {
+	public JsonOCRDServiceProviderWorker(String resourceBundleKeyPrefix, String name, boolean isResources) {
 		super(resourceBundleKeyPrefix);
 
 		this.name = name;
+		this.isResources = isResources;
 	}
 
 	/*
@@ -299,7 +332,7 @@ public abstract class JsonOCRDServiceProviderWorker extends OCRDServiceProviderW
 	 *         argument and the value the desired field handler.
 	 * @since 1.8
 	 */
-	protected Hashtable<String, ModelFieldCallback> getModelCallback(Target target) {
+	protected Hashtable<String, ModelFieldCallback> getModelCallbacks(Target target) {
 		return null;
 	}
 
@@ -312,18 +345,135 @@ public abstract class JsonOCRDServiceProviderWorker extends OCRDServiceProviderW
 	 */
 	@Override
 	public Model getModel(Target target) {
-		return modelFactory == null ? null : modelFactory.getModel(getModelCallback(target));
+		return modelFactory == null ? null : modelFactory.getModel(getModelCallbacks(target));
 	}
 
-	/* (non-Javadoc)
-	 * @see de.uniwuerzburg.zpd.ocr4all.application.spi.core.ProcessServiceProvider#newProcessor()
+	/**
+	 * Implementing subclasses that require special initialization on model
+	 * arguments can override this method to implement their logic. This method is
+	 * called each time, when a processor is executed.
+	 * 
+	 * @param processor The processor for service providers.
+	 * @return The model arguments that need to be handled. The key is the argument
+	 *         name and the value the desired argument handler.
+	 * @since 1.8
+	 */
+	protected Hashtable<String, ModelArgumentCallback> getProcessorCallbacks(CoreProcessorServiceProvider processor) {
+		return null;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see de.uniwuerzburg.zpd.ocr4all.application.spi.core.ProcessServiceProvider#
+	 * newProcessor()
 	 */
 	@Override
 	public Processor newProcessor() {
-		// TODO Auto-generated method stub
-		return null;
+		return modelFactory == null ? null : new CoreProcessorServiceProvider() {
+			/*
+			 * (non-Javadoc)
+			 * 
+			 * @see
+			 * de.uniwuerzburg.zpd.ocr4all.application.spi.ProcessServiceProvider.Processor#
+			 * execute(de.uniwuerzburg.zpd.ocr4all.application.spi.ProcessServiceProvider.
+			 * Processor.Callback, de.uniwuerzburg.zpd.ocr4all.application.spi.Framework,
+			 * de.uniwuerzburg.zpd.ocr4all.application.spi.model.argument.ModelArgument)
+			 */
+			@Override
+			public State execute(Callback callback, Framework framework, ModelArgument modelArgument) {
+				if (!initialize(getProcessorIdentifier(), callback, framework))
+					return ProcessServiceProvider.Processor.State.canceled;
+
+				/*
+				 * The JSON processor arguments
+				 */
+				final ObjectNode processorArguments = objectMapper.createObjectNode();
+
+				/*
+				 * Parse the processor arguments
+				 */
+				updatedStandardOutput("Parse parameters.");
+
+				final Set<String> jsonTypeObjectProcessorParameters = modelFactory
+						.getJsonTypeObjectProcessorParameters();
+				final Hashtable<String, ModelArgumentCallback> processorCallbacks = getProcessorCallbacks(this);
+
+				for (Argument argument : modelArgument.getArguments()) {
+					if (processorCallbacks != null && processorCallbacks.containsKey(argument.getArgument())) {
+						argument = processorCallbacks.get(argument.getArgument()).handle(argument,
+								jsonTypeObjectProcessorParameters);
+
+						if (argument == null)
+							continue;
+					}
+
+					if (argument instanceof SelectArgument) {
+						SelectArgument select = (SelectArgument) argument;
+
+						if (select.getValues().isPresent()) {
+							List<String> values = select.getValues().get();
+
+							if (values.size() == 1)
+								processorArguments.put(select.getArgument(), values.get(0));
+							else if (values.size() > 1) {
+								updatedStandardError(
+										"The select argument '" + select.getArgument() + "' allows only one value.");
+
+								return ProcessServiceProvider.Processor.State.interrupted;
+							}
+						}
+					} else if (argument instanceof StringArgument) {
+						StringArgument string = (StringArgument) argument;
+
+						if (string.getValue().isPresent()) {
+							if (jsonTypeObjectProcessorParameters.contains(string.getArgument())) {
+								try {
+									processorArguments.set(string.getArgument(),
+											objectMapper.readTree(string.getValue().get()));
+								} catch (JsonProcessingException e) {
+									updatedStandardError("The JSON value of argument '" + string.getArgument()
+											+ "' can not be parsed - " + e.getMessage());
+
+									return ProcessServiceProvider.Processor.State.interrupted;
+								}
+							} else
+								processorArguments.put(string.getArgument(), string.getValue().get());
+						}
+
+					} else if (argument instanceof IntegerArgument) {
+						IntegerArgument integer = (IntegerArgument) argument;
+
+						if (integer.getValue().isPresent())
+							processorArguments.put(integer.getArgument(), (int) integer.getValue().get());
+					} else if (argument instanceof DecimalArgument) {
+						DecimalArgument decimal = (DecimalArgument) argument;
+
+						if (decimal.getValue().isPresent())
+							processorArguments.put(decimal.getArgument(), (float) decimal.getValue().get());
+					} else if (argument instanceof BooleanArgument) {
+						BooleanArgument bool = (BooleanArgument) argument;
+
+						if (bool.getValue().isPresent())
+							processorArguments.put(bool.getArgument(), (boolean) bool.getValue().get());
+					} else {
+						updatedStandardError(
+								"The argument of type '" + argument.getClass().getName() + "'" + " is not supported.");
+
+						return ProcessServiceProvider.Processor.State.interrupted;
+					}
+				}
+
+				/*
+				 * Runs the processor
+				 */
+				return run(framework, isResources, processorArguments, null, () -> isCanceled(), () -> complete(),
+						message -> updatedStandardOutput(message), message -> updatedStandardError(message),
+						progress -> callback.updatedProgress(progress), 0.01F);
+			}
+		};
 	}
-	
+
 	/**
 	 * A functional interface that allows implementing classes to handle model
 	 * fields.
@@ -342,6 +492,28 @@ public abstract class JsonOCRDServiceProviderWorker extends OCRDServiceProviderW
 		 * @since 1.8
 		 */
 		public Field<?> handle(Field<?> field);
+	}
+
+	/**
+	 * A functional interface that allows implementing classes to handle model
+	 * arguments.
+	 *
+	 * @author <a href="mailto:herbert.baier@uni-wuerzburg.de">Herbert Baier</a>
+	 * @version 1.0
+	 * @since 1.8
+	 */
+	@FunctionalInterface
+	protected interface ModelArgumentCallback {
+		/**
+		 * Handles the argument.
+		 * 
+		 * @param argument                          The argument to handle.
+		 * @param jsonTypeObjectProcessorParameters The JSON processor parameters of
+		 *                                          type object.
+		 * @return The handled argument. Null if the argument should be ignored.
+		 * @since 1.8
+		 */
+		public Argument handle(Argument argument, Set<String> jsonTypeObjectProcessorParameters);
 	}
 
 	/**
@@ -812,14 +984,27 @@ public abstract class JsonOCRDServiceProviderWorker extends OCRDServiceProviderW
 			List<Entry> entries = new ArrayList<>();
 
 			for (Field<?> field : fields) {
-				if (modelFieldCallbacks != null && modelFieldCallbacks.containsKey(field.getArgument()))
+				if (modelFieldCallbacks != null && modelFieldCallbacks.containsKey(field.getArgument())) {
 					field = modelFieldCallbacks.get(field.getArgument()).handle(field);
 
-				if (field != null)
-					entries.add(field);
+					if (field == null)
+						continue;
+				}
+
+				entries.add(field);
 			}
 
 			return new Model(entries);
+		}
+
+		/**
+		 * Returns the JSON processor parameters of type object.
+		 *
+		 * @return The JSON processor parameters of type object.
+		 * @since 1.8
+		 */
+		public Set<String> getJsonTypeObjectProcessorParameters() {
+			return new HashSet<>(jsonTypeObjectProcessorParameters);
 		}
 
 		/**
