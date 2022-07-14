@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Hashtable;
 import java.util.List;
+import java.util.Set;
 
 import de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.JsonOCRDServiceProviderWorker;
 import de.uniwuerzburg.zpd.ocr4all.application.spi.OpticalCharacterRecognitionServiceProvider;
@@ -23,6 +24,9 @@ import de.uniwuerzburg.zpd.ocr4all.application.spi.env.Target;
 import de.uniwuerzburg.zpd.ocr4all.application.spi.model.Field;
 import de.uniwuerzburg.zpd.ocr4all.application.spi.model.SelectField;
 import de.uniwuerzburg.zpd.ocr4all.application.spi.model.StringField;
+import de.uniwuerzburg.zpd.ocr4all.application.spi.model.argument.Argument;
+import de.uniwuerzburg.zpd.ocr4all.application.spi.model.argument.SelectArgument;
+import de.uniwuerzburg.zpd.ocr4all.application.spi.model.argument.StringArgument;
 
 /**
  * Defines service providers for ocr-d Tesserocr recognize with JSON support.
@@ -257,8 +261,8 @@ public class JsonTesserocrRecognize extends JsonOCRDServiceProviderWorker
 					if (models.isEmpty())
 						models.add(new SelectField.Option(false, "empty", locale -> "model.empty"));
 
-					return new SelectField(stringField.getArgument(), locale -> stringField.getDescription(locale),
-							locale -> stringField.getWarning(locale).orElse(null), true, models, false);
+					return new SelectField(stringField.getArgument(), locale -> stringField.getLabel(locale),
+							locale -> stringField.getDescription(locale).orElse(null), true, models, false);
 				} else
 					return null;
 			}
@@ -279,8 +283,43 @@ public class JsonTesserocrRecognize extends JsonOCRDServiceProviderWorker
 	 */
 	@Override
 	protected Hashtable<String, ModelArgumentCallback> getProcessorCallbacks(CoreProcessorServiceProvider processor) {
-		// TODO Auto-generated method stub
-		return super.getProcessorCallbacks(processor);
+		ModelArgumentCallback modelsCallback = new ModelArgumentCallback() {
+			/*
+			 * (non-Javadoc)
+			 * 
+			 * @see de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.
+			 * JsonOCRDServiceProviderWorker.ModelArgumentCallback#handle(de.uniwuerzburg.
+			 * zpd.ocr4all.application.spi.model.argument.Argument, java.util.Set)
+			 */
+			@Override
+			public Argument handle(Argument argument, Set<String> jsonTypeObjectProcessorParameters) {
+				if (argument instanceof SelectArgument) {
+					SelectArgument selectArgument = (SelectArgument) argument;
+
+					if (selectArgument.getValues().isPresent()) {
+						StringBuffer buffer = new StringBuffer();
+
+						// Multiple models are combined by concatenating with +
+						for (String value : selectArgument.getValues().get()) {
+							if (buffer.length() > 0)
+								buffer.append("+");
+
+							buffer.append(value);
+						}
+
+						if (buffer.length() > 0)
+							return new StringArgument(selectArgument.getArgument(), buffer.toString());
+					}
+				}
+
+				return null;
+			}
+		};
+
+		Hashtable<String, ModelArgumentCallback> callbacks = new Hashtable<>();
+		callbacks.put("model", modelsCallback);
+
+		return callbacks;
 	}
 
 }

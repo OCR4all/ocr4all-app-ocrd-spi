@@ -21,7 +21,6 @@ import java.util.Set;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import de.uniwuerzburg.zpd.ocr4all.application.spi.core.CoreProcessorServiceProvider;
@@ -257,11 +256,12 @@ public abstract class JsonOCRDServiceProviderWorker extends OCRDServiceProviderW
 		if (!json.isBlank()) {
 			jsonProcessorDescription = json.trim();
 
-			ObjectMapper mapper = new ObjectMapper();
 			try {
-				final JsonNode root = mapper.readTree(jsonProcessorDescription);
+				final JsonNode root = objectMapper.readTree(jsonProcessorDescription);
 
-				description = getText(root.get("description"));
+				final JsonNode descriptionNode = root.get("description");
+				description = descriptionNode == null || descriptionNode.isContainerNode() ? null
+						: descriptionNode.asText();
 
 				modelFactory = new ModelFactory(root);
 			} catch (JsonProcessingException e) {
@@ -270,20 +270,27 @@ public abstract class JsonOCRDServiceProviderWorker extends OCRDServiceProviderW
 		}
 	}
 
-	/**
-	 * Returns the JSON text of the given node.
+	/*
+	 * (non-Javadoc)
 	 * 
-	 * @param node The JSON node.
-	 * @return The JSON text of the given node. Null if the node is null or it is a
-	 *         container.
-	 * @since 1.8
+	 * @see de.uniwuerzburg.zpd.ocr4all.application.spi.core.ServiceProviderCore#
+	 * startCallback()
 	 */
-	public static String getText(final JsonNode node) {
-		if (node == null || node.isContainerNode())
-			return null;
-		else {
-			return node.asText();
-		}
+	@Override
+	public void startCallback() throws ProviderException {
+		if (modelFactory == null)
+			initializeCallback();
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see de.uniwuerzburg.zpd.ocr4all.application.spi.core.ServiceProviderCore#
+	 * restartCallback()
+	 */
+	@Override
+	public void restartCallback() throws ProviderException {
+		startCallback();
 	}
 
 	/*
