@@ -879,7 +879,7 @@ public abstract class JsonOCRDServiceProviderWorker extends OCRDServiceProviderW
 		 * @since 1.8
 		 */
 		private enum JsonFieldNumberFormat {
-			integer, decimal("float");
+			integer, integerShortForm("int"), decimal("float");
 
 			/**
 			 * The name.
@@ -1064,6 +1064,7 @@ public abstract class JsonOCRDServiceProviderWorker extends OCRDServiceProviderW
 
 				switch (format) {
 				case integer:
+				case integerShortForm:
 					return new IntegerField(parameter,
 							JsonParameterFiel.def.isInteger(node) ? JsonParameterFiel.def.asInteger(node) : null,
 							locale -> parameter, locale -> description, null, null, null, null, null, false);
