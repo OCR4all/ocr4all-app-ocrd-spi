@@ -192,7 +192,6 @@ public abstract class OCRDServiceProviderWorker extends ServiceProviderCore {
 	/**
 	 * Returns the processor identifier.
 	 * 
-	 * @param configuration The service provider configuration.
 	 * @return The processor identifier.
 	 * @since 1.8
 	 */

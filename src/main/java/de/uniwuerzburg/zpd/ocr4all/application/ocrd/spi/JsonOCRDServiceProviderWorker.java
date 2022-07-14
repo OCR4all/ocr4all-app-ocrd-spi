@@ -164,8 +164,7 @@ public abstract class JsonOCRDServiceProviderWorker extends OCRDServiceProviderW
 	 * Creates an ocr-d service provider worker with JSON support and without
 	 * resources.
 	 * 
-	 * @param name        The service provider name.
-	 * @param isResources True if resources folder is required.
+	 * @param name The service provider name.
 	 * @since 1.8
 	 */
 	public JsonOCRDServiceProviderWorker(String name) {
