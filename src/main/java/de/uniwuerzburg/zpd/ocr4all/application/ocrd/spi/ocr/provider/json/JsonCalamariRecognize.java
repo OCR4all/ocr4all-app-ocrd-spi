@@ -1,5 +1,5 @@
 /**
- * File:     CalamariRecognizeJSON.java
+ * File:     JsonCalamariRecognize.java
  * Package:  de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.ocr.provider.json
  * 
  * Author:   Herbert Baier (herbert.baier@uni-wuerzburg.de)
@@ -7,11 +7,20 @@
  */
 package de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.ocr.provider.json;
 
-import java.util.Locale;
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Hashtable;
+import java.util.List;
 
-import de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.OCRDServiceProviderWorkerJSON;
+import de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.JsonOCRDServiceProviderWorker;
 import de.uniwuerzburg.zpd.ocr4all.application.spi.OpticalCharacterRecognitionServiceProvider;
 import de.uniwuerzburg.zpd.ocr4all.application.spi.env.ConfigurationServiceProvider;
+import de.uniwuerzburg.zpd.ocr4all.application.spi.env.Premise;
+import de.uniwuerzburg.zpd.ocr4all.application.spi.env.Target;
+import de.uniwuerzburg.zpd.ocr4all.application.spi.model.Field;
+import de.uniwuerzburg.zpd.ocr4all.application.spi.model.SelectField;
+import de.uniwuerzburg.zpd.ocr4all.application.spi.model.StringField;
 
 /**
  * Defines service providers for ocr-d Calamari recognize with JSON support.
@@ -27,16 +36,22 @@ import de.uniwuerzburg.zpd.ocr4all.application.spi.env.ConfigurationServiceProvi
  * <li>opt-resources: resources</li>
  * <li>docker-image: ocrd/all:maximum</li>
  * <li>docker-resources: /usr/local/share/ocrd-resources</li>
- * <li>calamari-recognize-id: ocrd-calamari-recognize</li>
- * <li>calamari-recognize-description: ocr-d calamari recognize processor</li>
+ * <li>calamari-recognize-json-id: ocrd-calamari-recognize</li>
+ * <li>calamari-recognize-json-description: ocr-d calamari recognize processor
+ * (json)</li>
  * </ul>
  *
  * @author <a href="mailto:herbert.baier@uni-wuerzburg.de">Herbert Baier</a>
  * @version 1.0
  * @since 1.8
  */
-public class CalamariRecognizeJSON extends OCRDServiceProviderWorkerJSON
+public class JsonCalamariRecognize extends JsonOCRDServiceProviderWorker
 		implements OpticalCharacterRecognitionServiceProvider {
+	/**
+	 * The service provider name;
+	 */
+	private static final String name = "Calamari recognize (JSON)";
+
 	/**
 	 * Defines service provider collection with keys and default values. Collection
 	 * blank values are not allowed and their values are trimmed.
@@ -111,8 +126,8 @@ public class CalamariRecognizeJSON extends OCRDServiceProviderWorkerJSON
 	 * 
 	 * @since 1.8
 	 */
-	public CalamariRecognizeJSON() {
-		super();
+	public JsonCalamariRecognize() {
+		super(name, true);
 	}
 
 	/*
@@ -143,18 +158,6 @@ public class CalamariRecognizeJSON extends OCRDServiceProviderWorkerJSON
 	 * (non-Javadoc)
 	 * 
 	 * @see
-	 * de.uniwuerzburg.zpd.ocr4all.application.spi.core.ServiceProvider#getName(java
-	 * .util.Locale)
-	 */
-	@Override
-	public String getName(Locale locale) {
-		return "Calamari (JSON)";
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
 	 * de.uniwuerzburg.zpd.ocr4all.application.spi.core.ServiceProvider#getVersion()
 	 */
 	@Override
@@ -173,16 +176,85 @@ public class CalamariRecognizeJSON extends OCRDServiceProviderWorkerJSON
 		return 1000;
 	}
 
+	/**
+	 * Returns the Calamari models. The hidden directories in the opt models path,
+	 * this means staring with a dot, are ignored.
+	 * 
+	 * @param configuration The service provider configuration.
+	 * @param target        The target.
+	 * @return The Calamari models.
+	 * @since 1.8
+	 */
+	private List<String> getModels(ConfigurationServiceProvider configuration, Target target) {
+		List<String> models = new ArrayList<>();
+
+		for (Path path : getDirectories(getOptResources(configuration, target)))
+			if (!path.getFileName().toString().startsWith("."))
+				models.add(path.getFileName().toString());
+
+		Collections.sort(models, String.CASE_INSENSITIVE_ORDER);
+
+		return models;
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see de.uniwuerzburg.zpd.ocr4all.application.spi.core.ProcessServiceProvider#
-	 * newProcessor()
+	 * @see
+	 * de.uniwuerzburg.zpd.ocr4all.application.spi.core.ServiceProvider#getPremise(
+	 * de.uniwuerzburg.zpd.ocr4all.application.spi.env.Target)
 	 */
 	@Override
-	public Processor newProcessor() {
-		// TODO Auto-generated method stub
-		return null;
+	public Premise getPremise(Target target) {
+		return getModels(configuration, target).isEmpty()
+				? new Premise(Premise.State.warn,
+						locale -> "There are no models available in the ocr-d opt directory '"
+								+ getOptResources(configuration, target).toString() + "'.")
+				: super.getPremise(target);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.
+	 * JsonOCRDServiceProviderWorker#getModelCallback(de.uniwuerzburg.zpd.ocr4all.
+	 * application.spi.env.Target)
+	 */
+	@Override
+	protected Hashtable<String, ModelFieldCallback> getModelCallbacks(Target target) {
+		// The models
+		ModelFieldCallback modelsCallback = new ModelFieldCallback() {
+			/*
+			 * (non-Javadoc)
+			 * 
+			 * @see de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.
+			 * JsonOCRDServiceProviderWorker.ModelFieldCallback#handle(de.uniwuerzburg.zpd.
+			 * ocr4all.application.spi.model.Field)
+			 */
+			@Override
+			public Field<?> handle(Field<?> field) {
+				if (field instanceof StringField) {
+					final StringField stringField = ((StringField) field);
+					final String value = stringField.getValue().orElse(null);
+
+					final List<SelectField.Item> models = new ArrayList<SelectField.Item>();
+					for (String model : getModels(configuration, target))
+						models.add(new SelectField.Option(model.equals(value), model, null));
+
+					if (models.isEmpty())
+						models.add(new SelectField.Option(false, "empty", locale -> "model.empty"));
+
+					return new SelectField(stringField.getArgument(), locale -> stringField.getLabel(locale),
+							locale -> stringField.getDescription(locale).orElse(null), false, models, false);
+				} else
+					return null;
+			}
+		};
+
+		Hashtable<String, ModelFieldCallback> callbacks = new Hashtable<>();
+		callbacks.put("checkpoint_dir", modelsCallback);
+
+		return callbacks;
 	}
 
 }

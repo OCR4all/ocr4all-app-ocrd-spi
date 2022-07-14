@@ -66,7 +66,7 @@ public abstract class OCRDServiceProviderWorker extends ServiceProviderCore {
 	/**
 	 * The JSON object mapper.
 	 */
-	private final ObjectMapper objectMapper = new ObjectMapper();
+	protected final ObjectMapper objectMapper = new ObjectMapper();
 	{
 		objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 	}
