@@ -920,7 +920,7 @@ public abstract class JsonOCRDServiceProviderWorker extends OCRDServiceProviderW
 			 * Returns the JSON field number format for given JSON node.
 			 * 
 			 * @param node The JSON object node for the processor parameter.
-			 * @return The JSON field number format. Null if unknown.
+			 * @return The JSON field number format. Decimal if unknown.
 			 * @since 1.8
 			 */
 			public static JsonFieldNumberFormat getFormat(JsonNode node) {
@@ -933,7 +933,7 @@ public abstract class JsonOCRDServiceProviderWorker extends OCRDServiceProviderW
 							return type;
 				}
 
-				return null;
+				return decimal;
 			}
 
 		}
@@ -1054,13 +1054,16 @@ public abstract class JsonOCRDServiceProviderWorker extends OCRDServiceProviderW
 							null, false);
 			case number:
 				JsonFieldNumberFormat format = JsonFieldNumberFormat.getFormat(node);
-				if (format == null) {
-					String name = JsonParameterFiel.format.asText(node);
-
-					throw new ProviderException(
-							(name == null ? "undefined required format" : "unknown format '" + name + "'")
-									+ " for parameter '" + parameter + "'.");
-				}
+				/*
+				 * Not required, since using decimal as default format.
+				 */
+//				if (format == null) {
+//					String name = JsonParameterFiel.format.asText(node);
+//
+//					throw new ProviderException(
+//							(name == null ? "undefined required format" : "unknown format '" + name + "'")
+//									+ " for parameter '" + parameter + "'.");
+//				}
 
 				switch (format) {
 				case integer:
