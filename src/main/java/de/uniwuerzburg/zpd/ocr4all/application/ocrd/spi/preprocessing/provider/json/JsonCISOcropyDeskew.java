@@ -3,7 +3,7 @@
  * Package:  de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.preprocessing.provider.json
  * 
  * Author:   Herbert Baier (herbert.baier@uni-wuerzburg.de)
- * Date:     14.07.2022
+ * Date:     18.07.2022
  */
 package de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.preprocessing.provider.json;
 
@@ -12,9 +12,9 @@ import de.uniwuerzburg.zpd.ocr4all.application.spi.PreprocessingServiceProvider;
 import de.uniwuerzburg.zpd.ocr4all.application.spi.env.ConfigurationServiceProvider;
 
 /**
- * Defines service providers for ocr-d cis ocropy binarize with JSON support.
- * The following properties of the service provider collection <b>ocr-d</b>
- * override the local default settings (<b>key</b>: <i>default value</i>):
+ * Defines service providers for ocr-d cis ocropy deskew with JSON support. The
+ * following properties of the service provider collection <b>ocr-d</b> override
+ * the local default settings (<b>key</b>: <i>default value</i>):
  * <ul>
  * <li>json: -J</li>
  * <li>uid: &lt;effective system user ID. -1 if not defined&gt;</li>
@@ -23,8 +23,8 @@ import de.uniwuerzburg.zpd.ocr4all.application.spi.env.ConfigurationServiceProvi
  * <li>opt-resources: resources</li>
  * <li>docker-image: ocrd/all:maximum</li>
  * <li>docker-resources: /usr/local/share/ocrd-resources</li>
- * <li>cis-ocropy-binarize-json-id: ocrd-cis-ocropy-binarize</li>
- * <li>cis-ocropy-binarize-json-description: ocr-d cis ocropy binarize processor
+ * <li>cis-ocropy-deskew-json-id: ocrd-cis-ocropy-deskew</li>
+ * <li>cis-ocropy-deskew-json-description: ocr-d cis ocropy deskew processor
  * (json)</li>
  * </ul>
  *
@@ -32,11 +32,11 @@ import de.uniwuerzburg.zpd.ocr4all.application.spi.env.ConfigurationServiceProvi
  * @version 1.0
  * @since 1.8
  */
-public class JsonCISOcropyBinarize extends JsonOCRDServiceProviderWorker implements PreprocessingServiceProvider {
+public class JsonCISOcropyDeskew extends JsonOCRDServiceProviderWorker implements PreprocessingServiceProvider {
 	/**
 	 * The service provider name;
 	 */
-	private static final String name = "CIS binarize (JSON)";
+	private static final String name = "CIS deskew (JSON)";
 
 	/**
 	 * Defines service provider collection with keys and default values. Collection
@@ -47,8 +47,8 @@ public class JsonCISOcropyBinarize extends JsonOCRDServiceProviderWorker impleme
 	 * @since 1.8
 	 */
 	private enum ServiceProviderCollection implements ConfigurationServiceProvider.CollectionKey {
-		processorIdentifier("cis-ocropy-binarize-json-id", "ocrd-cis-ocropy-binarize"),
-		processorDescription("cis-ocropy-binarize-json-description", "ocr-d cis ocropy binarize processor (json)");
+		processorIdentifier("cis-ocropy-deskew-json-id", "ocrd-cis-ocropy-deskew"),
+		processorDescription("cis-ocropy-deskew-json-description", "ocr-d cis ocropy deskew processor (json)");
 
 		/**
 		 * The key.
@@ -112,7 +112,7 @@ public class JsonCISOcropyBinarize extends JsonOCRDServiceProviderWorker impleme
 	 * 
 	 * @since 1.8
 	 */
-	public JsonCISOcropyBinarize() {
+	public JsonCISOcropyDeskew() {
 		super(name);
 	}
 
@@ -159,7 +159,7 @@ public class JsonCISOcropyBinarize extends JsonOCRDServiceProviderWorker impleme
 	 */
 	@Override
 	public int getIndex() {
-		return 1400;
+		return 1100;
 	}
 
 }
