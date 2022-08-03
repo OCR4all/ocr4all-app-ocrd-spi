@@ -10,6 +10,7 @@ package de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.ocr.provider.json;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Hashtable;
 import java.util.List;
@@ -249,7 +250,7 @@ public class JsonTesserocrRecognize extends JsonOCRDServiceProviderWorker
 			 * ocr4all.application.spi.model.Field)
 			 */
 			@Override
-			public Field<?> handle(Field<?> field) {
+			public List<Field<?>> handle(Field<?> field) {
 				if (field instanceof StringField) {
 					final StringField stringField = ((StringField) field);
 					final String value = stringField.getValue().orElse(null);
@@ -261,8 +262,9 @@ public class JsonTesserocrRecognize extends JsonOCRDServiceProviderWorker
 					if (models.isEmpty())
 						models.add(new SelectField.Option(false, "empty", locale -> "model.empty"));
 
-					return new SelectField(stringField.getArgument(), locale -> stringField.getLabel(locale),
-							locale -> stringField.getDescription(locale).orElse(null), true, models, false);
+					return Arrays.asList(new SelectField[] {
+							new SelectField(stringField.getArgument(), locale -> stringField.getLabel(locale),
+									locale -> stringField.getDescription(locale).orElse(null), true, models, false) });
 				} else
 					return null;
 			}
@@ -292,7 +294,7 @@ public class JsonTesserocrRecognize extends JsonOCRDServiceProviderWorker
 			 * zpd.ocr4all.application.spi.model.argument.Argument, java.util.Set)
 			 */
 			@Override
-			public Argument handle(Argument argument, Set<String> jsonTypeObjectProcessorParameters) {
+			public List<Argument> handle(Argument argument, Set<String> jsonTypeObjectProcessorParameters) {
 				if (argument instanceof SelectArgument) {
 					SelectArgument selectArgument = (SelectArgument) argument;
 
@@ -308,7 +310,8 @@ public class JsonTesserocrRecognize extends JsonOCRDServiceProviderWorker
 						}
 
 						if (buffer.length() > 0)
-							return new StringArgument(selectArgument.getArgument(), buffer.toString());
+							return Arrays.asList(new StringArgument[] {
+									new StringArgument(selectArgument.getArgument(), buffer.toString()) });
 					}
 				}
 

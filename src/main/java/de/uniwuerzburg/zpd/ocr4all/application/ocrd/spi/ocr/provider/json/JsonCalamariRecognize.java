@@ -9,6 +9,7 @@ package de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.ocr.provider.json;
 
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Hashtable;
 import java.util.List;
@@ -232,7 +233,7 @@ public class JsonCalamariRecognize extends JsonOCRDServiceProviderWorker
 			 * ocr4all.application.spi.model.Field)
 			 */
 			@Override
-			public Field<?> handle(Field<?> field) {
+			public List<Field<?>> handle(Field<?> field) {
 				if (field instanceof StringField) {
 					final StringField stringField = ((StringField) field);
 					final String value = stringField.getValue().orElse(null);
@@ -244,8 +245,9 @@ public class JsonCalamariRecognize extends JsonOCRDServiceProviderWorker
 					if (models.isEmpty())
 						models.add(new SelectField.Option(false, "empty", locale -> "model.empty"));
 
-					return new SelectField(stringField.getArgument(), locale -> stringField.getLabel(locale),
-							locale -> stringField.getDescription(locale).orElse(null), false, models, false);
+					return Arrays.asList(new SelectField[] {
+							new SelectField(stringField.getArgument(), locale -> stringField.getLabel(locale),
+									locale -> stringField.getDescription(locale).orElse(null), false, models, false) });
 				} else
 					return null;
 			}
