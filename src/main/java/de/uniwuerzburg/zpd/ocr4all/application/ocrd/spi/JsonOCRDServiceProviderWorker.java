@@ -328,6 +328,36 @@ public abstract class JsonOCRDServiceProviderWorker extends OCRDServiceProviderW
 	}
 
 	/**
+	 * Implementing subclasses that require entries at the beginning of the model
+	 * can override this method to implement their logic. This method is called each
+	 * time, when the model is required.
+	 * 
+	 * @param target The target. Null if the model is generic, this means, it should
+	 *               not depend on a target.
+	 * @return The entries to be added at the beginning of the model. Null or empty
+	 *         if no entry is required.
+	 * @since 1.8
+	 */
+	protected List<Entry> preModelEntries(Target target) {
+		return null;
+	}
+
+	/**
+	 * Implementing subclasses that require entries at the end of the model can
+	 * override this method to implement their logic. This method is called each
+	 * time, when the model is required.
+	 * 
+	 * @param target The target. Null if the model is generic, this means, it should
+	 *               not depend on a target.
+	 * @return The entries to be added at the end of the model. Null or empty if no
+	 *         entry is required.
+	 * @since 1.8
+	 */
+	protected List<Entry> posModelEntries(Target target) {
+		return null;
+	}
+
+	/**
 	 * Implementing subclasses that require special initialization on model fields
 	 * can override this method to implement their logic. This method is called each
 	 * time, when the model is required.
@@ -351,7 +381,22 @@ public abstract class JsonOCRDServiceProviderWorker extends OCRDServiceProviderW
 	 */
 	@Override
 	public Model getModel(Target target) {
-		return modelFactory == null ? null : modelFactory.getModel(getModelCallbacks(target));
+		return modelFactory == null ? null
+				: modelFactory.getModel(preModelEntries(target), posModelEntries(target), getModelCallbacks(target));
+	}
+
+	/**
+	 * Implementing subclasses that require extra model arguments can override this
+	 * method to implement their logic. This method is called each time, when a
+	 * processor is executed.
+	 * 
+	 * @param processor The processor for service providers.
+	 * @return The extra model arguments. Null or empty if no extra model argument
+	 *         is required.
+	 * @since 1.8
+	 */
+	protected List<Argument> extraArguments(CoreProcessorServiceProvider processor) {
+		return null;
 	}
 
 	/**
@@ -403,17 +448,30 @@ public abstract class JsonOCRDServiceProviderWorker extends OCRDServiceProviderW
 
 				final Set<String> jsonTypeObjectProcessorParameters = modelFactory
 						.getJsonTypeObjectProcessorParameters();
-				final Hashtable<String, ModelArgumentCallback> processorCallbacks = getProcessorCallbacks(this);
 
+				List<Argument> arguments = new ArrayList<>();
+				
+				List<Argument> extraArguments = extraArguments(this);
+				if (extraArguments != null && !extraArguments.isEmpty())
+					for (Argument argument : extraArguments)
+						if (argument != null)
+							arguments.add(argument);
+
+				final Hashtable<String, ModelArgumentCallback> processorCallbacks = getProcessorCallbacks(this);
 				for (Argument argument : modelArgument.getArguments()) {
 					if (processorCallbacks != null && processorCallbacks.containsKey(argument.getArgument())) {
-						argument = processorCallbacks.get(argument.getArgument()).handle(argument,
-								jsonTypeObjectProcessorParameters);
+						List<Argument> handledArguments = processorCallbacks.get(argument.getArgument())
+								.handle(argument, jsonTypeObjectProcessorParameters);
 
-						if (argument == null)
-							continue;
-					}
+						if (handledArguments != null && !handledArguments.isEmpty())
+							for (Argument handled : handledArguments)
+								if (handled != null)
+									arguments.add(handled);
+					} else
+						arguments.add(argument);
+				}
 
+				for (Argument argument : arguments) {
 					if (argument instanceof SelectArgument) {
 						SelectArgument select = (SelectArgument) argument;
 
@@ -494,10 +552,10 @@ public abstract class JsonOCRDServiceProviderWorker extends OCRDServiceProviderW
 		 * Handles the field.
 		 * 
 		 * @param field The field to handle.
-		 * @return The handled field. Null if the field should be removed.
+		 * @return The handled fields. Null or empty if the field should be removed.
 		 * @since 1.8
 		 */
-		public Field<?> handle(Field<?> field);
+		public List<Field<?>> handle(Field<?> field);
 	}
 
 	/**
@@ -516,10 +574,11 @@ public abstract class JsonOCRDServiceProviderWorker extends OCRDServiceProviderW
 		 * @param argument                          The argument to handle.
 		 * @param jsonTypeObjectProcessorParameters The JSON processor parameters of
 		 *                                          type object.
-		 * @return The handled argument. Null if the argument should be ignored.
+		 * @return The handled arguments. Null or empty if the argument should be
+		 *         ignored.
 		 * @since 1.8
 		 */
-		public Argument handle(Argument argument, Set<String> jsonTypeObjectProcessorParameters);
+		public List<Argument> handle(Argument argument, Set<String> jsonTypeObjectProcessorParameters);
 	}
 
 	/**
@@ -980,25 +1039,41 @@ public abstract class JsonOCRDServiceProviderWorker extends OCRDServiceProviderW
 		/**
 		 * Returns the model.
 		 * 
+		 * @param preModelEntries     The entries to be added at the beginning of the
+		 *                            model. Null or empty if no entry is required.
+		 * @param posModelEntries     The entries to be added at the end of the model.
+		 *                            Null or empty if no entry is required.
 		 * @param modelFieldCallbacks The model fields that need to be handled. The key
 		 *                            is the field argument and the value the desired
 		 *                            field handler.
 		 * @return The model.
 		 * @since 1.8
 		 */
-		public Model getModel(Hashtable<String, ModelFieldCallback> modelFieldCallbacks) {
+		public Model getModel(List<Entry> preModelEntries, List<Entry> posModelEntries,
+				Hashtable<String, ModelFieldCallback> modelFieldCallbacks) {
 			List<Entry> entries = new ArrayList<>();
+
+			if (preModelEntries != null && !preModelEntries.isEmpty())
+				for (Entry entry : preModelEntries)
+					if (entry != null)
+						entries.add(entry);
 
 			for (Field<?> field : fields) {
 				if (modelFieldCallbacks != null && modelFieldCallbacks.containsKey(field.getArgument())) {
-					field = modelFieldCallbacks.get(field.getArgument()).handle(field);
+					List<Field<?>> fields = modelFieldCallbacks.get(field.getArgument()).handle(field);
 
-					if (field == null)
-						continue;
-				}
-
-				entries.add(field);
+					if (fields != null && !fields.isEmpty())
+						for (Field<?> handled : fields)
+							if (handled != null)
+								entries.add(handled);
+				} else
+					entries.add(field);
 			}
+
+			if (posModelEntries != null && !posModelEntries.isEmpty())
+				for (Entry entry : posModelEntries)
+					if (entry != null)
+						entries.add(entry);
 
 			return new Model(entries);
 		}
