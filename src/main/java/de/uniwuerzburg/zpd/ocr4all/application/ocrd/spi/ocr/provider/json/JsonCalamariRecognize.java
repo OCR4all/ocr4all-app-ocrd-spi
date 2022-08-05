@@ -218,45 +218,50 @@ public class JsonCalamariRecognize extends JsonOCRDServiceProviderWorker
 	 * (non-Javadoc)
 	 * 
 	 * @see de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.
-	 * JsonOCRDServiceProviderWorker#getModelCallback(de.uniwuerzburg.zpd.ocr4all.
-	 * application.spi.env.Target)
+	 * JsonOCRDServiceProviderWorker#getModelCallbacks(de.uniwuerzburg.zpd.ocr4all.
+	 * application.spi.env.Target, java.util.List)
 	 */
 	@Override
-	protected Hashtable<String, ModelFieldCallback> getModelCallbacks(Target target) {
-		// The models
-		ModelFieldCallback modelsCallback = new ModelFieldCallback() {
-			/*
-			 * (non-Javadoc)
-			 * 
-			 * @see de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.
-			 * JsonOCRDServiceProviderWorker.ModelFieldCallback#handle(de.uniwuerzburg.zpd.
-			 * ocr4all.application.spi.model.Field)
-			 */
-			@Override
-			public List<Field<?>> handle(Field<?> field) {
-				if (field instanceof StringField) {
-					final StringField stringField = ((StringField) field);
-					final String value = stringField.getValue().orElse(null);
+	protected Hashtable<String, ModelFieldCallback> getModelCallbacks(Target target, List<String> arguments) {
+		final String model = "checkpoint_dir";
 
-					final List<SelectField.Item> models = new ArrayList<SelectField.Item>();
-					for (String model : getModels(configuration, target))
-						models.add(new SelectField.Option(model.equals(value), model, null));
+		if (arguments.contains(model)) {
+			// The models
+			ModelFieldCallback modelsCallback = new ModelFieldCallback() {
+				/*
+				 * (non-Javadoc)
+				 * 
+				 * @see de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.
+				 * JsonOCRDServiceProviderWorker.ModelFieldCallback#handle(de.uniwuerzburg.zpd.
+				 * ocr4all.application.spi.model.Field)
+				 */
+				@Override
+				public List<Field<?>> handle(Field<?> field) {
+					if (field instanceof StringField) {
+						final StringField stringField = ((StringField) field);
+						final String value = stringField.getValue().orElse(null);
 
-					if (models.isEmpty())
-						models.add(new SelectField.Option(false, "empty", locale -> "model.empty"));
+						final List<SelectField.Item> models = new ArrayList<SelectField.Item>();
+						for (String model : getModels(configuration, target))
+							models.add(new SelectField.Option(model.equals(value), model, null));
 
-					return Arrays.asList(new SelectField[] {
-							new SelectField(stringField.getArgument(), locale -> stringField.getLabel(locale),
-									locale -> stringField.getDescription(locale).orElse(null), false, models, false) });
-				} else
-					return null;
-			}
-		};
+						if (models.isEmpty())
+							models.add(new SelectField.Option(false, "empty", locale -> "model.empty"));
 
-		Hashtable<String, ModelFieldCallback> callbacks = new Hashtable<>();
-		callbacks.put("checkpoint_dir", modelsCallback);
+						return Arrays.asList(new SelectField[] { new SelectField(stringField.getArgument(),
+								locale -> stringField.getLabel(locale),
+								locale -> stringField.getDescription(locale).orElse(null), false, models, false) });
+					} else
+						return null;
+				}
+			};
 
-		return callbacks;
+			Hashtable<String, ModelFieldCallback> callbacks = new Hashtable<>();
+			callbacks.put(model, modelsCallback);
+
+			return callbacks;
+		} else
+			return null;
 	}
 
 }
