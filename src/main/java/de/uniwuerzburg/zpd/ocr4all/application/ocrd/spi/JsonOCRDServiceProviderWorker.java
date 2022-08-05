@@ -332,13 +332,14 @@ public abstract class JsonOCRDServiceProviderWorker extends OCRDServiceProviderW
 	 * can override this method to implement their logic. This method is called each
 	 * time, when the model is required.
 	 * 
-	 * @param target The target. Null if the model is generic, this means, it should
-	 *               not depend on a target.
+	 * @param target    The target. Null if the model is generic, this means, it
+	 *                  should not depend on a target.
+	 * @param arguments The arguments in reading order.
 	 * @return The entries to be added at the beginning of the model. Null or empty
 	 *         if no entry is required.
 	 * @since 1.8
 	 */
-	protected List<Entry> preModelEntries(Target target) {
+	protected List<Entry> preModelEntries(Target target, List<String> arguments) {
 		return null;
 	}
 
@@ -347,13 +348,14 @@ public abstract class JsonOCRDServiceProviderWorker extends OCRDServiceProviderW
 	 * override this method to implement their logic. This method is called each
 	 * time, when the model is required.
 	 * 
-	 * @param target The target. Null if the model is generic, this means, it should
-	 *               not depend on a target.
+	 * @param target    The target. Null if the model is generic, this means, it
+	 *                  should not depend on a target.
+	 * @param arguments The arguments in reading order.
 	 * @return The entries to be added at the end of the model. Null or empty if no
 	 *         entry is required.
 	 * @since 1.8
 	 */
-	protected List<Entry> posModelEntries(Target target) {
+	protected List<Entry> posModelEntries(Target target, List<String> arguments) {
 		return null;
 	}
 
@@ -362,13 +364,14 @@ public abstract class JsonOCRDServiceProviderWorker extends OCRDServiceProviderW
 	 * can override this method to implement their logic. This method is called each
 	 * time, when the model is required.
 	 * 
-	 * @param target The target. Null if the model is generic, this means, it should
-	 *               not depend on a target.
+	 * @param target    The target. Null if the model is generic, this means, it
+	 *                  should not depend on a target.
+	 * @param arguments The arguments in reading order.
 	 * @return The model fields that need to be handled. The key is the field
 	 *         argument and the value the desired field handler.
 	 * @since 1.8
 	 */
-	protected Hashtable<String, ModelFieldCallback> getModelCallbacks(Target target) {
+	protected Hashtable<String, ModelFieldCallback> getModelCallbacks(Target target, List<String> arguments) {
 		return null;
 	}
 
@@ -382,7 +385,9 @@ public abstract class JsonOCRDServiceProviderWorker extends OCRDServiceProviderW
 	@Override
 	public Model getModel(Target target) {
 		return modelFactory == null ? null
-				: modelFactory.getModel(preModelEntries(target), posModelEntries(target), getModelCallbacks(target));
+				: modelFactory.getModel(preModelEntries(target, modelFactory.getArguments()),
+						posModelEntries(target, modelFactory.getArguments()),
+						getModelCallbacks(target, modelFactory.getArguments()));
 	}
 
 	/**
@@ -391,11 +396,12 @@ public abstract class JsonOCRDServiceProviderWorker extends OCRDServiceProviderW
 	 * processor is executed.
 	 * 
 	 * @param processor The processor for service providers.
+	 * @param arguments The arguments in reading order.
 	 * @return The extra model arguments. Null or empty if no extra model argument
 	 *         is required.
 	 * @since 1.8
 	 */
-	protected List<Argument> extraArguments(CoreProcessorServiceProvider processor) {
+	protected List<Argument> extraArguments(CoreProcessorServiceProvider processor, List<String> arguments) {
 		return null;
 	}
 
@@ -405,11 +411,13 @@ public abstract class JsonOCRDServiceProviderWorker extends OCRDServiceProviderW
 	 * called each time, when a processor is executed.
 	 * 
 	 * @param processor The processor for service providers.
+	 * @param arguments The arguments in reading order.
 	 * @return The model arguments that need to be handled. The key is the argument
 	 *         name and the value the desired argument handler.
 	 * @since 1.8
 	 */
-	protected Hashtable<String, ModelArgumentCallback> getProcessorCallbacks(CoreProcessorServiceProvider processor) {
+	protected Hashtable<String, ModelArgumentCallback> getProcessorCallbacks(CoreProcessorServiceProvider processor,
+			List<String> arguments) {
 		return null;
 	}
 
@@ -450,14 +458,16 @@ public abstract class JsonOCRDServiceProviderWorker extends OCRDServiceProviderW
 						.getJsonTypeObjectProcessorParameters();
 
 				List<Argument> arguments = new ArrayList<>();
-				
-				List<Argument> extraArguments = extraArguments(this);
+
+				List<Argument> extraArguments = extraArguments(this, modelFactory.getArguments());
 				if (extraArguments != null && !extraArguments.isEmpty())
 					for (Argument argument : extraArguments)
 						if (argument != null)
 							arguments.add(argument);
 
-				final Hashtable<String, ModelArgumentCallback> processorCallbacks = getProcessorCallbacks(this);
+				final Hashtable<String, ModelArgumentCallback> processorCallbacks = getProcessorCallbacks(this,
+						modelFactory.getArguments());
+
 				for (Argument argument : modelArgument.getArguments()) {
 					if (processorCallbacks != null && processorCallbacks.containsKey(argument.getArgument())) {
 						List<Argument> handledArguments = processorCallbacks.get(argument.getArgument())
@@ -471,62 +481,65 @@ public abstract class JsonOCRDServiceProviderWorker extends OCRDServiceProviderW
 						arguments.add(argument);
 				}
 
-				for (Argument argument : arguments) {
-					if (argument instanceof SelectArgument) {
-						SelectArgument select = (SelectArgument) argument;
+				// Processes only the arguments that belong to the json description
+				Set<String> jsonArguments = new HashSet<>(modelFactory.getArguments());
+				for (Argument argument : arguments)
+					if (jsonArguments.contains(argument.getArgument())) {
+						if (argument instanceof SelectArgument) {
+							SelectArgument select = (SelectArgument) argument;
 
-						if (select.getValues().isPresent()) {
-							List<String> values = select.getValues().get();
+							if (select.getValues().isPresent()) {
+								List<String> values = select.getValues().get();
 
-							if (values.size() == 1)
-								processorArguments.put(select.getArgument(), values.get(0));
-							else if (values.size() > 1) {
-								updatedStandardError(
-										"The select argument '" + select.getArgument() + "' allows only one value.");
-
-								return ProcessServiceProvider.Processor.State.interrupted;
-							}
-						}
-					} else if (argument instanceof StringArgument) {
-						StringArgument string = (StringArgument) argument;
-
-						if (string.getValue().isPresent()) {
-							if (jsonTypeObjectProcessorParameters.contains(string.getArgument())) {
-								try {
-									processorArguments.set(string.getArgument(),
-											objectMapper.readTree(string.getValue().get()));
-								} catch (JsonProcessingException e) {
-									updatedStandardError("The JSON value of argument '" + string.getArgument()
-											+ "' can not be parsed - " + e.getMessage());
+								if (values.size() == 1)
+									processorArguments.put(select.getArgument(), values.get(0));
+								else if (values.size() > 1) {
+									updatedStandardError("The select argument '" + select.getArgument()
+											+ "' allows only one value.");
 
 									return ProcessServiceProvider.Processor.State.interrupted;
 								}
-							} else
-								processorArguments.put(string.getArgument(), string.getValue().get());
+							}
+						} else if (argument instanceof StringArgument) {
+							StringArgument string = (StringArgument) argument;
+
+							if (string.getValue().isPresent()) {
+								if (jsonTypeObjectProcessorParameters.contains(string.getArgument())) {
+									try {
+										processorArguments.set(string.getArgument(),
+												objectMapper.readTree(string.getValue().get()));
+									} catch (JsonProcessingException e) {
+										updatedStandardError("The JSON value of argument '" + string.getArgument()
+												+ "' can not be parsed - " + e.getMessage());
+
+										return ProcessServiceProvider.Processor.State.interrupted;
+									}
+								} else
+									processorArguments.put(string.getArgument(), string.getValue().get());
+							}
+
+						} else if (argument instanceof IntegerArgument) {
+							IntegerArgument integer = (IntegerArgument) argument;
+
+							if (integer.getValue().isPresent())
+								processorArguments.put(integer.getArgument(), (int) integer.getValue().get());
+						} else if (argument instanceof DecimalArgument) {
+							DecimalArgument decimal = (DecimalArgument) argument;
+
+							if (decimal.getValue().isPresent())
+								processorArguments.put(decimal.getArgument(), (float) decimal.getValue().get());
+						} else if (argument instanceof BooleanArgument) {
+							BooleanArgument bool = (BooleanArgument) argument;
+
+							if (bool.getValue().isPresent())
+								processorArguments.put(bool.getArgument(), (boolean) bool.getValue().get());
+						} else {
+							updatedStandardError("The argument of type '" + argument.getClass().getName() + "'"
+									+ " is not supported.");
+
+							return ProcessServiceProvider.Processor.State.interrupted;
 						}
-
-					} else if (argument instanceof IntegerArgument) {
-						IntegerArgument integer = (IntegerArgument) argument;
-
-						if (integer.getValue().isPresent())
-							processorArguments.put(integer.getArgument(), (int) integer.getValue().get());
-					} else if (argument instanceof DecimalArgument) {
-						DecimalArgument decimal = (DecimalArgument) argument;
-
-						if (decimal.getValue().isPresent())
-							processorArguments.put(decimal.getArgument(), (float) decimal.getValue().get());
-					} else if (argument instanceof BooleanArgument) {
-						BooleanArgument bool = (BooleanArgument) argument;
-
-						if (bool.getValue().isPresent())
-							processorArguments.put(bool.getArgument(), (boolean) bool.getValue().get());
-					} else {
-						updatedStandardError(
-								"The argument of type '" + argument.getClass().getName() + "'" + " is not supported.");
-
-						return ProcessServiceProvider.Processor.State.interrupted;
 					}
-				}
 
 				/*
 				 * Runs the processor
@@ -1076,6 +1089,21 @@ public abstract class JsonOCRDServiceProviderWorker extends OCRDServiceProviderW
 						entries.add(entry);
 
 			return new Model(entries);
+		}
+
+		/**
+		 * Returns the arguments in reading order.
+		 * 
+		 * @return The arguments in reading order.
+		 * @since 1.8
+		 */
+		public List<String> getArguments() {
+			List<String> arguments = new ArrayList<>();
+
+			for (Field<?> field : fields)
+				arguments.add(field.getArgument());
+
+			return arguments;
 		}
 
 		/**

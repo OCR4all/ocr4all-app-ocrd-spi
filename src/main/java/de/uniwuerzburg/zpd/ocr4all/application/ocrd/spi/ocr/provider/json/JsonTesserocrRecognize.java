@@ -63,6 +63,11 @@ public class JsonTesserocrRecognize extends JsonOCRDServiceProviderWorker
 	private static final String defaultModelExtension = "traineddata";
 
 	/**
+	 * The model argument.
+	 */
+	private static final String modelArgument = "model";
+
+	/**
 	 * Defines service provider collection with keys and default values. Collection
 	 * blank values are not allowed and their values are trimmed.
 	 *
@@ -235,45 +240,48 @@ public class JsonTesserocrRecognize extends JsonOCRDServiceProviderWorker
 	 * (non-Javadoc)
 	 * 
 	 * @see de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.
-	 * JsonOCRDServiceProviderWorker#getModelCallback(de.uniwuerzburg.zpd.ocr4all.
-	 * application.spi.env.Target)
+	 * JsonOCRDServiceProviderWorker#getModelCallbacks(de.uniwuerzburg.zpd.ocr4all.
+	 * application.spi.env.Target, java.util.List)
 	 */
 	@Override
-	protected Hashtable<String, ModelFieldCallback> getModelCallbacks(Target target) {
-		// The models
-		ModelFieldCallback modelsCallback = new ModelFieldCallback() {
-			/*
-			 * (non-Javadoc)
-			 * 
-			 * @see de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.
-			 * JsonOCRDServiceProviderWorker.ModelFieldCallback#handle(de.uniwuerzburg.zpd.
-			 * ocr4all.application.spi.model.Field)
-			 */
-			@Override
-			public List<Field<?>> handle(Field<?> field) {
-				if (field instanceof StringField) {
-					final StringField stringField = ((StringField) field);
-					final String value = stringField.getValue().orElse(null);
+	protected Hashtable<String, ModelFieldCallback> getModelCallbacks(Target target, List<String> arguments) {
+		if (arguments.contains(modelArgument)) {
+			// The models
+			ModelFieldCallback modelsCallback = new ModelFieldCallback() {
+				/*
+				 * (non-Javadoc)
+				 * 
+				 * @see de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.
+				 * JsonOCRDServiceProviderWorker.ModelFieldCallback#handle(de.uniwuerzburg.zpd.
+				 * ocr4all.application.spi.model.Field)
+				 */
+				@Override
+				public List<Field<?>> handle(Field<?> field) {
+					if (field instanceof StringField) {
+						final StringField stringField = ((StringField) field);
+						final String value = stringField.getValue().orElse(null);
 
-					final List<SelectField.Item> models = new ArrayList<SelectField.Item>();
-					for (String model : getModels(configuration, target))
-						models.add(new SelectField.Option(model.equals(value), model, null));
+						final List<SelectField.Item> models = new ArrayList<SelectField.Item>();
+						for (String model : getModels(configuration, target))
+							models.add(new SelectField.Option(model.equals(value), model, null));
 
-					if (models.isEmpty())
-						models.add(new SelectField.Option(false, "empty", locale -> "model.empty"));
+						if (models.isEmpty())
+							models.add(new SelectField.Option(false, "empty", locale -> "model.empty"));
 
-					return Arrays.asList(new SelectField[] {
-							new SelectField(stringField.getArgument(), locale -> stringField.getLabel(locale),
-									locale -> stringField.getDescription(locale).orElse(null), true, models, false) });
-				} else
-					return null;
-			}
-		};
+						return Arrays.asList(new SelectField[] { new SelectField(stringField.getArgument(),
+								locale -> stringField.getLabel(locale),
+								locale -> stringField.getDescription(locale).orElse(null), true, models, false) });
+					} else
+						return null;
+				}
+			};
 
-		Hashtable<String, ModelFieldCallback> callbacks = new Hashtable<>();
-		callbacks.put("model", modelsCallback);
+			Hashtable<String, ModelFieldCallback> callbacks = new Hashtable<>();
+			callbacks.put(modelArgument, modelsCallback);
 
-		return callbacks;
+			return callbacks;
+		} else
+			return null;
 	}
 
 	/*
@@ -281,48 +289,52 @@ public class JsonTesserocrRecognize extends JsonOCRDServiceProviderWorker
 	 * 
 	 * @see de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.
 	 * JsonOCRDServiceProviderWorker#getProcessorCallbacks(de.uniwuerzburg.zpd.
-	 * ocr4all.application.spi.core.CoreProcessorServiceProvider)
+	 * ocr4all.application.spi.core.CoreProcessorServiceProvider, java.util.List)
 	 */
 	@Override
-	protected Hashtable<String, ModelArgumentCallback> getProcessorCallbacks(CoreProcessorServiceProvider processor) {
-		ModelArgumentCallback modelsCallback = new ModelArgumentCallback() {
-			/*
-			 * (non-Javadoc)
-			 * 
-			 * @see de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.
-			 * JsonOCRDServiceProviderWorker.ModelArgumentCallback#handle(de.uniwuerzburg.
-			 * zpd.ocr4all.application.spi.model.argument.Argument, java.util.Set)
-			 */
-			@Override
-			public List<Argument> handle(Argument argument, Set<String> jsonTypeObjectProcessorParameters) {
-				if (argument instanceof SelectArgument) {
-					SelectArgument selectArgument = (SelectArgument) argument;
+	protected Hashtable<String, ModelArgumentCallback> getProcessorCallbacks(CoreProcessorServiceProvider processor,
+			List<String> arguments) {
+		if (arguments.contains(modelArgument)) {
+			ModelArgumentCallback modelsCallback = new ModelArgumentCallback() {
+				/*
+				 * (non-Javadoc)
+				 * 
+				 * @see de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.
+				 * JsonOCRDServiceProviderWorker.ModelArgumentCallback#handle(de.uniwuerzburg.
+				 * zpd.ocr4all.application.spi.model.argument.Argument, java.util.Set)
+				 */
+				@Override
+				public List<Argument> handle(Argument argument, Set<String> jsonTypeObjectProcessorParameters) {
+					if (argument instanceof SelectArgument) {
+						SelectArgument selectArgument = (SelectArgument) argument;
 
-					if (selectArgument.getValues().isPresent()) {
-						StringBuffer buffer = new StringBuffer();
+						if (selectArgument.getValues().isPresent()) {
+							StringBuffer buffer = new StringBuffer();
 
-						// Multiple models are combined by concatenating with +
-						for (String value : selectArgument.getValues().get()) {
+							// Multiple models are combined by concatenating with +
+							for (String value : selectArgument.getValues().get()) {
+								if (buffer.length() > 0)
+									buffer.append("+");
+
+								buffer.append(value);
+							}
+
 							if (buffer.length() > 0)
-								buffer.append("+");
-
-							buffer.append(value);
+								return Arrays.asList(new StringArgument[] {
+										new StringArgument(selectArgument.getArgument(), buffer.toString()) });
 						}
-
-						if (buffer.length() > 0)
-							return Arrays.asList(new StringArgument[] {
-									new StringArgument(selectArgument.getArgument(), buffer.toString()) });
 					}
+
+					return null;
 				}
+			};
 
-				return null;
-			}
-		};
+			Hashtable<String, ModelArgumentCallback> callbacks = new Hashtable<>();
+			callbacks.put(modelArgument, modelsCallback);
 
-		Hashtable<String, ModelArgumentCallback> callbacks = new Hashtable<>();
-		callbacks.put("model", modelsCallback);
-
-		return callbacks;
+			return callbacks;
+		} else
+			return null;
 	}
 
 }
