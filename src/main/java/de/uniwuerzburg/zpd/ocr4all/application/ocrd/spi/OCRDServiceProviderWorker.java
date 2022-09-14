@@ -33,6 +33,7 @@ import de.uniwuerzburg.zpd.ocr4all.application.spi.env.ConfigurationServiceProvi
 import de.uniwuerzburg.zpd.ocr4all.application.spi.env.Framework;
 import de.uniwuerzburg.zpd.ocr4all.application.spi.env.SystemCommand;
 import de.uniwuerzburg.zpd.ocr4all.application.spi.env.Target;
+import de.uniwuerzburg.zpd.ocr4all.application.spi.util.MetsUtils;
 import de.uniwuerzburg.zpd.ocr4all.application.spi.util.SystemProcess;
 
 /**
@@ -397,7 +398,7 @@ public abstract class OCRDServiceProviderWorker extends ServiceProviderCore {
 	 * @since 1.8
 	 */
 	protected List<String> getProcessorArguments(Framework framework, boolean isResources, Object arguments,
-			MetsFileGroup metsFileGroup) throws JsonProcessingException {
+			MetsUtils.FileGroup metsFileGroup) throws JsonProcessingException {
 		// Get the effective system user/group id
 		String uid = configuration.getValue(ServiceProviderCollection.uid);
 		if (uid == null && framework.isUID())
@@ -532,7 +533,7 @@ public abstract class OCRDServiceProviderWorker extends ServiceProviderCore {
 			return ProcessServiceProvider.Processor.State.interrupted;
 		}
 
-		final MetsFileGroup metsFileGroup = new MetsFileGroup(framework);
+		final MetsUtils.FileGroup metsFileGroup = MetsUtils.getFileGroup(framework);
 
 		SystemProcess process = null;
 		try {
@@ -841,89 +842,4 @@ public abstract class OCRDServiceProviderWorker extends ServiceProviderCore {
 		public ProcessServiceProvider.Processor.State complete();
 	}
 
-	/**
-	 * MetsFileGroup is an immutable class that defines mets file groups.
-	 *
-	 * @author <a href="mailto:herbert.baier@uni-wuerzburg.de">Herbert Baier</a>
-	 * @version 1.0
-	 * @since 1.8
-	 */
-	protected static class MetsFileGroup {
-		/**
-		 * The file group prefix.
-		 */
-		private final String fileGroupPrefix;
-
-		/**
-		 * The input file group.
-		 */
-		private final String input;
-
-		/**
-		 * The output file group.
-		 */
-		private final String output;
-
-		/**
-		 * Creates a mets file group.
-		 * 
-		 * @param framework The framework.
-		 * @since 1.8
-		 */
-		public MetsFileGroup(Framework framework) {
-			super();
-
-			fileGroupPrefix = framework.getMetsGroup();
-
-			this.input = getFileGroup(framework.getTarget().getWorkflow().getSnapshotTrack());
-			this.output = getFileGroup(framework.getSnapshotTrack());
-		}
-
-		/**
-		 * Returns the file group.
-		 * 
-		 * @param snapshotTrack The snapshot track.
-		 * @return The file group.
-		 * @since 1.8
-		 */
-		private String getFileGroup(List<Integer> snapshotTrack) {
-			StringBuffer path = new StringBuffer();
-
-			for (int snapshotId : snapshotTrack)
-				path.append("-" + snapshotId);
-
-			return fileGroupPrefix + path.toString();
-		}
-
-		/**
-		 * Returns the file group prefix.
-		 *
-		 * @return The file group prefix.
-		 * @since 1.8
-		 */
-		public String getFileGroupPrefix() {
-			return fileGroupPrefix;
-		}
-
-		/**
-		 * Returns the input file group.
-		 *
-		 * @return The input file group.
-		 * @since 1.8
-		 */
-		public String getInput() {
-			return input;
-		}
-
-		/**
-		 * Returns the output file group.
-		 *
-		 * @return The output file group.
-		 * @since 1.8
-		 */
-		public String getOutput() {
-			return output;
-		}
-
-	}
 }
