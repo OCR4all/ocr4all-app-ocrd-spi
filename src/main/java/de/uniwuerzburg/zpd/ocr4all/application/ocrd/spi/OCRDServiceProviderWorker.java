@@ -398,7 +398,7 @@ public abstract class OCRDServiceProviderWorker extends ServiceProviderCore {
 	 * @since 1.8
 	 */
 	protected List<String> getProcessorArguments(Framework framework, boolean isResources, Object arguments,
-			MetsUtils.FileGroup metsFileGroup) throws JsonProcessingException {
+			MetsUtils.FrameworkFileGroup metsFileGroup) throws JsonProcessingException {
 		// Get the effective system user/group id
 		String uid = configuration.getValue(ServiceProviderCollection.uid);
 		if (uid == null && framework.isUID())
@@ -533,7 +533,7 @@ public abstract class OCRDServiceProviderWorker extends ServiceProviderCore {
 			return ProcessServiceProvider.Processor.State.interrupted;
 		}
 
-		final MetsUtils.FileGroup metsFileGroup = MetsUtils.getFileGroup(framework);
+		final MetsUtils.FrameworkFileGroup metsFileGroup = MetsUtils.getFileGroup(framework);
 
 		SystemProcess process = null;
 		try {
