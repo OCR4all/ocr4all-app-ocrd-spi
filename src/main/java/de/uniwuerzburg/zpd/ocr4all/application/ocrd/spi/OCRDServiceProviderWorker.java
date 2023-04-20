@@ -388,9 +388,10 @@ public abstract class OCRDServiceProviderWorker extends ServiceProviderCore {
 	/**
 	 * Returns the ocr-d arguments for the docker process.
 	 * 
-	 * @param framework   The framework.
-	 * @param isResources True if resources folder is required.
-	 * @param arguments   The ocr-d processor arguments.
+	 * @param framework     The framework.
+	 * @param isResources   True if resources folder is required.
+	 * @param arguments     The ocr-d processor arguments.
+	 * @param metsFileGroup The mets file group.
 	 * @return The ocr-d arguments for the docker process.
 	 * @throws JsonProcessingException Throws on processing (parsing, generating)
 	 *                                 JSON arguments that are not pure I/O
