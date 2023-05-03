@@ -1,3 +1,3 @@
-de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.preprocessing.provider.CISOcropyBinarize
+#de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.preprocessing.provider.CISOcropyBinarize
 de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.preprocessing.provider.json.JsonCISOcropyDeskew
 de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.preprocessing.provider.json.JsonCISOcropyBinarize
