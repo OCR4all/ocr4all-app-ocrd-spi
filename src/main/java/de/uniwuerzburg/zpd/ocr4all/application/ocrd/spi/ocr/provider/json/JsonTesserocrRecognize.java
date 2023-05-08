@@ -9,6 +9,7 @@ package de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.ocr.provider.json;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -44,6 +45,7 @@ import de.uniwuerzburg.zpd.ocr4all.application.spi.model.argument.StringArgument
  * <li>tesserocr-recognize-json-id: ocrd-tesserocr-recognize</li>
  * <li>tesserocr-recognize-json-description: ocr-d tesserocr recognize processor
  * (json)</li>
+ * <li>tesserocr-docker-resources: ocr-d tesserocr resources folder</li>
  * </ul>
  *
  * @author <a href="mailto:herbert.baier@uni-wuerzburg.de">Herbert Baier</a>
@@ -77,7 +79,8 @@ public class JsonTesserocrRecognize extends JsonOCRDServiceProviderWorker
 	 */
 	private enum ServiceProviderCollection implements ConfigurationServiceProvider.CollectionKey {
 		processorIdentifier("tesserocr-recognize-json-id", "ocrd-tesserocr-recognize"),
-		processorDescription("tesserocr-recognize-json-description", "ocr-d tesserocr recognize processor (json)");
+		processorDescription("tesserocr-recognize-json-description", "ocr-d tesserocr recognize processor (json)"),
+		dockerResources("tesserocr-docker-resources", "/usr/local/share/tessdata");
 
 		/**
 		 * The key.
@@ -167,6 +170,21 @@ public class JsonTesserocrRecognize extends JsonOCRDServiceProviderWorker
 	@Override
 	protected ConfigurationServiceProvider.CollectionKey processorDescription() {
 		return ServiceProviderCollection.processorDescription;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.OCRDServiceProviderWorker#
+	 * getDockerResources(de.uniwuerzburg.zpd.ocr4all.application.spi.env.
+	 * ConfigurationServiceProvider)
+	 */
+	@Override
+	protected Path getDockerResources(ConfigurationServiceProvider configuration) {
+		return Paths
+				.get(ConfigurationServiceProvider.getValue(configuration, ServiceProviderCollection.dockerResources))
+				.normalize();
 	}
 
 	/*
