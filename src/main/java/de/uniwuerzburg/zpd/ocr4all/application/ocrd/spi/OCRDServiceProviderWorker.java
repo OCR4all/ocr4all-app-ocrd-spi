@@ -422,7 +422,7 @@ public abstract class OCRDServiceProviderWorker extends ServiceProviderCore {
 
 		if (isResources) {
 			Path optResources = getOptResources(framework);
-			Path dockerResources = getDockerResources(framework);
+			Path dockerResources = getDockerResources();
 
 			if (Files.isDirectory(optResources))
 				processorArguments
@@ -676,12 +676,11 @@ public abstract class OCRDServiceProviderWorker extends ServiceProviderCore {
 	/**
 	 * Returns the docker resources folder.
 	 * 
-	 * @param framework The framework.
 	 * @return The docker resources folder.
 	 * @since 1.8
 	 */
-	protected Path getDockerResources(Framework framework) {
-		return framework == null ? null : getDockerResources(configuration);
+	protected Path getDockerResources() {
+		return getDockerResources(configuration);
 	}
 
 	/**
