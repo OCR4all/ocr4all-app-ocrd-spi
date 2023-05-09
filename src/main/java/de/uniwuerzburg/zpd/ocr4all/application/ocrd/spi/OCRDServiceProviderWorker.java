@@ -15,6 +15,7 @@ import java.nio.file.StandardCopyOption;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.MissingResourceException;
@@ -27,12 +28,16 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.JsonOCRDServiceProviderWorker.ModelFieldCallback;
 import de.uniwuerzburg.zpd.ocr4all.application.spi.core.ProcessServiceProvider;
 import de.uniwuerzburg.zpd.ocr4all.application.spi.core.ServiceProviderCore;
 import de.uniwuerzburg.zpd.ocr4all.application.spi.env.ConfigurationServiceProvider;
 import de.uniwuerzburg.zpd.ocr4all.application.spi.env.Framework;
 import de.uniwuerzburg.zpd.ocr4all.application.spi.env.SystemCommand;
 import de.uniwuerzburg.zpd.ocr4all.application.spi.env.Target;
+import de.uniwuerzburg.zpd.ocr4all.application.spi.model.Field;
+import de.uniwuerzburg.zpd.ocr4all.application.spi.model.SelectField;
+import de.uniwuerzburg.zpd.ocr4all.application.spi.model.StringField;
 import de.uniwuerzburg.zpd.ocr4all.application.spi.util.MetsUtils;
 import de.uniwuerzburg.zpd.ocr4all.application.spi.util.SystemProcess;
 
@@ -671,6 +676,59 @@ public abstract class OCRDServiceProviderWorker extends ServiceProviderCore {
 	 */
 	protected Path getOptResources(ConfigurationServiceProvider configuration, Target target) {
 		return getOptFolder(configuration, target, ServiceProviderCollection.optResources, processorIdentifier());
+	}
+
+	/**
+	 * Returns the folders in opt resources. The hidden folders, this means staring
+	 * with a dot, are ignored.
+	 * 
+	 * @param configuration The service provider configuration.
+	 * @param target        The target.
+	 * @return The folders in opt resources.
+	 * @since 1.8
+	 */
+	protected List<String> getOptResourcesFolders(ConfigurationServiceProvider configuration, Target target) {
+		List<String> models = new ArrayList<>();
+
+		for (Path path : getDirectories(getOptResources(configuration, target)))
+			if (!path.getFileName().toString().startsWith("."))
+				models.add(path.getFileName().toString());
+
+		Collections.sort(models, String.CASE_INSENSITIVE_ORDER);
+
+		return models;
+	}
+
+	protected ModelFieldCallback getOptResourcesFolderFieldCallback(ConfigurationServiceProvider configuration,
+			Target target) {
+		return new ModelFieldCallback() {
+			/*
+			 * (non-Javadoc)
+			 * 
+			 * @see de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.
+			 * JsonOCRDServiceProviderWorker.ModelFieldCallback#handle(de.uniwuerzburg.zpd.
+			 * ocr4all.application.spi.model.Field)
+			 */
+			@Override
+			public List<Field<?>> handle(Field<?> field) {
+				if (field instanceof StringField) {
+					final StringField stringField = ((StringField) field);
+					final String value = stringField.getValue().orElse(null);
+
+					final List<SelectField.Item> models = new ArrayList<SelectField.Item>();
+					for (String model : getOptResourcesFolders(configuration, target))
+						models.add(new SelectField.Option(model.equals(value), model, null));
+
+					if (models.isEmpty())
+						models.add(new SelectField.Option(false, "empty", locale -> "model.empty"));
+
+					return Arrays.asList(new SelectField[] {
+							new SelectField(stringField.getArgument(), locale -> stringField.getLabel(locale),
+									locale -> stringField.getDescription(locale).orElse(null), false, models, false) });
+				} else
+					return null;
+			}
+		};
 	}
 
 	/**

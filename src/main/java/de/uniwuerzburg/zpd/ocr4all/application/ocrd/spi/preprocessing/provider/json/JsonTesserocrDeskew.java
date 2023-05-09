@@ -1,9 +1,9 @@
 /**
- * File:     JsonCISOcropyDeskew.java
+ * File:     JsonTesserocrDeskew.java
  * Package:  de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.preprocessing.provider.json
  * 
  * Author:   Herbert Baier (herbert.baier@uni-wuerzburg.de)
- * Date:     18.07.2022
+ * Date:     09.05.2023
  */
 package de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.preprocessing.provider.json;
 
@@ -12,7 +12,7 @@ import de.uniwuerzburg.zpd.ocr4all.application.spi.PreprocessingServiceProvider;
 import de.uniwuerzburg.zpd.ocr4all.application.spi.env.ConfigurationServiceProvider;
 
 /**
- * Defines service providers for ocr-d cis ocropy deskew with JSON support. The
+ * Defines service providers for ocr-d Tesserocr deskew with JSON support. The
  * following properties of the service provider collection <b>ocr-d</b> override
  * the local default settings (<b>key</b>: <i>default value</i>):
  * <ul>
@@ -23,8 +23,8 @@ import de.uniwuerzburg.zpd.ocr4all.application.spi.env.ConfigurationServiceProvi
  * <li>opt-resources: resources</li>
  * <li>docker-image: ocrd/all:maximum</li>
  * <li>docker-resources: /usr/local/share/ocrd-resources</li>
- * <li>cis-ocropy-deskew-json-id: ocrd-cis-ocropy-deskew</li>
- * <li>cis-ocropy-deskew-json-description: ocr-d cis ocropy deskew processor
+ * <li>tesserocr-deskew-json-id: ocrd-tesserocr-deskew</li>
+ * <li>tesserocr-deskew-json-description: ocr-d Tesserocr deskew processor
  * (json)</li>
  * </ul>
  *
@@ -32,11 +32,11 @@ import de.uniwuerzburg.zpd.ocr4all.application.spi.env.ConfigurationServiceProvi
  * @version 1.0
  * @since 1.8
  */
-public class JsonCISOcropyDeskew extends JsonOCRDServiceProviderWorker implements PreprocessingServiceProvider {
+public class JsonTesserocrDeskew extends JsonOCRDServiceProviderWorker implements PreprocessingServiceProvider {
 	/**
 	 * The service provider name;
 	 */
-	private static final String name = "CIS deskew (JSON)";
+	private static final String name = "Tesserocr deskew (JSON)";
 
 	/**
 	 * Defines service provider collection with keys and default values. Collection
@@ -47,8 +47,8 @@ public class JsonCISOcropyDeskew extends JsonOCRDServiceProviderWorker implement
 	 * @since 1.8
 	 */
 	private enum ServiceProviderCollection implements ConfigurationServiceProvider.CollectionKey {
-		processorIdentifier("cis-ocropy-deskew-json-id", "ocrd-cis-ocropy-deskew"),
-		processorDescription("cis-ocropy-deskew-json-description", "ocr-d cis ocropy deskew processor (json)");
+		processorIdentifier("tesserocr-deskew-json-id", "ocrd-tesserocr-deskew"),
+		processorDescription("tesserocr-deskew-json-description", "ocr-d Tesserocr deskew processor (json)");
 
 		/**
 		 * The key.
@@ -107,12 +107,12 @@ public class JsonCISOcropyDeskew extends JsonOCRDServiceProviderWorker implement
 	}
 
 	/**
-	 * Default constructor for a service provider for ocr-d cis ocropy deskew with
-	 * JSON support.
+	 * Default constructor for a service provider for ocr-d Tesserocr deskew with JSON
+	 * support.
 	 * 
 	 * @since 1.8
 	 */
-	public JsonCISOcropyDeskew() {
+	public JsonTesserocrDeskew() {
 		super(name);
 	}
 

@@ -7,10 +7,6 @@
  */
 package de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.ocr.provider.json;
 
-import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.Hashtable;
 import java.util.List;
 
@@ -19,9 +15,6 @@ import de.uniwuerzburg.zpd.ocr4all.application.spi.OpticalCharacterRecognitionSe
 import de.uniwuerzburg.zpd.ocr4all.application.spi.env.ConfigurationServiceProvider;
 import de.uniwuerzburg.zpd.ocr4all.application.spi.env.Premise;
 import de.uniwuerzburg.zpd.ocr4all.application.spi.env.Target;
-import de.uniwuerzburg.zpd.ocr4all.application.spi.model.Field;
-import de.uniwuerzburg.zpd.ocr4all.application.spi.model.SelectField;
-import de.uniwuerzburg.zpd.ocr4all.application.spi.model.StringField;
 
 /**
  * Defines service providers for ocr-d Calamari recognize with JSON support.
@@ -52,7 +45,12 @@ public class JsonCalamariRecognize extends JsonOCRDServiceProviderWorker
 	 * The service provider name;
 	 */
 	private static final String name = "Calamari recognize (JSON)";
-
+	
+	/**
+	 * The model argument.
+	 */
+	private static final String modelArgument = "checkpoint_dir";
+	
 	/**
 	 * Defines service provider collection with keys and default values. Collection
 	 * blank values are not allowed and their values are trimmed.
@@ -177,27 +175,6 @@ public class JsonCalamariRecognize extends JsonOCRDServiceProviderWorker
 		return 1000;
 	}
 
-	/**
-	 * Returns the Calamari models. The hidden directories in the opt models path,
-	 * this means staring with a dot, are ignored.
-	 * 
-	 * @param configuration The service provider configuration.
-	 * @param target        The target.
-	 * @return The Calamari models.
-	 * @since 1.8
-	 */
-	private List<String> getModels(ConfigurationServiceProvider configuration, Target target) {
-		List<String> models = new ArrayList<>();
-
-		for (Path path : getDirectories(getOptResources(configuration, target)))
-			if (!path.getFileName().toString().startsWith("."))
-				models.add(path.getFileName().toString());
-
-		Collections.sort(models, String.CASE_INSENSITIVE_ORDER);
-
-		return models;
-	}
-
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -207,7 +184,7 @@ public class JsonCalamariRecognize extends JsonOCRDServiceProviderWorker
 	 */
 	@Override
 	public Premise getPremise(Target target) {
-		return getModels(configuration, target).isEmpty()
+		return getOptResourcesFolders(configuration, target).isEmpty()
 				? new Premise(Premise.State.warn,
 						locale -> "There are no models available in the ocr-d opt directory '"
 								+ getOptResources(configuration, target).toString() + "'.")
@@ -223,41 +200,12 @@ public class JsonCalamariRecognize extends JsonOCRDServiceProviderWorker
 	 */
 	@Override
 	protected Hashtable<String, ModelFieldCallback> getModelCallbacks(Target target, List<String> arguments) {
-		final String model = "checkpoint_dir";
-
-		if (arguments.contains(model)) {
+		if (arguments.contains(modelArgument)) {
 			// The models
-			ModelFieldCallback modelsCallback = new ModelFieldCallback() {
-				/*
-				 * (non-Javadoc)
-				 * 
-				 * @see de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.
-				 * JsonOCRDServiceProviderWorker.ModelFieldCallback#handle(de.uniwuerzburg.zpd.
-				 * ocr4all.application.spi.model.Field)
-				 */
-				@Override
-				public List<Field<?>> handle(Field<?> field) {
-					if (field instanceof StringField) {
-						final StringField stringField = ((StringField) field);
-						final String value = stringField.getValue().orElse(null);
-
-						final List<SelectField.Item> models = new ArrayList<SelectField.Item>();
-						for (String model : getModels(configuration, target))
-							models.add(new SelectField.Option(model.equals(value), model, null));
-
-						if (models.isEmpty())
-							models.add(new SelectField.Option(false, "empty", locale -> "model.empty"));
-
-						return Arrays.asList(new SelectField[] { new SelectField(stringField.getArgument(),
-								locale -> stringField.getLabel(locale),
-								locale -> stringField.getDescription(locale).orElse(null), false, models, false) });
-					} else
-						return null;
-				}
-			};
+			ModelFieldCallback modelsCallback = getOptResourcesFolderFieldCallback(configuration, target);
 
 			Hashtable<String, ModelFieldCallback> callbacks = new Hashtable<>();
-			callbacks.put(model, modelsCallback);
+			callbacks.put(modelArgument, modelsCallback);
 
 			return callbacks;
 		} else
