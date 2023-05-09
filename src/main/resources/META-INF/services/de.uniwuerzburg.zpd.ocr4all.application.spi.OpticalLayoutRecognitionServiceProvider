@@ -1,6 +1,7 @@
 #de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.olr.provider.TesserocrSegmentRegion
 #de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.olr.provider.TesserocrSegmentLine
 #de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.olr.provider.CISOcropySegment
-de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.olr.provider.json.JsonTesserocrSegmentRegion
-de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.olr.provider.json.JsonTesserocrSegmentLine
 de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.olr.provider.json.JsonCISOcropySegment
+de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.olr.provider.json.JsonEynollahSegment
+de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.olr.provider.json.JsonTesserocrSegmentLine
+de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.olr.provider.json.JsonTesserocrSegmentRegion

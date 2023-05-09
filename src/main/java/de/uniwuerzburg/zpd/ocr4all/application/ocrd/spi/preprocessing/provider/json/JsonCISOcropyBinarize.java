@@ -159,7 +159,7 @@ public class JsonCISOcropyBinarize extends JsonOCRDServiceProviderWorker impleme
 	 */
 	@Override
 	public int getIndex() {
-		return 1400;
+		return 1600;
 	}
 
 }
