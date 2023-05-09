@@ -699,6 +699,14 @@ public abstract class OCRDServiceProviderWorker extends ServiceProviderCore {
 		return models;
 	}
 
+	/**
+	 * Returns the model field callback for opt resource.
+	 * 
+	 * @param configuration The service provider configuration.
+	 * @param target        The target.
+	 * @return The model field callback for opt resource.
+	 * @since 1.8
+	 */
 	protected ModelFieldCallback getOptResourcesFolderFieldCallback(ConfigurationServiceProvider configuration,
 			Target target) {
 		return new ModelFieldCallback() {

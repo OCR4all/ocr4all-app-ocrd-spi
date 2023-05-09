@@ -7,14 +7,9 @@
  */
 package de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.olr.provider.json;
 
-import java.util.Hashtable;
-import java.util.List;
-
-import de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.JsonOCRDServiceProviderWorker;
+import de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.JsonOCRDServiceProviderOptResourceWorker;
 import de.uniwuerzburg.zpd.ocr4all.application.spi.OpticalLayoutRecognitionServiceProvider;
 import de.uniwuerzburg.zpd.ocr4all.application.spi.env.ConfigurationServiceProvider;
-import de.uniwuerzburg.zpd.ocr4all.application.spi.env.Premise;
-import de.uniwuerzburg.zpd.ocr4all.application.spi.env.Target;
 
 /**
  * Defines service providers for ocr-d eynollah segment with JSON support. The
@@ -37,7 +32,7 @@ import de.uniwuerzburg.zpd.ocr4all.application.spi.env.Target;
  * @version 1.0
  * @since 1.8
  */
-public class JsonEynollahSegment extends JsonOCRDServiceProviderWorker
+public class JsonEynollahSegment extends JsonOCRDServiceProviderOptResourceWorker
 		implements OpticalLayoutRecognitionServiceProvider {
 	/**
 	 * The service provider name;
@@ -124,7 +119,7 @@ public class JsonEynollahSegment extends JsonOCRDServiceProviderWorker
 	 * @since 1.8
 	 */
 	public JsonEynollahSegment() {
-		super(name);
+		super(name, modelArgument);
 	}
 
 	/*
@@ -171,43 +166,6 @@ public class JsonEynollahSegment extends JsonOCRDServiceProviderWorker
 	@Override
 	public int getIndex() {
 		return 1500;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * de.uniwuerzburg.zpd.ocr4all.application.spi.core.ServiceProvider#getPremise(
-	 * de.uniwuerzburg.zpd.ocr4all.application.spi.env.Target)
-	 */
-	@Override
-	public Premise getPremise(Target target) {
-		return getOptResourcesFolders(configuration, target).isEmpty()
-				? new Premise(Premise.State.warn,
-						locale -> "There are no models available in the ocr-d opt directory '"
-								+ getOptResources(configuration, target).toString() + "'.")
-				: super.getPremise(target);
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.
-	 * JsonOCRDServiceProviderWorker#getModelCallbacks(de.uniwuerzburg.zpd.ocr4all.
-	 * application.spi.env.Target, java.util.List)
-	 */
-	@Override
-	protected Hashtable<String, ModelFieldCallback> getModelCallbacks(Target target, List<String> arguments) {
-		if (arguments.contains(modelArgument)) {
-			// The models
-			ModelFieldCallback modelsCallback = getOptResourcesFolderFieldCallback(configuration, target);
-
-			Hashtable<String, ModelFieldCallback> callbacks = new Hashtable<>();
-			callbacks.put(modelArgument, modelsCallback);
-
-			return callbacks;
-		} else
-			return null;
 	}
 
 }
