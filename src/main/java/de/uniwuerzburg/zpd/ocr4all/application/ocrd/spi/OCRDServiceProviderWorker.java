@@ -669,13 +669,42 @@ public abstract class OCRDServiceProviderWorker extends ServiceProviderCore {
 	/**
 	 * Returns the opt resources folder.
 	 * 
+	 * @param framework           The framework.
+	 * @param processorIdentifier The service provider collection with key and
+	 *                            default value for processor identifier.
+	 * @return The opt resources folder.
+	 * @since 1.8
+	 */
+	protected Path getOptResources(Framework framework,
+			ConfigurationServiceProvider.CollectionKey processorIdentifier) {
+		return framework == null ? null : getOptResources(configuration, framework.getTarget(), processorIdentifier);
+	}
+
+	/**
+	 * Returns the opt resources folder.
+	 * 
 	 * @param configuration The service provider configuration.
 	 * @param target        The target.
 	 * @return The opt resources folder.
 	 * @since 1.8
 	 */
 	protected Path getOptResources(ConfigurationServiceProvider configuration, Target target) {
-		return getOptFolder(configuration, target, ServiceProviderCollection.optResources, processorIdentifier());
+		return getOptResources(configuration, target, processorIdentifier());
+	}
+
+	/**
+	 * Returns the opt resources folder.
+	 * 
+	 * @param configuration       The service provider configuration.
+	 * @param target              The target.
+	 * @param processorIdentifier The service provider collection with key and
+	 *                            default value for processor identifier.
+	 * @return The opt resources folder.
+	 * @since 1.8
+	 */
+	protected Path getOptResources(ConfigurationServiceProvider configuration, Target target,
+			ConfigurationServiceProvider.CollectionKey processorIdentifier) {
+		return getOptFolder(configuration, target, ServiceProviderCollection.optResources, processorIdentifier);
 	}
 
 	/**
