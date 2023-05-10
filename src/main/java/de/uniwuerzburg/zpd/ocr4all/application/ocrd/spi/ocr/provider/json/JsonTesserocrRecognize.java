@@ -41,11 +41,10 @@ import de.uniwuerzburg.zpd.ocr4all.application.spi.model.argument.StringArgument
  * <li>opt-folder: ocr-d</li>
  * <li>opt-resources: resources</li>
  * <li>docker-image: ocrd/all:maximum</li>
- * <li>docker-resources: /usr/local/share/ocrd-resources</li>
  * <li>tesserocr-recognize-json-id: ocrd-tesserocr-recognize</li>
  * <li>tesserocr-recognize-json-description: ocr-d tesserocr recognize processor
  * (json)</li>
- * <li>tesserocr-docker-resources: ocr-d tesserocr resources folder</li>
+ * <li>tesserocr-docker-resources: /usr/local/share/tessdata</li>
  * </ul>
  *
  * @author <a href="mailto:herbert.baier@uni-wuerzburg.de">Herbert Baier</a>
@@ -77,7 +76,7 @@ public class JsonTesserocrRecognize extends JsonOCRDServiceProviderWorker
 	 * @version 1.0
 	 * @since 1.8
 	 */
-	private enum ServiceProviderCollection implements ConfigurationServiceProvider.CollectionKey {
+	protected enum ServiceProviderCollection implements ConfigurationServiceProvider.CollectionKey {
 		processorIdentifier("tesserocr-recognize-json-id", "ocrd-tesserocr-recognize"),
 		processorDescription("tesserocr-recognize-json-description", "ocr-d tesserocr recognize processor (json)"),
 		dockerResources("tesserocr-docker-resources", "/usr/local/share/tessdata");
@@ -145,6 +144,16 @@ public class JsonTesserocrRecognize extends JsonOCRDServiceProviderWorker
 	 * @since 1.8
 	 */
 	public JsonTesserocrRecognize() {
+		this(name);
+	}
+
+	/**
+	 * Creates a service provider for ocr-d Tesserocr recognize with JSON support.
+	 * 
+	 * @param name The service provider name;
+	 * @since 1.8
+	 */
+	protected JsonTesserocrRecognize(String name) {
 		super(name, true);
 	}
 
@@ -222,7 +231,9 @@ public class JsonTesserocrRecognize extends JsonOCRDServiceProviderWorker
 		List<String> models = new ArrayList<>();
 
 		try {
-			for (Path path : getFilesTopLevelFolder(getOptResources(configuration, target), defaultModelExtension)) {
+			for (Path path : getFilesTopLevelFolder(
+					getOptResources(configuration, target, ServiceProviderCollection.processorIdentifier),
+					defaultModelExtension)) {
 				String model = path.getFileName().toString();
 
 				// Removes from model name the default extension
@@ -247,10 +258,11 @@ public class JsonTesserocrRecognize extends JsonOCRDServiceProviderWorker
 	 */
 	@Override
 	public Premise getPremise(Target target) {
-		return getModels(configuration, target).isEmpty()
-				? new Premise(Premise.State.warn,
-						locale -> "There are no models available in the ocr-d opt directory '"
-								+ getOptResources(configuration, target).toString() + "'.")
+		return getModels(configuration, target).isEmpty() ? new Premise(Premise.State.warn,
+				locale -> "There are no models available in the ocr-d opt directory '"
+						+ getOptResources(configuration, target, ServiceProviderCollection.processorIdentifier)
+								.toString()
+						+ "'.")
 				: super.getPremise(target);
 	}
 
