@@ -25,7 +25,7 @@ import de.uniwuerzburg.zpd.ocr4all.application.spi.env.ConfigurationServiceProvi
  * <li>docker-resources: /usr/local/share/ocrd-resources</li>
  * <li>cis-ocropy-denoise-json-id: ocrd-cis-ocropy-denoise</li>
  * <li>cis-ocropy-denoise-json-description: ocr-d cis ocropy denoise processor
- * (json)</li>
+ * </li>
  * </ul>
  *
  * @author <a href="mailto:herbert.baier@uni-wuerzburg.de">Herbert Baier</a>
@@ -48,7 +48,7 @@ public class JsonCISOcropyDenoise extends JsonOCRDServiceProviderWorker implemen
 	 */
 	private enum ServiceProviderCollection implements ConfigurationServiceProvider.CollectionKey {
 		processorIdentifier("cis-ocropy-denoise-json-id", "ocrd-cis-ocropy-denoise"),
-		processorDescription("cis-ocropy-denoise-json-description", "ocr-d cis ocropy denoise processor (json)");
+		processorDescription("cis-ocropy-denoise-json-description", "ocr-d cis ocropy denoise processor");
 
 		/**
 		 * The key.

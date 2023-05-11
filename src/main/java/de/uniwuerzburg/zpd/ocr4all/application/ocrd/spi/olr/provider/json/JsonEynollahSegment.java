@@ -24,8 +24,7 @@ import de.uniwuerzburg.zpd.ocr4all.application.spi.env.ConfigurationServiceProvi
  * <li>docker-image: ocrd/all:maximum</li>
  * <li>docker-resources: /usr/local/share/ocrd-resources</li>
  * <li>eynollah-segment-json-id: ocrd-eynollah-segment</li>
- * <li>eynollah-segment-json-description: ocr-d eynollah segment processor
- * (json)</li>
+ * <li>eynollah-segment-json-description: ocr-d eynollah segment processor</li>
  * </ul>
  *
  * @author <a href="mailto:herbert.baier@uni-wuerzburg.de">Herbert Baier</a>
@@ -54,7 +53,7 @@ public class JsonEynollahSegment extends JsonOCRDServiceProviderOptResourceWorke
 	 */
 	private enum ServiceProviderCollection implements ConfigurationServiceProvider.CollectionKey {
 		processorIdentifier("eynollah-segment-json-id", "ocrd-eynollah-segment"),
-		processorDescription("eynollah-segment-json-description", "ocr-d eynollah segment processor (json)");
+		processorDescription("eynollah-segment-json-description", "ocr-d eynollah segment processor");
 
 		/**
 		 * The key.

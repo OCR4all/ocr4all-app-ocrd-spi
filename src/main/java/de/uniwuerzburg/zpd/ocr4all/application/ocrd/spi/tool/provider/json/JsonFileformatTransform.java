@@ -1,20 +1,20 @@
 /**
- * File:     JsonTesserocrSegment.java
- * Package:  de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.olr.provider.json
+ * File:     JsonFileformatTransform.java
+ * Package:  de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.preprocessing.provider.json
  * 
  * Author:   Herbert Baier (herbert.baier@uni-wuerzburg.de)
- * Date:     10.05.2023
+ * Date:     11.05.2023
  */
-package de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.olr.provider.json;
+package de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.tool.provider.json;
 
 import de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.JsonOCRDServiceProviderWorker;
-import de.uniwuerzburg.zpd.ocr4all.application.spi.OpticalLayoutRecognitionServiceProvider;
+import de.uniwuerzburg.zpd.ocr4all.application.spi.ToolServiceProvider;
 import de.uniwuerzburg.zpd.ocr4all.application.spi.env.ConfigurationServiceProvider;
 
 /**
- * Defines service providers for ocr-d tesserocr segment with JSON support. The
- * following properties of the service provider collection <b>ocr-d</b> override
- * the local default settings (<b>key</b>: <i>default value</i>):
+ * Defines service providers for ocr-d file format transform with JSON support.
+ * The following properties of the service provider collection <b>ocr-d</b>
+ * override the local default settings (<b>key</b>: <i>default value</i>):
  * <ul>
  * <li>json: -J</li>
  * <li>uid: &lt;effective system user ID. -1 if not defined&gt;</li>
@@ -23,21 +23,20 @@ import de.uniwuerzburg.zpd.ocr4all.application.spi.env.ConfigurationServiceProvi
  * <li>opt-resources: resources</li>
  * <li>docker-image: ocrd/all:maximum</li>
  * <li>docker-resources: /usr/local/share/ocrd-resources</li>
- * <li>tesserocr-segment-json-id: ocrd-tesserocr-segment</li>
- * <li>tesserocr-segment-json-description: ocr-d tesserocr segment processor
- * </li>
+ * <li>fileformat-transform-json-id: ocrd-fileformat-transform</li>
+ * <li>fileformat-transform-json-description: ocr-d file format transform
+ * processor</li>
  * </ul>
  *
  * @author <a href="mailto:herbert.baier@uni-wuerzburg.de">Herbert Baier</a>
  * @version 1.0
  * @since 1.8
  */
-public class JsonTesserocrSegment extends JsonOCRDServiceProviderWorker
-		implements OpticalLayoutRecognitionServiceProvider {
+public class JsonFileformatTransform extends JsonOCRDServiceProviderWorker implements ToolServiceProvider {
 	/**
 	 * The service provider name;
 	 */
-	private static final String name = "Tesserocr segment";
+	private static final String name = "file format transform";
 
 	/**
 	 * Defines service provider collection with keys and default values. Collection
@@ -48,8 +47,8 @@ public class JsonTesserocrSegment extends JsonOCRDServiceProviderWorker
 	 * @since 1.8
 	 */
 	private enum ServiceProviderCollection implements ConfigurationServiceProvider.CollectionKey {
-		processorIdentifier("tesserocr-segment-json-id", "ocrd-tesserocr-segment"),
-		processorDescription("tesserocr-segment-json-description", "ocr-d tesserocr segment processor");
+		processorIdentifier("fileformat-transform-json-id", "ocrd-fileformat-transform"),
+		processorDescription("fileformat-transform-json-description", "ocr-d file format transform processor");
 
 		/**
 		 * The key.
@@ -108,12 +107,12 @@ public class JsonTesserocrSegment extends JsonOCRDServiceProviderWorker
 	}
 
 	/**
-	 * Default constructor for a service provider for ocr-d tesserocr segment with
-	 * JSON support.
+	 * Default constructor for a service provider for ocr-d file format transform
+	 * with JSON support.
 	 * 
 	 * @since 1.8
 	 */
-	public JsonTesserocrSegment() {
+	public JsonFileformatTransform() {
 		super(name);
 	}
 
@@ -160,7 +159,7 @@ public class JsonTesserocrSegment extends JsonOCRDServiceProviderWorker
 	 */
 	@Override
 	public int getIndex() {
-		return 1200;
+		return 1000;
 	}
 
 }

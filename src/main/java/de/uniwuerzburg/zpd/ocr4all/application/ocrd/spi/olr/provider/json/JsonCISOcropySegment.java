@@ -25,7 +25,7 @@ import de.uniwuerzburg.zpd.ocr4all.application.spi.env.ConfigurationServiceProvi
  * <li>docker-resources: /usr/local/share/ocrd-resources</li>
  * <li>cis-ocropy-segment-json-id: ocrd-cis-ocropy-segment</li>
  * <li>cis-ocropy-segment-json-description: ocr-d cis ocropy segment processor
- * (json)</li>
+ * </li>
  * </ul>
  *
  * @author <a href="mailto:herbert.baier@uni-wuerzburg.de">Herbert Baier</a>
@@ -49,7 +49,7 @@ public class JsonCISOcropySegment extends JsonOCRDServiceProviderWorker
 	 */
 	private enum ServiceProviderCollection implements ConfigurationServiceProvider.CollectionKey {
 		processorIdentifier("cis-ocropy-segment-json-id", "ocrd-cis-ocropy-segment"),
-		processorDescription("cis-ocropy-segment-json-description", "ocr-d cis ocropy segment processor (json)");
+		processorDescription("cis-ocropy-segment-json-description", "ocr-d cis ocropy segment processor");
 
 		/**
 		 * The key.

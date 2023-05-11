@@ -27,7 +27,7 @@ import de.uniwuerzburg.zpd.ocr4all.application.spi.env.Framework;
  * <li>docker-image: ocrd/all:maximum</li>
  * <li>tesserocr-fontshape-json-id: ocrd-tesserocr-fontshape</li>
  * <li>tesserocr-fontshape-json-description: ocr-d tesserocr font shape
- * processor (json)</li>
+ * processor</li>
  * <li>tesserocr-docker-resources: /usr/local/share/tessdata</li>
  * <li>tesserocr-recognize-json-id: ocrd-tesserocr-recognize</li>
  * </ul>
@@ -52,7 +52,7 @@ public class JsonTesserocrFontshape extends JsonTesserocrRecognize {
 	 */
 	private enum ServiceProviderCollection implements ConfigurationServiceProvider.CollectionKey {
 		processorIdentifier("tesserocr-fontshape-json-id", "ocrd-tesserocr-fontshape"),
-		processorDescription("tesserocr-fontshape-json-description", "ocr-d Tesserocr font shape processor (json)");
+		processorDescription("tesserocr-fontshape-json-description", "ocr-d Tesserocr font shape processor");
 
 		/**
 		 * The key.

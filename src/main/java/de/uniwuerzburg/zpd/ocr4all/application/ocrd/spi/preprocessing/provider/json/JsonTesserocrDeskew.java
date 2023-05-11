@@ -24,8 +24,7 @@ import de.uniwuerzburg.zpd.ocr4all.application.spi.env.ConfigurationServiceProvi
  * <li>docker-image: ocrd/all:maximum</li>
  * <li>docker-resources: /usr/local/share/ocrd-resources</li>
  * <li>tesserocr-deskew-json-id: ocrd-tesserocr-deskew</li>
- * <li>tesserocr-deskew-json-description: ocr-d Tesserocr deskew processor
- * (json)</li>
+ * <li>tesserocr-deskew-json-description: ocr-d Tesserocr deskew processor</li>
  * </ul>
  *
  * @author <a href="mailto:herbert.baier@uni-wuerzburg.de">Herbert Baier</a>
@@ -48,7 +47,7 @@ public class JsonTesserocrDeskew extends JsonOCRDServiceProviderWorker implement
 	 */
 	private enum ServiceProviderCollection implements ConfigurationServiceProvider.CollectionKey {
 		processorIdentifier("tesserocr-deskew-json-id", "ocrd-tesserocr-deskew"),
-		processorDescription("tesserocr-deskew-json-description", "ocr-d Tesserocr deskew processor (json)");
+		processorDescription("tesserocr-deskew-json-description", "ocr-d Tesserocr deskew processor");
 
 		/**
 		 * The key.
@@ -107,8 +106,8 @@ public class JsonTesserocrDeskew extends JsonOCRDServiceProviderWorker implement
 	}
 
 	/**
-	 * Default constructor for a service provider for ocr-d Tesserocr deskew with JSON
-	 * support.
+	 * Default constructor for a service provider for ocr-d Tesserocr deskew with
+	 * JSON support.
 	 * 
 	 * @since 1.8
 	 */

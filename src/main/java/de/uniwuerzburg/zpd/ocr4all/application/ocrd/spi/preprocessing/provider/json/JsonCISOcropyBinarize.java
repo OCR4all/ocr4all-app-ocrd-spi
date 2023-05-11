@@ -25,7 +25,7 @@ import de.uniwuerzburg.zpd.ocr4all.application.spi.env.ConfigurationServiceProvi
  * <li>docker-resources: /usr/local/share/ocrd-resources</li>
  * <li>cis-ocropy-binarize-json-id: ocrd-cis-ocropy-binarize</li>
  * <li>cis-ocropy-binarize-json-description: ocr-d cis ocropy binarize processor
- * (json)</li>
+ * </li>
  * </ul>
  *
  * @author <a href="mailto:herbert.baier@uni-wuerzburg.de">Herbert Baier</a>
@@ -48,7 +48,7 @@ public class JsonCISOcropyBinarize extends JsonOCRDServiceProviderWorker impleme
 	 */
 	private enum ServiceProviderCollection implements ConfigurationServiceProvider.CollectionKey {
 		processorIdentifier("cis-ocropy-binarize-json-id", "ocrd-cis-ocropy-binarize"),
-		processorDescription("cis-ocropy-binarize-json-description", "ocr-d cis ocropy binarize processor (json)");
+		processorDescription("cis-ocropy-binarize-json-description", "ocr-d cis ocropy binarize processor");
 
 		/**
 		 * The key.

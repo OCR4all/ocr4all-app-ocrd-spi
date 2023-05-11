@@ -26,7 +26,7 @@ import de.uniwuerzburg.zpd.ocr4all.application.spi.env.ConfigurationServiceProvi
  * <li>docker-resources: /usr/local/share/ocrd-resources</li>
  * <li>sbb-binarize-json-id: ocrd-sbb-binarize</li>
  * <li>sbb-binarize-json-description: ocr-d sbb image binarization processor
- * using pre-trained models (json)</li>
+ * using pre-trained models</li>
  * </ul>
  *
  * @author <a href="mailto:herbert.baier@uni-wuerzburg.de">Herbert Baier</a>
@@ -53,9 +53,8 @@ public class JsonSbbBinarize extends JsonOCRDServiceProviderOptResourceWorker im
 	 * @since 1.8
 	 */
 	private enum ServiceProviderCollection implements ConfigurationServiceProvider.CollectionKey {
-		processorIdentifier("sbb-binarize-json-id", "ocrd-sbb-binarize"),
-		processorDescription("sbb-binarize-json-description",
-				"ocr-d sbb image binarization processor using pre-trained models (json)");
+		processorIdentifier("sbb-binarize-json-id", "ocrd-sbb-binarize"), processorDescription(
+				"sbb-binarize-json-description", "ocr-d sbb image binarization processor using pre-trained models");
 
 		/**
 		 * The key.

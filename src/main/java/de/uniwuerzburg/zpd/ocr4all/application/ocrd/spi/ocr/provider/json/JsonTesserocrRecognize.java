@@ -43,7 +43,7 @@ import de.uniwuerzburg.zpd.ocr4all.application.spi.model.argument.StringArgument
  * <li>docker-image: ocrd/all:maximum</li>
  * <li>tesserocr-recognize-json-id: ocrd-tesserocr-recognize</li>
  * <li>tesserocr-recognize-json-description: ocr-d tesserocr recognize processor
- * (json)</li>
+ * </li>
  * <li>tesserocr-docker-resources: /usr/local/share/tessdata</li>
  * </ul>
  *
@@ -78,7 +78,7 @@ public class JsonTesserocrRecognize extends JsonOCRDServiceProviderWorker
 	 */
 	protected enum ServiceProviderCollection implements ConfigurationServiceProvider.CollectionKey {
 		processorIdentifier("tesserocr-recognize-json-id", "ocrd-tesserocr-recognize"),
-		processorDescription("tesserocr-recognize-json-description", "ocr-d tesserocr recognize processor (json)"),
+		processorDescription("tesserocr-recognize-json-description", "ocr-d tesserocr recognize processor"),
 		dockerResources("tesserocr-docker-resources", "/usr/local/share/tessdata");
 
 		/**
