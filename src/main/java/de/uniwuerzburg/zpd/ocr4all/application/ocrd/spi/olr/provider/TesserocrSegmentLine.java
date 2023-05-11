@@ -7,6 +7,8 @@
  */
 package de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.olr.provider;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
 import java.util.Set;
@@ -237,6 +239,28 @@ public class TesserocrSegmentLine extends OCRDServiceProviderWorker implements O
 	@Override
 	public Optional<String> getDescription(Locale locale) {
 		return Optional.of(getString(locale, "description"));
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see de.uniwuerzburg.zpd.ocr4all.application.spi.core.ServiceProvider#
+	 * getCategories()
+	 */
+	@Override
+	public List<String> getCategories() {
+		return Arrays.asList("Layout analysis");
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * de.uniwuerzburg.zpd.ocr4all.application.spi.core.ServiceProvider#getSteps()
+	 */
+	@Override
+	public List<String> getSteps() {
+		return Arrays.asList("layout/segmentation/line");
 	}
 
 	/*

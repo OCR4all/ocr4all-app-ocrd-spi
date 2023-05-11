@@ -8,6 +8,7 @@
 package de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.preprocessing.provider;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
@@ -348,6 +349,29 @@ public class CISOcropyBinarize extends OCRDServiceProviderWorker implements Prep
 	@Override
 	public Optional<String> getDescription(Locale locale) {
 		return Optional.of(getString(locale, "description"));
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see de.uniwuerzburg.zpd.ocr4all.application.spi.core.ServiceProvider#
+	 * getCategories()
+	 */
+	@Override
+	public List<String> getCategories() {
+		return Arrays.asList("Image preprocessing");
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * de.uniwuerzburg.zpd.ocr4all.application.spi.core.ServiceProvider#getSteps()
+	 */
+	@Override
+	public List<String> getSteps() {
+		return Arrays.asList("preprocessing/optimization/binarization",
+				"preprocessing/optimization/grayscale_normalization", "preprocessing/optimization/deskewing");
 	}
 
 	/*
