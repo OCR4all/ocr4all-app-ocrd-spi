@@ -36,7 +36,7 @@ public class JsonCISOcropyBinarize extends JsonOCRDServiceProviderWorker impleme
 	/**
 	 * The service provider name;
 	 */
-	private static final String name = "CIS binarize (JSON)";
+	private static final String name = "CIS binarize";
 
 	/**
 	 * Defines service provider collection with keys and default values. Collection

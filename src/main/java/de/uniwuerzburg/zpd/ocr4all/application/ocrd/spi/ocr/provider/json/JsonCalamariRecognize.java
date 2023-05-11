@@ -39,7 +39,7 @@ public class JsonCalamariRecognize extends JsonOCRDServiceProviderOptResourceWor
 	/**
 	 * The service provider name;
 	 */
-	private static final String name = "Calamari recognize (JSON)";
+	private static final String name = "Calamari recognize";
 
 	/**
 	 * The model argument.

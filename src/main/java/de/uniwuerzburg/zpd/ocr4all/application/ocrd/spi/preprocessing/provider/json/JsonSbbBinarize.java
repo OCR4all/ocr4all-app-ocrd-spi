@@ -37,7 +37,7 @@ public class JsonSbbBinarize extends JsonOCRDServiceProviderOptResourceWorker im
 	/**
 	 * The service provider name;
 	 */
-	private static final String name = "SBB binarize (JSON)";
+	private static final String name = "SBB binarize";
 
 	/**
 	 * The model argument.

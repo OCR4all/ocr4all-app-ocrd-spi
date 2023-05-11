@@ -40,7 +40,7 @@ public class JsonTesserocrFontshape extends JsonTesserocrRecognize {
 	/**
 	 * The service provider name;
 	 */
-	private static final String name = "Tesserocr font shape (JSON)";
+	private static final String name = "Tesserocr font shape";
 
 	/**
 	 * Defines service provider collection with keys and default values. Collection

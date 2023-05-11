@@ -37,7 +37,7 @@ public class JsonTesserocrSegment extends JsonOCRDServiceProviderWorker
 	/**
 	 * The service provider name;
 	 */
-	private static final String name = "Tesserocr segment (JSON)";
+	private static final String name = "Tesserocr segment";
 
 	/**
 	 * Defines service provider collection with keys and default values. Collection

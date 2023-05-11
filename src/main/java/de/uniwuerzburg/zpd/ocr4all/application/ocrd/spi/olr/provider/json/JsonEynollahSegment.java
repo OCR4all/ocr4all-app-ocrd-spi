@@ -37,7 +37,7 @@ public class JsonEynollahSegment extends JsonOCRDServiceProviderOptResourceWorke
 	/**
 	 * The service provider name;
 	 */
-	private static final String name = "Eynollah segment (JSON)";
+	private static final String name = "Eynollah segment";
 
 	/**
 	 * The model argument.

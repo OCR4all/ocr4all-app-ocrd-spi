@@ -36,7 +36,7 @@ public class JsonCISOcropyDenoise extends JsonOCRDServiceProviderWorker implemen
 	/**
 	 * The service provider name;
 	 */
-	private static final String name = "CIS denoise (JSON)";
+	private static final String name = "CIS denoise";
 
 	/**
 	 * Defines service provider collection with keys and default values. Collection

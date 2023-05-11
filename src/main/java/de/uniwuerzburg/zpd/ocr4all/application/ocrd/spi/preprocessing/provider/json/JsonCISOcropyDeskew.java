@@ -36,7 +36,7 @@ public class JsonCISOcropyDeskew extends JsonOCRDServiceProviderWorker implement
 	/**
 	 * The service provider name;
 	 */
-	private static final String name = "CIS deskew (JSON)";
+	private static final String name = "CIS deskew";
 
 	/**
 	 * Defines service provider collection with keys and default values. Collection

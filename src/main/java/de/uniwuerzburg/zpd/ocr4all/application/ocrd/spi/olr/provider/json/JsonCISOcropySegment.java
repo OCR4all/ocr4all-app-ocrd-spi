@@ -37,7 +37,7 @@ public class JsonCISOcropySegment extends JsonOCRDServiceProviderWorker
 	/**
 	 * The service provider name;
 	 */
-	private static final String name = "CIS segment (JSON)";
+	private static final String name = "CIS segment";
 
 	/**
 	 * Defines service provider collection with keys and default values. Collection

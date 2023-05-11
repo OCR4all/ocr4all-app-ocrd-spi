@@ -56,7 +56,7 @@ public class JsonTesserocrRecognize extends JsonOCRDServiceProviderWorker
 	/**
 	 * The service provider name;
 	 */
-	private static final String name = "Tesserocr recognize (JSON)";
+	private static final String name = "Tesserocr recognize";
 
 	/**
 	 * The Tesseract default model extension.
