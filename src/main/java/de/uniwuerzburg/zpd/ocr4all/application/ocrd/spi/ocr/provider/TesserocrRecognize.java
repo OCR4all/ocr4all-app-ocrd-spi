@@ -10,6 +10,7 @@ package de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.ocr.provider;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
@@ -341,6 +342,28 @@ public class TesserocrRecognize extends OCRDServiceProviderWorker
 	/*
 	 * (non-Javadoc)
 	 * 
+	 * @see de.uniwuerzburg.zpd.ocr4all.application.spi.core.ServiceProvider#
+	 * getCategories()
+	 */
+	@Override
+	public List<String> getCategories() {
+		return Arrays.asList("Text recognition and optimization");
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * de.uniwuerzburg.zpd.ocr4all.application.spi.core.ServiceProvider#getSteps()
+	 */
+	@Override
+	public List<String> getSteps() {
+		return Arrays.asList("layout/segmentation/region", "layout/segmentation/line", "recognition/text-recognition");
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see
 	 * de.uniwuerzburg.zpd.ocr4all.application.core.spi.provider.ServiceProvider#
 	 * getIcon()
@@ -385,7 +408,7 @@ public class TesserocrRecognize extends OCRDServiceProviderWorker
 		} catch (IOException e) {
 			// Nothing to do
 		}
-		
+
 		Collections.sort(models, String.CASE_INSENSITIVE_ORDER);
 
 		return models;

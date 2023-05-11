@@ -156,6 +156,16 @@ public abstract class JsonOCRDServiceProviderWorker extends OCRDServiceProviderW
 	private String description = null;
 
 	/**
+	 * The service provider categories.
+	 */
+	private List<String> categories = null;
+
+	/**
+	 * The service provider steps.
+	 */
+	private List<String> steps = null;
+
+	/**
 	 * The model factory.
 	 */
 	private ModelFactory modelFactory = null;
@@ -258,14 +268,39 @@ public abstract class JsonOCRDServiceProviderWorker extends OCRDServiceProviderW
 			try {
 				final JsonNode root = objectMapper.readTree(jsonProcessorDescription);
 
-				final JsonNode descriptionNode = root.get("description");
+				JsonNode descriptionNode = root.get("description");
 				description = descriptionNode == null || descriptionNode.isContainerNode() ? null
 						: descriptionNode.asText();
+
+				categories = getValueAsList("categories", root);
+				steps = getValueAsList("steps", root);
 
 				modelFactory = new ModelFactory(root);
 			} catch (JsonProcessingException e) {
 				throw new ProviderException("could not parse JSON processor description - " + e.getMessage());
 			}
+		}
+	}
+
+	/**
+	 * Returns the json list.
+	 * 
+	 * @param name       The name of the field (of Object node) to access.
+	 * @param objectNode The json object node.
+	 * @return The json list.
+	 * @since 1.8
+	 */
+	private List<String> getValueAsList(String name, JsonNode objectNode) {
+		JsonNode valuesNode = objectNode.get(name);
+		if (valuesNode == null)
+			return null;
+		else {
+			List<String> list = new ArrayList<>();
+
+			for (JsonNode valueNode : valuesNode)
+				list.add(valueNode.asText());
+
+			return list;
 		}
 	}
 
@@ -301,6 +336,28 @@ public abstract class JsonOCRDServiceProviderWorker extends OCRDServiceProviderW
 	@Override
 	public Optional<String> getDescription(Locale locale) {
 		return description == null ? super.getDescription(locale) : Optional.of(description);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see de.uniwuerzburg.zpd.ocr4all.application.spi.core.ServiceProvider#
+	 * getCategories()
+	 */
+	@Override
+	public List<String> getCategories() {
+		return categories;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * de.uniwuerzburg.zpd.ocr4all.application.spi.core.ServiceProvider#getSteps()
+	 */
+	@Override
+	public List<String> getSteps() {
+		return steps;
 	}
 
 	/*

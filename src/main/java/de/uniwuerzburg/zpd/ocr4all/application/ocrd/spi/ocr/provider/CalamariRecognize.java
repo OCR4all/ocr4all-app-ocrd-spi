@@ -9,6 +9,7 @@ package de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.ocr.provider;
 
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
@@ -294,6 +295,28 @@ public class CalamariRecognize extends OCRDServiceProviderWorker implements Opti
 	/*
 	 * (non-Javadoc)
 	 * 
+	 * @see de.uniwuerzburg.zpd.ocr4all.application.spi.core.ServiceProvider#
+	 * getCategories()
+	 */
+	@Override
+	public List<String> getCategories() {
+		return Arrays.asList("Text recognition and optimization");
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * de.uniwuerzburg.zpd.ocr4all.application.spi.core.ServiceProvider#getSteps()
+	 */
+	@Override
+	public List<String> getSteps() {
+		return Arrays.asList("recognition/text-recognition");
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see
 	 * de.uniwuerzburg.zpd.ocr4all.application.core.spi.provider.ServiceProvider#
 	 * getIcon()
@@ -332,7 +355,7 @@ public class CalamariRecognize extends OCRDServiceProviderWorker implements Opti
 				models.add(path.getFileName().toString());
 
 		Collections.sort(models, String.CASE_INSENSITIVE_ORDER);
-		
+
 		return models;
 	}
 
