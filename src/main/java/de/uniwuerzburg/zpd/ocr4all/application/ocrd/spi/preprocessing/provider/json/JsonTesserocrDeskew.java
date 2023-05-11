@@ -36,7 +36,7 @@ public class JsonTesserocrDeskew extends JsonOCRDServiceProviderWorker implement
 	/**
 	 * The service provider name;
 	 */
-	private static final String name = "Tesserocr deskew (JSON)";
+	private static final String name = "Tesserocr deskew";
 
 	/**
 	 * Defines service provider collection with keys and default values. Collection

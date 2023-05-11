@@ -36,7 +36,7 @@ public class JsonTesserocrCrop extends JsonOCRDServiceProviderWorker implements 
 	/**
 	 * The service provider name;
 	 */
-	private static final String name = "Tesserocr crop (JSON)";
+	private static final String name = "Tesserocr crop";
 
 	/**
 	 * Defines service provider collection with keys and default values. Collection

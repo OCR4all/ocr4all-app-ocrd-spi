@@ -36,7 +36,7 @@ public class JsonOlenaBinarize extends JsonOCRDServiceProviderWorker implements 
 	/**
 	 * The service provider name;
 	 */
-	private static final String name = "Olena/SCRIBO binarize (JSON)";
+	private static final String name = "Olena/SCRIBO binarize";
 
 	/**
 	 * Defines service provider collection with keys and default values. Collection
