@@ -26,8 +26,8 @@ import de.uniwuerzburg.zpd.ocr4all.application.spi.env.ConfigurationServiceProvi
  * <li>docker-image: ocrd/all:maximum</li>
  * <li>docker-resources: /usr/local/share/ocrd-resources</li>
  * <li>calamari-recognize-json-id: ocrd-calamari-recognize</li>
- * <li>calamari-recognize-json-description: ocr-d calamari recognize processor
- * (json)</li>
+ * <li>calamari-recognize-json-description: ocr-d calamari recognize
+ * processor</li>
  * </ul>
  *
  * @author <a href="mailto:herbert.baier@uni-wuerzburg.de">Herbert Baier</a>
@@ -56,7 +56,7 @@ public class JsonCalamariRecognize extends JsonOCRDServiceProviderOptResourceWor
 	 */
 	private enum ServiceProviderCollection implements ConfigurationServiceProvider.CollectionKey {
 		processorIdentifier("calamari-recognize-json-id", "ocrd-calamari-recognize"),
-		processorDescription("calamari-recognize-json-description", "ocr-d calamari recognize processor (json)");
+		processorDescription("calamari-recognize-json-description", "ocr-d calamari recognize processor");
 
 		/**
 		 * The key.

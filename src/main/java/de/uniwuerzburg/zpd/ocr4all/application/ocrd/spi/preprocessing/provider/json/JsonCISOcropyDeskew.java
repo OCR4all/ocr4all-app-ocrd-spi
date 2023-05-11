@@ -25,7 +25,7 @@ import de.uniwuerzburg.zpd.ocr4all.application.spi.env.ConfigurationServiceProvi
  * <li>docker-resources: /usr/local/share/ocrd-resources</li>
  * <li>cis-ocropy-deskew-json-id: ocrd-cis-ocropy-deskew</li>
  * <li>cis-ocropy-deskew-json-description: ocr-d cis ocropy deskew processor
- * (json)</li>
+ * </li>
  * </ul>
  *
  * @author <a href="mailto:herbert.baier@uni-wuerzburg.de">Herbert Baier</a>
@@ -48,7 +48,7 @@ public class JsonCISOcropyDeskew extends JsonOCRDServiceProviderWorker implement
 	 */
 	private enum ServiceProviderCollection implements ConfigurationServiceProvider.CollectionKey {
 		processorIdentifier("cis-ocropy-deskew-json-id", "ocrd-cis-ocropy-deskew"),
-		processorDescription("cis-ocropy-deskew-json-description", "ocr-d cis ocropy deskew processor (json)");
+		processorDescription("cis-ocropy-deskew-json-description", "ocr-d cis ocropy deskew processor");
 
 		/**
 		 * The key.

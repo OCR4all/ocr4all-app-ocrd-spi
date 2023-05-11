@@ -24,8 +24,7 @@ import de.uniwuerzburg.zpd.ocr4all.application.spi.env.ConfigurationServiceProvi
  * <li>docker-image: ocrd/all:maximum</li>
  * <li>docker-resources: /usr/local/share/ocrd-resources</li>
  * <li>tesserocr-crop-json-id: ocrd-tesserocr-crop</li>
- * <li>tesserocr-crop-json-description: ocr-d Tesserocr crop processor
- * (json)</li>
+ * <li>tesserocr-crop-json-description: ocr-d Tesserocr crop processor</li>
  * </ul>
  *
  * @author <a href="mailto:herbert.baier@uni-wuerzburg.de">Herbert Baier</a>
@@ -48,7 +47,7 @@ public class JsonTesserocrCrop extends JsonOCRDServiceProviderWorker implements 
 	 */
 	private enum ServiceProviderCollection implements ConfigurationServiceProvider.CollectionKey {
 		processorIdentifier("tesserocr-crop-json-id", "ocrd-tesserocr-crop"),
-		processorDescription("tesserocr-crop-json-description", "ocr-d Tesserocr crop processor (json)");
+		processorDescription("tesserocr-crop-json-description", "ocr-d Tesserocr crop processor");
 
 		/**
 		 * The key.

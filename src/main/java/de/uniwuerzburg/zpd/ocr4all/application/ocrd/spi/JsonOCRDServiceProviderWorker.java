@@ -1147,7 +1147,7 @@ public abstract class JsonOCRDServiceProviderWorker extends OCRDServiceProviderW
 
 					final List<SelectField.Item> items = new ArrayList<SelectField.Item>();
 					for (String item : JsonParameterFiel.enumeration.getEnumeration(node))
-						if (item != null)
+						if (item != null && !item.trim().isEmpty())
 							items.add(new SelectField.Option(item.equals(value), item, null));
 
 					return new SelectField(parameter, locale -> parameter, locale -> description, false, items, false);

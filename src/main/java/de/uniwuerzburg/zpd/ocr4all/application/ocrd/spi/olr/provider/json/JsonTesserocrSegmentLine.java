@@ -25,7 +25,7 @@ import de.uniwuerzburg.zpd.ocr4all.application.spi.env.ConfigurationServiceProvi
  * <li>docker-resources: /usr/local/share/ocrd-resources</li>
  * <li>tesserocr-segment-line-json-id: ocrd-tesserocr-segment-line</li>
  * <li>tesserocr-segment-line-json-description: ocr-d tesserocr segment line
- * processor (json)</li>
+ * processor</li>
  * </ul>
  *
  * @author <a href="mailto:herbert.baier@uni-wuerzburg.de">Herbert Baier</a>
@@ -48,8 +48,8 @@ public class JsonTesserocrSegmentLine extends JsonOCRDServiceProviderWorker
 	 * @since 1.8
 	 */
 	private enum ServiceProviderCollection implements ConfigurationServiceProvider.CollectionKey {
-		processorIdentifier("tesserocr-segment-line-json-id", "ocrd-tesserocr-segment-line"), processorDescription(
-				"tesserocr-segment-line-json-description", "ocr-d tesserocr segment line processor (json)");
+		processorIdentifier("tesserocr-segment-line-json-id", "ocrd-tesserocr-segment-line"),
+		processorDescription("tesserocr-segment-line-json-description", "ocr-d tesserocr segment line processor");
 
 		/**
 		 * The key.

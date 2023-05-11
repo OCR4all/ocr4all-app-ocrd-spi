@@ -25,7 +25,7 @@ import de.uniwuerzburg.zpd.ocr4all.application.spi.env.ConfigurationServiceProvi
  * <li>docker-resources: /usr/local/share/ocrd-resources</li>
  * <li>olena-binarize-json-id: ocrd-olena-binarize</li>
  * <li>olena-binarize-json-description: ocr-d Olena/SCRIBO binarize processor
- * (json)</li>
+ * </li>
  * </ul>
  *
  * @author <a href="mailto:herbert.baier@uni-wuerzburg.de">Herbert Baier</a>
@@ -48,7 +48,7 @@ public class JsonOlenaBinarize extends JsonOCRDServiceProviderWorker implements 
 	 */
 	private enum ServiceProviderCollection implements ConfigurationServiceProvider.CollectionKey {
 		processorIdentifier("olena-binarize-json-id", "ocrd-olena-binarize"),
-		processorDescription("olena-binarize-json-description", "ocr-d Olena/SCRIBO binarize processor (json)");
+		processorDescription("olena-binarize-json-description", "ocr-d Olena/SCRIBO binarize processor");
 
 		/**
 		 * The key.
