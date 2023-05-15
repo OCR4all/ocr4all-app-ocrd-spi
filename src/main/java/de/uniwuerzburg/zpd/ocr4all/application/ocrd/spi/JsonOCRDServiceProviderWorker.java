@@ -486,7 +486,7 @@ public abstract class JsonOCRDServiceProviderWorker extends OCRDServiceProviderW
 	 */
 	@Override
 	public Processor newProcessor() {
-		return modelFactory == null ? null : new CoreProcessorServiceProvider() {
+		return modelFactory == null ? null : new OCRDProcessorServiceProvider() {
 			/*
 			 * (non-Javadoc)
 			 * 
@@ -601,9 +601,10 @@ public abstract class JsonOCRDServiceProviderWorker extends OCRDServiceProviderW
 				/*
 				 * Runs the processor
 				 */
-				return run(framework, isResources, processorArguments, null, () -> isCanceled(), () -> complete(),
-						message -> updatedStandardOutput(message), message -> updatedStandardError(message),
-						progress -> callback.updatedProgress(progress), 0.01F);
+				return run(framework, isResources, processorArguments, null, dockerProcess, () -> isCanceled(),
+						() -> complete(), message -> updatedStandardOutput(message),
+						message -> updatedStandardError(message), progress -> callback.updatedProgress(progress),
+						0.01F);
 			}
 		};
 	}

@@ -17,9 +17,9 @@ import java.util.Set;
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.OCRDProcessorServiceProvider;
 import de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.OCRDServiceProviderWorker;
 import de.uniwuerzburg.zpd.ocr4all.application.spi.OpticalLayoutRecognitionServiceProvider;
-import de.uniwuerzburg.zpd.ocr4all.application.spi.core.CoreProcessorServiceProvider;
 import de.uniwuerzburg.zpd.ocr4all.application.spi.core.ProcessServiceProvider;
 import de.uniwuerzburg.zpd.ocr4all.application.spi.env.ConfigurationServiceProvider;
 import de.uniwuerzburg.zpd.ocr4all.application.spi.env.Framework;
@@ -421,7 +421,7 @@ public class CISOcropySegment extends OCRDServiceProviderWorker implements Optic
 	 */
 	@Override
 	public ProcessServiceProvider.Processor newProcessor() {
-		return new CoreProcessorServiceProvider() {
+		return new OCRDProcessorServiceProvider() {
 			/*
 			 * (non-Javadoc)
 			 * 
@@ -736,7 +736,7 @@ public class CISOcropySegment extends OCRDServiceProviderWorker implements Optic
 				/*
 				 * Runs the processor
 				 */
-				return run(framework, processorArgument, availableArguments, () -> isCanceled(), () -> complete(),
+				return run(framework, processorArgument, availableArguments, dockerProcess, () -> isCanceled(), () -> complete(),
 						message -> updatedStandardOutput(message), message -> updatedStandardError(message),
 						progress -> callback.updatedProgress(progress), 0.01F);
 			}
