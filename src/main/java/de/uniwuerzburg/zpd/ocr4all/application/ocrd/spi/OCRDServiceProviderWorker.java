@@ -472,6 +472,7 @@ public abstract class OCRDServiceProviderWorker extends ServiceProviderCore {
 	 * @param unnecessaryArguments The unnecessary processor arguments. Null or
 	 *                             empty means that there are no unnecessary
 	 *                             processor arguments.
+	 * @param dockerProcess        The docker process.
 	 * @param runningState         The callback for processor running state.
 	 * @param execution            The callback for processor execution.
 	 * @param standardOutput       The callback for standard output.
@@ -482,11 +483,12 @@ public abstract class OCRDServiceProviderWorker extends ServiceProviderCore {
 	 * @since 1.8
 	 */
 	protected ProcessServiceProvider.Processor.State run(Framework framework, Object arguments,
-			Set<String> unnecessaryArguments, ProcessorRunningState runningState, ProcessorExecution execution,
-			Message standardOutput, Message standardError, Progress progress, float baseProgress) {
+			Set<String> unnecessaryArguments, OCRDProcessorServiceProvider.DockerProcess dockerProcess,
+			ProcessorRunningState runningState, ProcessorExecution execution, Message standardOutput,
+			Message standardError, Progress progress, float baseProgress) {
 
-		return run(framework, false, arguments, unnecessaryArguments, runningState, execution, standardOutput,
-				standardError, progress, baseProgress);
+		return run(framework, false, arguments, unnecessaryArguments, dockerProcess, runningState, execution,
+				standardOutput, standardError, progress, baseProgress);
 	}
 
 	/**
@@ -498,6 +500,7 @@ public abstract class OCRDServiceProviderWorker extends ServiceProviderCore {
 	 * @param unnecessaryArguments The unnecessary processor arguments. Null or
 	 *                             empty means that there are no unnecessary
 	 *                             processor arguments.
+	 * @param dockerProcess        The docker process.
 	 * @param runningState         The callback for processor running state.
 	 * @param execution            The callback for processor execution.
 	 * @param standardOutput       The callback for standard output.
@@ -508,8 +511,9 @@ public abstract class OCRDServiceProviderWorker extends ServiceProviderCore {
 	 * @since 1.8
 	 */
 	protected ProcessServiceProvider.Processor.State run(Framework framework, boolean isResources, Object arguments,
-			Set<String> unnecessaryArguments, ProcessorRunningState runningState, ProcessorExecution execution,
-			Message standardOutput, Message standardError, Progress progress, float baseProgress) {
+			Set<String> unnecessaryArguments, OCRDProcessorServiceProvider.DockerProcess dockerProcess,
+			ProcessorRunningState runningState, ProcessorExecution execution, Message standardOutput,
+			Message standardError, Progress progress, float baseProgress) {
 		try {
 			standardOutput.update("Using processor parameters " + objectMapper.writeValueAsString(arguments) + ".");
 		} catch (JsonProcessingException ex) {
@@ -541,26 +545,28 @@ public abstract class OCRDServiceProviderWorker extends ServiceProviderCore {
 
 		final MetsUtils.FrameworkFileGroup metsFileGroup = MetsUtils.getFileGroup(framework);
 
-		SystemProcess process = null;
 		try {
 			List<String> processorArguments = getProcessorArguments(framework, isResources, arguments, metsFileGroup);
 
-			process = getDockerProcess(framework);
+			dockerProcess.setProcess(getDockerProcess(framework));
 
-			standardOutput.update("Execute docker process '" + process.getCommand() + "' with parameters: "
-					+ processorArguments + ".");
+			standardOutput.update("Execute docker process '" + dockerProcess.getProcess().getCommand()
+					+ "' with parameters: " + processorArguments + ".");
 
-			process.execute(processorArguments);
+			dockerProcess.getProcess().execute(processorArguments);
 
-			updateProcessorMessages(process, standardOutput, standardError);
+			updateProcessorMessages(dockerProcess.getProcess(), standardOutput, standardError);
 
-			if (process.getExitValue() != 0) {
+			if (runningState.isCanceled())
+				return ProcessServiceProvider.Processor.State.canceled;
+			else if (dockerProcess.getProcess().getExitValue() != 0) {
 				standardError.update("Cannot run " + getProcessorDescription() + ".");
 
 				return ProcessServiceProvider.Processor.State.interrupted;
 			}
 		} catch (IOException e) {
-			updateProcessorMessages(process, standardOutput, standardError);
+			if (dockerProcess.isProcessSet())
+				updateProcessorMessages(dockerProcess.getProcess(), standardOutput, standardError);
 
 			standardError.update("troubles running " + getProcessorDescription() + " - " + e.getMessage() + ".");
 

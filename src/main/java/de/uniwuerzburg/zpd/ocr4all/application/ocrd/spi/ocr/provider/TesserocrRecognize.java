@@ -21,9 +21,9 @@ import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.OCRDProcessorServiceProvider;
 import de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.OCRDServiceProviderWorker;
 import de.uniwuerzburg.zpd.ocr4all.application.spi.OpticalCharacterRecognitionServiceProvider;
-import de.uniwuerzburg.zpd.ocr4all.application.spi.core.CoreProcessorServiceProvider;
 import de.uniwuerzburg.zpd.ocr4all.application.spi.core.ProcessServiceProvider;
 import de.uniwuerzburg.zpd.ocr4all.application.spi.env.ConfigurationServiceProvider;
 import de.uniwuerzburg.zpd.ocr4all.application.spi.env.Framework;
@@ -535,7 +535,7 @@ public class TesserocrRecognize extends OCRDServiceProviderWorker
 	 */
 	@Override
 	public ProcessServiceProvider.Processor newProcessor() {
-		return new CoreProcessorServiceProvider() {
+		return new OCRDProcessorServiceProvider() {
 			/*
 			 * (non-Javadoc)
 			 * 
@@ -968,7 +968,7 @@ public class TesserocrRecognize extends OCRDServiceProviderWorker
 				/*
 				 * Runs the processor
 				 */
-				return run(framework, true, processorArgument, availableArguments, () -> isCanceled(), () -> complete(),
+				return run(framework, true, processorArgument, availableArguments, dockerProcess, () -> isCanceled(), () -> complete(),
 						message -> updatedStandardOutput(message), message -> updatedStandardError(message),
 						progress -> callback.updatedProgress(progress), 0.01F);
 			}
