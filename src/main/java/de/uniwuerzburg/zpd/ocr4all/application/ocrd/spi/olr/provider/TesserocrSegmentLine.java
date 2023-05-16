@@ -43,6 +43,7 @@ import de.uniwuerzburg.zpd.ocr4all.application.spi.model.argument.ModelArgument;
  * <li>opt-resources: resources</li>
  * <li>docker-image: ocrd/all:maximum</li>
  * <li>docker-resources: /usr/local/share/ocrd-resources</li>
+ * <li>docker-stop-wait-kill-seconds: 2</li>
  * <li>tesserocr-segment-line-id: ocrd-tesserocr-segment-line</li>
  * <li>tesserocr-segment-line-description: ocr-d tesserocr segment line
  * processor</li>

@@ -23,6 +23,7 @@ import de.uniwuerzburg.zpd.ocr4all.application.spi.env.ConfigurationServiceProvi
  * <li>opt-resources: resources</li>
  * <li>docker-image: ocrd/all:maximum</li>
  * <li>docker-resources: /usr/local/share/ocrd-resources</li>
+ * <li>docker-stop-wait-kill-seconds: 2</li>
  * <li>cis-ocropy-deskew-json-id: ocrd-cis-ocropy-deskew</li>
  * <li>cis-ocropy-deskew-json-description: ocr-d cis ocropy deskew processor
  * </li>

@@ -7,6 +7,9 @@
  */
 package de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi;
 
+import java.io.IOException;
+import java.util.List;
+
 import de.uniwuerzburg.zpd.ocr4all.application.spi.core.CoreProcessorServiceProvider;
 import de.uniwuerzburg.zpd.ocr4all.application.spi.core.ProcessServiceProvider;
 import de.uniwuerzburg.zpd.ocr4all.application.spi.util.SystemProcess;
@@ -38,7 +41,15 @@ public abstract class OCRDProcessorServiceProvider extends CoreProcessorServiceP
 	public void cancel() {
 		super.cancel();
 
-		if (dockerProcess.isProcessSet())
+		if (dockerProcess.isStopContainerProcessSet()) {
+			try {
+				dockerProcess.getStopContainerProcess().execute(dockerProcess.getStopContainerProcessArguments());
+			} catch (IOException e) {
+				if (dockerProcess.isProcessSet())
+					dockerProcess.getProcess().cancel();
+
+			}
+		} else if (dockerProcess.isProcessSet())
 			dockerProcess.getProcess().cancel();
 	}
 
@@ -54,6 +65,35 @@ public abstract class OCRDProcessorServiceProvider extends CoreProcessorServiceP
 		 * The process.
 		 */
 		private SystemProcess process = null;
+
+		/**
+		 * The system process to stop the container.
+		 */
+		private SystemProcess stopContainerProcess = null;
+
+		/**
+		 * The arguments for the system process to stop the container.
+		 */
+		private List<String> stopContainerProcessArguments = null;
+
+		/**
+		 * Configure the docker process.
+		 * 
+		 * @param process                       The process.
+		 * @param stopContainerProcess          The system process to stop the
+		 *                                      container.
+		 * @param stopContainerProcessArguments The arguments for the system process to
+		 *                                      stop the container.
+		 * @since 1.8
+		 */
+		public void configure(SystemProcess process, SystemProcess stopContainerProcess,
+				List<String> stopContainerProcessArguments) {
+			this.process = process;
+
+			this.stopContainerProcess = stopContainerProcess;
+			this.stopContainerProcessArguments = this.stopContainerProcess == null ? null
+					: stopContainerProcessArguments;
+		}
 
 		/**
 		 * Returns true if the process is set.
@@ -76,13 +116,33 @@ public abstract class OCRDProcessorServiceProvider extends CoreProcessorServiceP
 		}
 
 		/**
-		 * Set the process.
+		 * Returns true if the system process to stop the container is set.
 		 *
-		 * @param process The process to set.
+		 * @return True if the system process to stop the container is set.
 		 * @since 1.8
 		 */
-		public void setProcess(SystemProcess process) {
-			this.process = process;
+		public boolean isStopContainerProcessSet() {
+			return stopContainerProcess != null;
+		}
+
+		/**
+		 * Returns the system process to stop the container.
+		 *
+		 * @return The system process to stop the container.
+		 * @since 1.8
+		 */
+		public SystemProcess getStopContainerProcess() {
+			return stopContainerProcess;
+		}
+
+		/**
+		 * Returns the arguments for the system process to stop the container.
+		 *
+		 * @return The arguments for the system process to stop the container.
+		 * @since 1.8
+		 */
+		public List<String> getStopContainerProcessArguments() {
+			return stopContainerProcessArguments;
 		}
 
 	}

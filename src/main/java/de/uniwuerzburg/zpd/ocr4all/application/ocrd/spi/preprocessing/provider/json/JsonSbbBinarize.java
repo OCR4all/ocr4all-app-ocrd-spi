@@ -24,6 +24,7 @@ import de.uniwuerzburg.zpd.ocr4all.application.spi.env.ConfigurationServiceProvi
  * <li>opt-resources: resources</li>
  * <li>docker-image: ocrd/all:maximum</li>
  * <li>docker-resources: /usr/local/share/ocrd-resources</li>
+ * <li>docker-stop-wait-kill-seconds: 2</li>
  * <li>sbb-binarize-json-id: ocrd-sbb-binarize</li>
  * <li>sbb-binarize-json-description: ocr-d sbb image binarization processor
  * using pre-trained models</li>

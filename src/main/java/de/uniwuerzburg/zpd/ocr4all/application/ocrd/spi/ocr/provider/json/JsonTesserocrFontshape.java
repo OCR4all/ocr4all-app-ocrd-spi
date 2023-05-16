@@ -25,6 +25,7 @@ import de.uniwuerzburg.zpd.ocr4all.application.spi.env.Framework;
  * <li>opt-folder: ocr-d</li>
  * <li>opt-resources: resources</li>
  * <li>docker-image: ocrd/all:maximum</li>
+ * <li>docker-stop-wait-kill-seconds: 2</li>
  * <li>tesserocr-fontshape-json-id: ocrd-tesserocr-fontshape</li>
  * <li>tesserocr-fontshape-json-description: ocr-d tesserocr font shape
  * processor</li>
