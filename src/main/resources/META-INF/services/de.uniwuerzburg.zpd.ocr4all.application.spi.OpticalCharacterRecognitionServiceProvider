@@ -1,5 +1,6 @@
 #de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.ocr.provider.CalamariRecognize
 #de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.ocr.provider.TesserocrRecognize
+# json processors
 de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.ocr.provider.json.JsonCalamariRecognize
-de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.ocr.provider.json.JsonTesserocrFontshape
+#de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.ocr.provider.json.JsonTesserocrFontshape
 de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.ocr.provider.json.JsonTesserocrRecognize
