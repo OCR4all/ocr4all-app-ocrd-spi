@@ -23,6 +23,7 @@ import de.uniwuerzburg.zpd.ocr4all.application.spi.env.ConfigurationServiceProvi
  * <li>opt-resources: resources</li>
  * <li>docker-image: ocrd/all:maximum</li>
  * <li>docker-resources: /usr/local/share/ocrd-resources</li>
+ * <li>docker-stop-wait-kill-seconds: 2</li>
  * <li>pagetopdf-json-id: ocrd-pagetopdf</li>
  * <li>pagetopdf-json-description: ocr-d page to pdf processor</li>
  * </ul>

@@ -52,6 +52,7 @@ import de.uniwuerzburg.zpd.ocr4all.application.spi.util.SystemProcess;
  * <li>opt-resources: resources</li>
  * <li>docker-image: ocrd/all:maximum</li>
  * <li>docker-resources: /usr/local/share/ocrd-resources</li>
+ * <li>docker-stop-wait-kill-seconds: 2</li>
  * </ul>
  *
  * @author <a href="mailto:herbert.baier@uni-wuerzburg.de">Herbert Baier</a>
@@ -88,7 +89,8 @@ public abstract class OCRDServiceProviderWorker extends ServiceProviderCore {
 	private enum ServiceProviderCollection implements ConfigurationServiceProvider.CollectionKey {
 		uid("uid", null), gid("gid", null), optFolder("opt-folder", "ocr-d"),
 		optResources("opt-resources", "resources"), dockerImage("docker-image", "ocrd/all:maximum"),
-		dockerResources("docker-resources", "/usr/local/share/ocrd-resources");
+		dockerResources("docker-resources", "/usr/local/share/ocrd-resources"),
+		dockerStopWaitKillSeconds("docker-stop-wait-kill-seconds", "2");
 
 		/**
 		 * The key.
@@ -420,7 +422,8 @@ public abstract class OCRDServiceProviderWorker extends ServiceProviderCore {
 		}
 
 		// Build the processor arguments
-		List<String> processorArguments = new ArrayList<>(Arrays.asList("run", "--rm"));
+		List<String> processorArguments = new ArrayList<>(
+				Arrays.asList("run", "--rm", "--name", metsFileGroup.getOutput()));
 
 		if (uid != null)
 			processorArguments.addAll(Arrays.asList("-u", uid));
@@ -544,39 +547,51 @@ public abstract class OCRDServiceProviderWorker extends ServiceProviderCore {
 		}
 
 		final MetsUtils.FrameworkFileGroup metsFileGroup = MetsUtils.getFileGroup(framework);
+		List<String> processorArguments;
 
 		try {
-			List<String> processorArguments = getProcessorArguments(framework, isResources, arguments, metsFileGroup);
-
-			dockerProcess.setProcess(getDockerProcess(framework));
-
-			standardOutput.update("Execute docker process '" + dockerProcess.getProcess().getCommand()
-					+ "' with parameters: " + processorArguments + ".");
-
-			dockerProcess.getProcess().execute(processorArguments);
-
-			updateProcessorMessages(dockerProcess.getProcess(), standardOutput, standardError);
-
-			if (runningState.isCanceled())
-				return ProcessServiceProvider.Processor.State.canceled;
-			else if (dockerProcess.getProcess().getExitValue() != 0) {
-				standardError.update("Cannot run " + getProcessorDescription() + ".");
-
-				return ProcessServiceProvider.Processor.State.interrupted;
-			}
+			processorArguments = getProcessorArguments(framework, isResources, arguments, metsFileGroup);
 		} catch (IOException e) {
-			if (dockerProcess.isProcessSet())
-				updateProcessorMessages(dockerProcess.getProcess(), standardOutput, standardError);
-
 			standardError.update("troubles running " + getProcessorDescription() + " - " + e.getMessage() + ".");
 
 			return ProcessServiceProvider.Processor.State.interrupted;
 		}
 
-		if (runningState.isCanceled())
-			return ProcessServiceProvider.Processor.State.canceled;
+		dockerProcess
+				.configure(getDockerProcess(framework), getDockerProcess(),
+						Arrays.asList("stop",
+								"--time=" + ConfigurationServiceProvider.getValue(configuration,
+										ServiceProviderCollection.dockerStopWaitKillSeconds),
+								metsFileGroup.getOutput()));
 
-		progress.update(0.097F);
+		standardOutput.update("Execute docker process '" + dockerProcess.getProcess().getCommand()
+				+ "' with parameters: " + processorArguments + ".");
+
+		ProcessServiceProvider.Processor.State state = null;
+
+		try {
+			dockerProcess.getProcess().execute(processorArguments);
+
+			updateProcessorMessages(dockerProcess.getProcess(), standardOutput, standardError);
+
+			if (runningState.isCanceled())
+				state = ProcessServiceProvider.Processor.State.canceled;
+			else if (dockerProcess.getProcess().getExitValue() != 0) {
+				standardError.update("Cannot run " + getProcessorDescription() + ", exit code "
+						+ dockerProcess.getProcess().getExitValue() + ".");
+
+				state = ProcessServiceProvider.Processor.State.interrupted;
+			}
+		} catch (IOException e) {
+			updateProcessorMessages(dockerProcess.getProcess(), standardOutput, standardError);
+
+			standardError.update("troubles running " + getProcessorDescription() + " - " + e.getMessage() + ".");
+
+			state = ProcessServiceProvider.Processor.State.interrupted;
+		}
+
+		if (state == null)
+			progress.update(0.097F);
 
 		// Update paths in xml files
 		standardOutput.update("Update paths in xml files.");
@@ -593,10 +608,12 @@ public abstract class OCRDServiceProviderWorker extends ServiceProviderCore {
 			standardError
 					.update("troubles updating " + getProcessorDescription() + " xml files - " + e.getMessage() + ".");
 
-			return ProcessServiceProvider.Processor.State.interrupted;
+			if (state == null)
+				state = ProcessServiceProvider.Processor.State.interrupted;
 		}
 
-		progress.update(0.098F);
+		if (state == null)
+			progress.update(0.098F);
 
 		// Move processor output directory to snapshot sandbox
 		standardOutput.update("Move processor output directory to snapshot sandbox.");
@@ -608,13 +625,12 @@ public abstract class OCRDServiceProviderWorker extends ServiceProviderCore {
 			standardError.update("troubles moving " + getProcessorDescription()
 					+ " output directory to snapshot sandbox - " + e.getMessage() + ".");
 
-			return ProcessServiceProvider.Processor.State.interrupted;
+			if (state == null)
+				state = ProcessServiceProvider.Processor.State.interrupted;
 		}
 
-		if (runningState.isCanceled())
-			return ProcessServiceProvider.Processor.State.canceled;
-
-		progress.update(0.099F);
+		if (state == null)
+			progress.update(0.099F);
 
 		// Update paths in mets file
 		standardOutput.update("Update paths in mets file.");
@@ -627,10 +643,11 @@ public abstract class OCRDServiceProviderWorker extends ServiceProviderCore {
 			standardError
 					.update("troubles updating " + getProcessorDescription() + " mets file - " + e.getMessage() + ".");
 
-			return ProcessServiceProvider.Processor.State.interrupted;
+			if (state == null)
+				state = ProcessServiceProvider.Processor.State.interrupted;
 		}
 
-		return execution.complete();
+		return state == null ? execution.complete() : state;
 	}
 
 	/**

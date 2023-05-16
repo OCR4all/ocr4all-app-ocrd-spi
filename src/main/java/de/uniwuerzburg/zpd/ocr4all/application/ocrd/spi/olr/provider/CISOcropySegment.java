@@ -48,6 +48,7 @@ import de.uniwuerzburg.zpd.ocr4all.application.spi.model.argument.SelectArgument
  * <li>opt-resources: resources</li>
  * <li>docker-image: ocrd/all:maximum</li>
  * <li>docker-resources: /usr/local/share/ocrd-resources</li>
+ * <li>docker-stop-wait-kill-seconds: 2</li>
  * <li>cis-ocropy-segment-id: ocrd-cis-ocropy-segment</li>
  * <li>cis-ocropy-segment-description: ocr-d cis ocropy segment processor</li>
  * </ul>

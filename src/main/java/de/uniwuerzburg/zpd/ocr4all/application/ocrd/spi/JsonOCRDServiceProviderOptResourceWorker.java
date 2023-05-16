@@ -25,6 +25,7 @@ import de.uniwuerzburg.zpd.ocr4all.application.spi.env.Target;
  * <li>opt-resources: resources</li>
  * <li>docker-image: ocrd/all:maximum</li>
  * <li>docker-resources: /usr/local/share/ocrd-resources</li>
+ * <li>docker-stop-wait-kill-seconds: 2</li>
  * </ul>
  *
  * @author <a href="mailto:herbert.baier@uni-wuerzburg.de">Herbert Baier</a>
