@@ -548,7 +548,7 @@ public abstract class OCRDServiceProviderWorker extends ServiceProviderCore {
 		}
 
 		final MetsUtils.FrameworkFileGroup metsFileGroup = MetsUtils.getFileGroup(framework);
-		String dockerName = UUID.randomUUID().toString();
+		String dockerName = "ocr4all-" + UUID.randomUUID().toString();
 
 		List<String> processorArguments;
 
