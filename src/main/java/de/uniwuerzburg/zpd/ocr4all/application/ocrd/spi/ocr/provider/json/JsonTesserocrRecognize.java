@@ -44,7 +44,7 @@ import de.uniwuerzburg.zpd.ocr4all.application.spi.model.argument.StringArgument
  * <li>docker-stop-wait-kill-seconds: 2</li>
  * <li>tesserocr-recognize-json-id: ocrd-tesserocr-recognize</li>
  * <li>tesserocr-recognize-json-description: ocr-d tesserocr recognize processor
- * </li>
+ * <li>tesserocr-recognize-json-default-model: null</li></li>
  * <li>tesserocr-docker-resources: /usr/local/share/tessdata</li>
  * </ul>
  *
@@ -80,6 +80,7 @@ public class JsonTesserocrRecognize extends JsonOCRDServiceProviderWorker
 	protected enum ServiceProviderCollection implements ConfigurationServiceProvider.CollectionKey {
 		processorIdentifier("tesserocr-recognize-json-id", "ocrd-tesserocr-recognize"),
 		processorDescription("tesserocr-recognize-json-description", "ocr-d tesserocr recognize processor"),
+		defaultModel("tesserocr-recognize-json-default-model", null),
 		dockerResources("tesserocr-docker-resources", "/usr/local/share/tessdata");
 
 		/**
@@ -290,7 +291,10 @@ public class JsonTesserocrRecognize extends JsonOCRDServiceProviderWorker
 				public List<Field<?>> handle(Field<?> field) {
 					if (field instanceof StringField) {
 						final StringField stringField = ((StringField) field);
-						final String value = stringField.getValue().orElse(null);
+						
+						String value = ConfigurationServiceProvider.getValue(configuration, ServiceProviderCollection.defaultModel);
+						if (value == null)
+							value = stringField.getValue().orElse(null);
 
 						final List<SelectField.Item> models = new ArrayList<SelectField.Item>();
 						for (String model : getModels(configuration, target))

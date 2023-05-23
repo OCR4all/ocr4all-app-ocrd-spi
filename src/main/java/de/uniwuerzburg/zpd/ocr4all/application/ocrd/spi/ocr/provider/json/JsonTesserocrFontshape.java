@@ -31,6 +31,7 @@ import de.uniwuerzburg.zpd.ocr4all.application.spi.env.Framework;
  * processor</li>
  * <li>tesserocr-docker-resources: /usr/local/share/tessdata</li>
  * <li>tesserocr-recognize-json-id: ocrd-tesserocr-recognize</li>
+ * <li>tesserocr-recognize-json-default-model: null</li></li>
  * </ul>
  *
  * @author <a href="mailto:herbert.baier@uni-wuerzburg.de">Herbert Baier</a>

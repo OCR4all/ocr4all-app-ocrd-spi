@@ -29,6 +29,7 @@ import de.uniwuerzburg.zpd.ocr4all.application.spi.env.ConfigurationServiceProvi
  * <li>calamari-recognize-json-id: ocrd-calamari-recognize</li>
  * <li>calamari-recognize-json-description: ocr-d calamari recognize
  * processor</li>
+ * <li>calamari-recognize-json-default-model: null</li>
  * </ul>
  *
  * @author <a href="mailto:herbert.baier@uni-wuerzburg.de">Herbert Baier</a>
@@ -57,7 +58,8 @@ public class JsonCalamariRecognize extends JsonOCRDServiceProviderOptResourceWor
 	 */
 	private enum ServiceProviderCollection implements ConfigurationServiceProvider.CollectionKey {
 		processorIdentifier("calamari-recognize-json-id", "ocrd-calamari-recognize"),
-		processorDescription("calamari-recognize-json-description", "ocr-d calamari recognize processor");
+		processorDescription("calamari-recognize-json-description", "ocr-d calamari recognize processor"),
+		defaultModel("calamari-recognize-json-default-model", null);
 
 		/**
 		 * The key.
@@ -123,6 +125,17 @@ public class JsonCalamariRecognize extends JsonOCRDServiceProviderOptResourceWor
 	 */
 	public JsonCalamariRecognize() {
 		super(name, modelArgument);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.
+	 * JsonOCRDServiceProviderOptResourceWorker#getDefaultModel()
+	 */
+	@Override
+	protected String getDefaultModel() {
+		return ConfigurationServiceProvider.getValue(configuration, ServiceProviderCollection.defaultModel);
 	}
 
 	/*

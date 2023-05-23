@@ -51,6 +51,17 @@ public abstract class JsonOCRDServiceProviderOptResourceWorker extends JsonOCRDS
 		this.modelArgument = modelArgument;
 	}
 
+	/**
+	 * Returns the default model. Extending classes can overwrite this method to set
+	 * a default model.
+	 * 
+	 * @return The default model.
+	 * @since 1.8
+	 */
+	protected String getDefaultModel() {
+		return null;
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -78,7 +89,8 @@ public abstract class JsonOCRDServiceProviderOptResourceWorker extends JsonOCRDS
 	protected Hashtable<String, ModelFieldCallback> getModelCallbacks(Target target, List<String> arguments) {
 		if (arguments.contains(modelArgument)) {
 			// The models
-			ModelFieldCallback modelsCallback = getOptResourcesFolderFieldCallback(configuration, target);
+			ModelFieldCallback modelsCallback = getOptResourcesFolderFieldCallback(configuration, target,
+					getDefaultModel());
 
 			Hashtable<String, ModelFieldCallback> callbacks = new Hashtable<>();
 			callbacks.put(modelArgument, modelsCallback);

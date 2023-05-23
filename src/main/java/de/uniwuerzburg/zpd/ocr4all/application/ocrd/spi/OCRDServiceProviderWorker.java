@@ -756,11 +756,12 @@ public abstract class OCRDServiceProviderWorker extends ServiceProviderCore {
 	 * 
 	 * @param configuration The service provider configuration.
 	 * @param target        The target.
+	 * @param defaultModel  The default model.
 	 * @return The model field callback for opt resource.
 	 * @since 1.8
 	 */
 	protected ModelFieldCallback getOptResourcesFolderFieldCallback(ConfigurationServiceProvider configuration,
-			Target target) {
+			Target target, String defaultModel) {
 		return new ModelFieldCallback() {
 			/*
 			 * (non-Javadoc)
@@ -773,7 +774,8 @@ public abstract class OCRDServiceProviderWorker extends ServiceProviderCore {
 			public List<Field<?>> handle(Field<?> field) {
 				if (field instanceof StringField) {
 					final StringField stringField = ((StringField) field);
-					final String value = stringField.getValue().orElse(null);
+
+					final String value = defaultModel == null ? stringField.getValue().orElse(null) : defaultModel;
 
 					final List<SelectField.Item> models = new ArrayList<SelectField.Item>();
 					for (String model : getOptResourcesFolders(configuration, target))
