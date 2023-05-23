@@ -2,7 +2,7 @@
 #de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.olr.provider.TesserocrSegmentLine
 #de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.olr.provider.CISOcropySegment
 # json processors
-de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.olr.provider.json.JsonCISOcropySegment
+#de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.olr.provider.json.JsonCISOcropySegment
 #de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.olr.provider.json.JsonEynollahSegment
 de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.olr.provider.json.JsonTesserocrSegment
 #de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.olr.provider.json.JsonTesserocrSegmentLine

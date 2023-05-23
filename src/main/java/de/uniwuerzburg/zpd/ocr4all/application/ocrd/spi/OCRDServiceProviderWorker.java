@@ -21,6 +21,7 @@ import java.util.Locale;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -397,6 +398,7 @@ public abstract class OCRDServiceProviderWorker extends ServiceProviderCore {
 	 * 
 	 * @param framework     The framework.
 	 * @param isResources   True if resources folder is required.
+	 * @param dockerName    The docker name.
 	 * @param arguments     The ocr-d processor arguments.
 	 * @param metsFileGroup The mets file group.
 	 * @return The ocr-d arguments for the docker process.
@@ -405,8 +407,8 @@ public abstract class OCRDServiceProviderWorker extends ServiceProviderCore {
 	 *                                 problems.
 	 * @since 1.8
 	 */
-	protected List<String> getProcessorArguments(Framework framework, boolean isResources, Object arguments,
-			MetsUtils.FrameworkFileGroup metsFileGroup) throws JsonProcessingException {
+	protected List<String> getProcessorArguments(Framework framework, boolean isResources, String dockerName,
+			Object arguments, MetsUtils.FrameworkFileGroup metsFileGroup) throws JsonProcessingException {
 		// Get the effective system user/group id
 		String uid = configuration.getValue(ServiceProviderCollection.uid);
 		if (uid == null && framework.isUID())
@@ -422,8 +424,7 @@ public abstract class OCRDServiceProviderWorker extends ServiceProviderCore {
 		}
 
 		// Build the processor arguments
-		List<String> processorArguments = new ArrayList<>(
-				Arrays.asList("run", "--rm", "--name", metsFileGroup.getOutput()));
+		List<String> processorArguments = new ArrayList<>(Arrays.asList("run", "--rm", "--name", dockerName));
 
 		if (uid != null)
 			processorArguments.addAll(Arrays.asList("-u", uid));
@@ -547,22 +548,21 @@ public abstract class OCRDServiceProviderWorker extends ServiceProviderCore {
 		}
 
 		final MetsUtils.FrameworkFileGroup metsFileGroup = MetsUtils.getFileGroup(framework);
+		String dockerName = "ocr4all-" + UUID.randomUUID().toString();
+
 		List<String> processorArguments;
 
 		try {
-			processorArguments = getProcessorArguments(framework, isResources, arguments, metsFileGroup);
+			processorArguments = getProcessorArguments(framework, isResources, dockerName, arguments, metsFileGroup);
 		} catch (IOException e) {
 			standardError.update("troubles running " + getProcessorDescription() + " - " + e.getMessage() + ".");
 
 			return ProcessServiceProvider.Processor.State.interrupted;
 		}
 
-		dockerProcess
-				.configure(getDockerProcess(framework), getDockerProcess(),
-						Arrays.asList("stop",
-								"--time=" + ConfigurationServiceProvider.getValue(configuration,
-										ServiceProviderCollection.dockerStopWaitKillSeconds),
-								metsFileGroup.getOutput()));
+		dockerProcess.configure(getDockerProcess(framework), getDockerProcess(),
+				Arrays.asList("stop", "--time=" + ConfigurationServiceProvider.getValue(configuration,
+						ServiceProviderCollection.dockerStopWaitKillSeconds), dockerName));
 
 		standardOutput.update("Execute docker process '" + dockerProcess.getProcess().getCommand()
 				+ "' with parameters: " + processorArguments + ".");
