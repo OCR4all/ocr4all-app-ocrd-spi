@@ -29,9 +29,9 @@ import de.uniwuerzburg.zpd.ocr4all.application.spi.env.Framework;
  * <li>tesserocr-fontshape-json-id: ocrd-tesserocr-fontshape</li>
  * <li>tesserocr-fontshape-json-description: ocr-d tesserocr font shape
  * processor</li>
+ * <li>tesserocr-fontshape-json-default-model: null</li></li>
  * <li>tesserocr-docker-resources: /usr/local/share/tessdata</li>
  * <li>tesserocr-recognize-json-id: ocrd-tesserocr-recognize</li>
- * <li>tesserocr-recognize-json-default-model: null</li></li>
  * </ul>
  *
  * @author <a href="mailto:herbert.baier@uni-wuerzburg.de">Herbert Baier</a>
@@ -54,7 +54,8 @@ public class JsonTesserocrFontshape extends JsonTesserocrRecognize {
 	 */
 	private enum ServiceProviderCollection implements ConfigurationServiceProvider.CollectionKey {
 		processorIdentifier("tesserocr-fontshape-json-id", "ocrd-tesserocr-fontshape"),
-		processorDescription("tesserocr-fontshape-json-description", "ocr-d Tesserocr font shape processor");
+		processorDescription("tesserocr-fontshape-json-description", "ocr-d Tesserocr font shape processor"),
+		defaultModel("tesserocr-fontshape-json-default-model", null);
 
 		/**
 		 * The key.
@@ -144,6 +145,17 @@ public class JsonTesserocrFontshape extends JsonTesserocrRecognize {
 	@Override
 	protected ConfigurationServiceProvider.CollectionKey processorDescription() {
 		return ServiceProviderCollection.processorDescription;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.ocr.provider.json.
+	 * JsonTesserocrRecognize#getDefaultModel()
+	 */
+	@Override
+	protected ConfigurationServiceProvider.CollectionKey getDefaultModel() {
+		return ServiceProviderCollection.defaultModel;
 	}
 
 	/*
