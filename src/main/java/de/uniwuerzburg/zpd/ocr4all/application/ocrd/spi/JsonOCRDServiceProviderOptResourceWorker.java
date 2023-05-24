@@ -10,6 +10,7 @@ package de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi;
 import java.util.Hashtable;
 import java.util.List;
 
+import de.uniwuerzburg.zpd.ocr4all.application.spi.env.ConfigurationServiceProvider;
 import de.uniwuerzburg.zpd.ocr4all.application.spi.env.Premise;
 import de.uniwuerzburg.zpd.ocr4all.application.spi.env.Target;
 
@@ -55,10 +56,10 @@ public abstract class JsonOCRDServiceProviderOptResourceWorker extends JsonOCRDS
 	 * Returns the default model. Extending classes can overwrite this method to set
 	 * a default model.
 	 * 
-	 * @return The default model.
+	 * @return The default model. Null, if there is no default model.
 	 * @since 1.8
 	 */
-	protected String getDefaultModel() {
+	protected ConfigurationServiceProvider.CollectionKey getDefaultModel() {
 		return null;
 	}
 
@@ -90,7 +91,7 @@ public abstract class JsonOCRDServiceProviderOptResourceWorker extends JsonOCRDS
 		if (arguments.contains(modelArgument)) {
 			// The models
 			ModelFieldCallback modelsCallback = getOptResourcesFolderFieldCallback(configuration, target,
-					getDefaultModel());
+					ConfigurationServiceProvider.getValue(configuration, getDefaultModel()));
 
 			Hashtable<String, ModelFieldCallback> callbacks = new Hashtable<>();
 			callbacks.put(modelArgument, modelsCallback);

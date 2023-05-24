@@ -268,6 +268,17 @@ public class JsonTesserocrRecognize extends JsonOCRDServiceProviderWorker
 				: super.getPremise(target);
 	}
 
+	/**
+	 * Returns the default model. Extending classes can overwrite this method to set
+	 * a default model.
+	 * 
+	 * @return The default model. Null, if there is no default model.
+	 * @since 1.8
+	 */
+	protected ConfigurationServiceProvider.CollectionKey getDefaultModel() {
+		return ServiceProviderCollection.defaultModel;
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -291,8 +302,8 @@ public class JsonTesserocrRecognize extends JsonOCRDServiceProviderWorker
 				public List<Field<?>> handle(Field<?> field) {
 					if (field instanceof StringField) {
 						final StringField stringField = ((StringField) field);
-						
-						String value = ConfigurationServiceProvider.getValue(configuration, ServiceProviderCollection.defaultModel);
+
+						String value = ConfigurationServiceProvider.getValue(configuration, getDefaultModel());
 						if (value == null)
 							value = stringField.getValue().orElse(null);
 

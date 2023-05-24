@@ -130,17 +130,6 @@ public class JsonCalamariRecognize extends JsonOCRDServiceProviderOptResourceWor
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.
-	 * JsonOCRDServiceProviderOptResourceWorker#getDefaultModel()
-	 */
-	@Override
-	protected String getDefaultModel() {
-		return ConfigurationServiceProvider.getValue(configuration, ServiceProviderCollection.defaultModel);
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
 	 * @see
 	 * de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.OCRDServiceProviderWorker#
 	 * processorIdentifier()
@@ -160,6 +149,17 @@ public class JsonCalamariRecognize extends JsonOCRDServiceProviderOptResourceWor
 	@Override
 	protected ConfigurationServiceProvider.CollectionKey processorDescription() {
 		return ServiceProviderCollection.processorDescription;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.
+	 * JsonOCRDServiceProviderOptResourceWorker#getDefaultModel()
+	 */
+	@Override
+	protected ConfigurationServiceProvider.CollectionKey getDefaultModel() {
+		return ServiceProviderCollection.defaultModel;
 	}
 
 	/*
