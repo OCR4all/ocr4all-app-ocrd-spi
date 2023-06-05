@@ -35,11 +35,6 @@ import de.uniwuerzburg.zpd.ocr4all.application.spi.env.ConfigurationServiceProvi
 public class JsonEynollahSegment extends JsonOCRDServiceProviderOptResourceWorker
 		implements OpticalLayoutRecognitionServiceProvider {
 	/**
-	 * The service provider name;
-	 */
-	private static final String name = "Eynollah segment";
-
-	/**
 	 * The model argument.
 	 */
 	private static final String modelArgument = "models";
@@ -119,7 +114,7 @@ public class JsonEynollahSegment extends JsonOCRDServiceProviderOptResourceWorke
 	 * @since 1.8
 	 */
 	public JsonEynollahSegment() {
-		super(name, modelArgument);
+		super(modelArgument);
 	}
 
 	/*

@@ -25,7 +25,8 @@ import de.uniwuerzburg.zpd.ocr4all.application.spi.env.ConfigurationServiceProvi
  * <li>docker-resources: /usr/local/share/ocrd-resources</li>
  * <li>docker-stop-wait-kill-seconds: 2</li>
  * <li>tesserocr-binarize-json-id: ocrd-tesserocr-binarize</li>
- * <li>tesserocr-binarize-json-description: ocr-d Tesserocr binarize processor</li>
+ * <li>tesserocr-binarize-json-description: ocr-d Tesserocr binarize
+ * processor</li>
  * </ul>
  *
  * @author <a href="mailto:herbert.baier@uni-wuerzburg.de">Herbert Baier</a>
@@ -33,11 +34,6 @@ import de.uniwuerzburg.zpd.ocr4all.application.spi.env.ConfigurationServiceProvi
  * @since 1.8
  */
 public class JsonTesserocrBinarize extends JsonOCRDServiceProviderWorker implements PreprocessingServiceProvider {
-	/**
-	 * The service provider name;
-	 */
-	private static final String name = "Tesserocr binarize";
-
 	/**
 	 * Defines service provider collection with keys and default values. Collection
 	 * blank values are not allowed and their values are trimmed.
@@ -113,7 +109,7 @@ public class JsonTesserocrBinarize extends JsonOCRDServiceProviderWorker impleme
 	 * @since 1.8
 	 */
 	public JsonTesserocrBinarize() {
-		super(name);
+		super();
 	}
 
 	/*
