@@ -35,11 +35,6 @@ import de.uniwuerzburg.zpd.ocr4all.application.spi.env.ConfigurationServiceProvi
  */
 public class JsonCISOcropyDenoise extends JsonOCRDServiceProviderWorker implements PreprocessingServiceProvider {
 	/**
-	 * The service provider name;
-	 */
-	private static final String name = "CIS denoise";
-
-	/**
 	 * Defines service provider collection with keys and default values. Collection
 	 * blank values are not allowed and their values are trimmed.
 	 *
@@ -114,7 +109,7 @@ public class JsonCISOcropyDenoise extends JsonOCRDServiceProviderWorker implemen
 	 * @since 1.8
 	 */
 	public JsonCISOcropyDenoise() {
-		super(name);
+		super();
 	}
 
 	/*

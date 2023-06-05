@@ -36,11 +36,6 @@ import de.uniwuerzburg.zpd.ocr4all.application.spi.env.ConfigurationServiceProvi
 public class JsonCISOcropySegment extends JsonOCRDServiceProviderWorker
 		implements OpticalLayoutRecognitionServiceProvider {
 	/**
-	 * The service provider name;
-	 */
-	private static final String name = "CIS segment";
-
-	/**
 	 * Defines service provider collection with keys and default values. Collection
 	 * blank values are not allowed and their values are trimmed.
 	 *
@@ -115,7 +110,7 @@ public class JsonCISOcropySegment extends JsonOCRDServiceProviderWorker
 	 * @since 1.8
 	 */
 	public JsonCISOcropySegment() {
-		super(name);
+		super();
 	}
 
 	/*

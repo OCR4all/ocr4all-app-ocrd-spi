@@ -39,11 +39,6 @@ import de.uniwuerzburg.zpd.ocr4all.application.spi.env.ConfigurationServiceProvi
 public class JsonCalamariRecognize extends JsonOCRDServiceProviderOptResourceWorker
 		implements OpticalCharacterRecognitionServiceProvider {
 	/**
-	 * The service provider name;
-	 */
-	private static final String name = "Calamari recognize";
-
-	/**
 	 * The model argument.
 	 */
 	private static final String modelArgument = "checkpoint_dir";
@@ -124,7 +119,7 @@ public class JsonCalamariRecognize extends JsonOCRDServiceProviderOptResourceWor
 	 * @since 1.8
 	 */
 	public JsonCalamariRecognize() {
-		super(name, modelArgument);
+		super(modelArgument);
 	}
 
 	/*

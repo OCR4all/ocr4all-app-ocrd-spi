@@ -36,11 +36,6 @@ import de.uniwuerzburg.zpd.ocr4all.application.spi.env.ConfigurationServiceProvi
  */
 public class JsonSbbBinarize extends JsonOCRDServiceProviderOptResourceWorker implements PreprocessingServiceProvider {
 	/**
-	 * The service provider name;
-	 */
-	private static final String name = "SBB binarize";
-
-	/**
 	 * The model argument.
 	 */
 	private static final String modelArgument = "model";
@@ -120,7 +115,7 @@ public class JsonSbbBinarize extends JsonOCRDServiceProviderOptResourceWorker im
 	 * @since 1.8
 	 */
 	public JsonSbbBinarize() {
-		super(name, modelArgument);
+		super(modelArgument);
 	}
 
 	/*

@@ -37,11 +37,6 @@ import de.uniwuerzburg.zpd.ocr4all.application.spi.env.ConfigurationServiceProvi
 public class JsonTesserocrSegmentRegion extends JsonOCRDServiceProviderWorker
 		implements OpticalLayoutRecognitionServiceProvider {
 	/**
-	 * The service provider name;
-	 */
-	private static final String name = "Tesserocr segment region";
-
-	/**
 	 * Defines service provider collection with keys and default values. Collection
 	 * blank values are not allowed and their values are trimmed.
 	 *
@@ -116,7 +111,7 @@ public class JsonTesserocrSegmentRegion extends JsonOCRDServiceProviderWorker
 	 * @since 1.8
 	 */
 	public JsonTesserocrSegmentRegion() {
-		super(name);
+		super();
 	}
 
 	/*

@@ -34,11 +34,6 @@ import de.uniwuerzburg.zpd.ocr4all.application.spi.env.ConfigurationServiceProvi
  */
 public class JsonPageToPDF extends JsonOCRDServiceProviderWorker implements ToolServiceProvider {
 	/**
-	 * The service provider name;
-	 */
-	private static final String name = "page to pdf";
-
-	/**
 	 * Defines service provider collection with keys and default values. Collection
 	 * blank values are not allowed and their values are trimmed.
 	 *
@@ -113,7 +108,7 @@ public class JsonPageToPDF extends JsonOCRDServiceProviderWorker implements Tool
 	 * @since 1.8
 	 */
 	public JsonPageToPDF() {
-		super(name);
+		super();
 	}
 
 	/*

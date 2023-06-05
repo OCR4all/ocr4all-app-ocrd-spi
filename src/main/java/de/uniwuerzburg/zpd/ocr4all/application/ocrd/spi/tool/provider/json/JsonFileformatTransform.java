@@ -35,11 +35,6 @@ import de.uniwuerzburg.zpd.ocr4all.application.spi.env.ConfigurationServiceProvi
  */
 public class JsonFileformatTransform extends JsonOCRDServiceProviderWorker implements ToolServiceProvider {
 	/**
-	 * The service provider name;
-	 */
-	private static final String name = "file format transform";
-
-	/**
 	 * Defines service provider collection with keys and default values. Collection
 	 * blank values are not allowed and their values are trimmed.
 	 *
@@ -114,7 +109,7 @@ public class JsonFileformatTransform extends JsonOCRDServiceProviderWorker imple
 	 * @since 1.8
 	 */
 	public JsonFileformatTransform() {
-		super(name);
+		super();
 	}
 
 	/*

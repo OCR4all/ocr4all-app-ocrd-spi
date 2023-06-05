@@ -35,11 +35,6 @@ import de.uniwuerzburg.zpd.ocr4all.application.spi.env.ConfigurationServiceProvi
  */
 public class JsonCISOcropyBinarize extends JsonOCRDServiceProviderWorker implements PreprocessingServiceProvider {
 	/**
-	 * The service provider name;
-	 */
-	private static final String name = "CIS binarize";
-
-	/**
 	 * Defines service provider collection with keys and default values. Collection
 	 * blank values are not allowed and their values are trimmed.
 	 *
@@ -114,7 +109,7 @@ public class JsonCISOcropyBinarize extends JsonOCRDServiceProviderWorker impleme
 	 * @since 1.8
 	 */
 	public JsonCISOcropyBinarize() {
-		super(name);
+		super();
 	}
 
 	/*

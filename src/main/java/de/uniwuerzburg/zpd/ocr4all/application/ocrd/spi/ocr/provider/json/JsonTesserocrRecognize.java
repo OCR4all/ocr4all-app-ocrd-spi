@@ -55,11 +55,6 @@ import de.uniwuerzburg.zpd.ocr4all.application.spi.model.argument.StringArgument
 public class JsonTesserocrRecognize extends JsonOCRDServiceProviderWorker
 		implements OpticalCharacterRecognitionServiceProvider {
 	/**
-	 * The service provider name;
-	 */
-	private static final String name = "Tesserocr recognize";
-
-	/**
 	 * The Tesseract default model extension.
 	 */
 	private static final String defaultModelExtension = "traineddata";
@@ -140,23 +135,12 @@ public class JsonTesserocrRecognize extends JsonOCRDServiceProviderWorker
 	}
 
 	/**
-	 * Default constructor for a service provider for ocr-d Tesserocr recognize with
-	 * JSON support.
+	 * Creates a service provider for ocr-d Tesserocr recognize with JSON support.
 	 * 
 	 * @since 1.8
 	 */
 	public JsonTesserocrRecognize() {
-		this(name);
-	}
-
-	/**
-	 * Creates a service provider for ocr-d Tesserocr recognize with JSON support.
-	 * 
-	 * @param name The service provider name;
-	 * @since 1.8
-	 */
-	protected JsonTesserocrRecognize(String name) {
-		super(name, true);
+		super(true);
 	}
 
 	/*

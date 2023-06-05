@@ -34,11 +34,6 @@ import de.uniwuerzburg.zpd.ocr4all.application.spi.env.ConfigurationServiceProvi
  */
 public class JsonTesserocrDeskew extends JsonOCRDServiceProviderWorker implements PreprocessingServiceProvider {
 	/**
-	 * The service provider name;
-	 */
-	private static final String name = "Tesserocr deskew";
-
-	/**
 	 * Defines service provider collection with keys and default values. Collection
 	 * blank values are not allowed and their values are trimmed.
 	 *
@@ -113,7 +108,7 @@ public class JsonTesserocrDeskew extends JsonOCRDServiceProviderWorker implement
 	 * @since 1.8
 	 */
 	public JsonTesserocrDeskew() {
-		super(name);
+		super();
 	}
 
 	/*

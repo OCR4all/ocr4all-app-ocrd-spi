@@ -40,11 +40,6 @@ import de.uniwuerzburg.zpd.ocr4all.application.spi.env.Framework;
  */
 public class JsonTesserocrFontshape extends JsonTesserocrRecognize {
 	/**
-	 * The service provider name;
-	 */
-	private static final String name = "Tesserocr font shape";
-
-	/**
 	 * Defines service provider collection with keys and default values. Collection
 	 * blank values are not allowed and their values are trimmed.
 	 *
@@ -120,7 +115,7 @@ public class JsonTesserocrFontshape extends JsonTesserocrRecognize {
 	 * @since 1.8
 	 */
 	public JsonTesserocrFontshape() {
-		super(name);
+		super();
 	}
 
 	/*

@@ -42,12 +42,11 @@ public abstract class JsonOCRDServiceProviderOptResourceWorker extends JsonOCRDS
 	/**
 	 * Creates an ocr-d service provider worker with JSON and opt resource support.
 	 * 
-	 * @param name          The service provider name.
 	 * @param modelArgument The model argument.
 	 * @since 1.8
 	 */
-	public JsonOCRDServiceProviderOptResourceWorker(String name, String modelArgument) {
-		super(name, true);
+	public JsonOCRDServiceProviderOptResourceWorker(String modelArgument) {
+		super(true);
 
 		this.modelArgument = modelArgument;
 	}
