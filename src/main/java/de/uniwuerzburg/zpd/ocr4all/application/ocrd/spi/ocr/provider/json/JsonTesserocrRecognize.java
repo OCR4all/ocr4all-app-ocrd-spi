@@ -43,7 +43,7 @@ import de.uniwuerzburg.zpd.ocr4all.application.spi.model.argument.StringArgument
  * <li>docker-image: ocrd/all:maximum</li>
  * <li>docker-stop-wait-kill-seconds: 2</li>
  * <li>tesserocr-recognize-json-id: ocrd-tesserocr-recognize</li>
- * <li>tesserocr-recognize-json-description: ocr-d tesserocr recognize processor
+ * <li>tesserocr-recognize-json-description: ocr-d tesserocr recognize processor</li>
  * <li>tesserocr-recognize-json-default-model: null</li>
  * <li>tesserocr-docker-resources: /usr/local/share/tessdata</li>
  * </ul>
