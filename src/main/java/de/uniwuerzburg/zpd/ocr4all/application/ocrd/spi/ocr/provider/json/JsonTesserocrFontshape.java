@@ -29,7 +29,7 @@ import de.uniwuerzburg.zpd.ocr4all.application.spi.env.Framework;
  * <li>tesserocr-fontshape-json-id: ocrd-tesserocr-fontshape</li>
  * <li>tesserocr-fontshape-json-description: ocr-d tesserocr font shape
  * processor</li>
- * <li>tesserocr-fontshape-json-default-model: null</li></li>
+ * <li>tesserocr-fontshape-json-default-model: null</li>
  * <li>tesserocr-docker-resources: /usr/local/share/tessdata</li>
  * <li>tesserocr-recognize-json-id: ocrd-tesserocr-recognize</li>
  * </ul>
