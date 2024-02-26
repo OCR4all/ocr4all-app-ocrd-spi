@@ -25,9 +25,11 @@
 		<maven.compiler.target>17</maven.compiler.target>
 		
 		<!-- use the respective Spring Boot version of the ocr4all-app project -->
-		<SpringBoot_ocr4all-app_com.fasterxml.jackson.core.jackson-databind-version>2.15.4</SpringBoot_ocr4all-app_com.fasterxml.jackson.core.jackson-databind-version>
+		<SpringBoot_ocr4all-app_com.fasterxml.jackson.core.jackson-databind.version>2.15.4</SpringBoot_ocr4all-app_com.fasterxml.jackson.core.jackson-databind.version>
 		
-		<org.apache.maven.plugins.maven-source-plugin-version>3.3.0</org.apache.maven.plugins.maven-source-plugin-version>
+		<org.apache.maven.plugins.maven-source-plugin.version>3.3.0</org.apache.maven.plugins.maven-source-plugin.version>
+		
+		<de.uni-wuerzburg.zpd.ocr4all.version>1.0-SNAPSHOT</de.uni-wuerzburg.zpd.ocr4all.version>
 	</properties>
 
 	<dependencies>
@@ -35,7 +37,7 @@
 		<dependency>
 			<groupId>com.fasterxml.jackson.core</groupId>
 			<artifactId>jackson-databind</artifactId>
-			<version>${SpringBoot_ocr4all-app_com.fasterxml.jackson.core.jackson-databind-version}</version>
+			<version>${SpringBoot_ocr4all-app_com.fasterxml.jackson.core.jackson-databind.version}</version>
 			<scope>provided</scope>
 		</dependency>
 		
@@ -43,7 +45,7 @@
 		<dependency>
 			<groupId>de.uni-wuerzburg.zpd</groupId>
 			<artifactId>ocr4all-app-spi</artifactId>
-			<version>1.0-SNAPSHOT</version>
+			<version>${de.uni-wuerzburg.zpd.ocr4all.version}</version>
 			<scope>provided</scope>
 		</dependency>		
 	</dependencies>
@@ -53,7 +55,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-source-plugin</artifactId>
-				<version>${org.apache.maven.plugins.maven-source-plugin-version}</version>
+				<version>${org.apache.maven.plugins.maven-source-plugin.version}</version>
 				<executions>
 					<execution>
 						<id>attach-sources</id>
@@ -66,7 +68,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-javadoc-plugin</artifactId>
-				<version>${org.apache.maven.plugins.maven-source-plugin-version}</version>
+				<version>${org.apache.maven.plugins.maven-source-plugin.version}</version>
 				<executions>
 					<execution>
 						<id>attach-javadocs</id>
