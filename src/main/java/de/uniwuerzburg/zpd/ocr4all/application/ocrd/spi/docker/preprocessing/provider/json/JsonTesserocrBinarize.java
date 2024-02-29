@@ -7,7 +7,7 @@
  */
 package de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.docker.preprocessing.provider.json;
 
-import de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.docker.JsonOCRDServiceProviderWorker;
+import de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.docker.OCRDDockerJsonServiceProviderWorker;
 import de.uniwuerzburg.zpd.ocr4all.application.spi.PreprocessingServiceProvider;
 import de.uniwuerzburg.zpd.ocr4all.application.spi.env.ConfigurationServiceProvider;
 
@@ -33,7 +33,7 @@ import de.uniwuerzburg.zpd.ocr4all.application.spi.env.ConfigurationServiceProvi
  * @version 1.0
  * @since 1.8
  */
-public class JsonTesserocrBinarize extends JsonOCRDServiceProviderWorker implements PreprocessingServiceProvider {
+public class JsonTesserocrBinarize extends OCRDDockerJsonServiceProviderWorker implements PreprocessingServiceProvider {
 	/**
 	 * Defines service provider collection with keys and default values. Collection
 	 * blank values are not allowed and their values are trimmed.
@@ -116,7 +116,7 @@ public class JsonTesserocrBinarize extends JsonOCRDServiceProviderWorker impleme
 	 * (non-Javadoc)
 	 * 
 	 * @see
-	 * de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.docker.OCRDServiceProviderWorker#
+	 * de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.docker.OCRDDockerServiceProviderWorker#
 	 * processorIdentifier()
 	 */
 	@Override
@@ -128,7 +128,7 @@ public class JsonTesserocrBinarize extends JsonOCRDServiceProviderWorker impleme
 	 * (non-Javadoc)
 	 * 
 	 * @see
-	 * de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.docker.OCRDServiceProviderWorker#
+	 * de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.docker.OCRDDockerServiceProviderWorker#
 	 * processorDescription()
 	 */
 	@Override

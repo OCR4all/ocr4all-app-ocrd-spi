@@ -18,8 +18,8 @@ import java.util.Set;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.docker.OCRDProcessorServiceProvider;
-import de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.docker.OCRDServiceProviderWorker;
+import de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.docker.OCRDDockerProcessorServiceProvider;
+import de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.docker.OCRDDockerServiceProviderWorker;
 import de.uniwuerzburg.zpd.ocr4all.application.spi.OpticalCharacterRecognitionServiceProvider;
 import de.uniwuerzburg.zpd.ocr4all.application.spi.core.ProcessServiceProvider;
 import de.uniwuerzburg.zpd.ocr4all.application.spi.env.ConfigurationServiceProvider;
@@ -58,7 +58,7 @@ import de.uniwuerzburg.zpd.ocr4all.application.spi.model.argument.StringArgument
  * @version 1.0
  * @since 1.8
  */
-public class CalamariRecognize extends OCRDServiceProviderWorker implements OpticalCharacterRecognitionServiceProvider {
+public class CalamariRecognize extends OCRDDockerServiceProviderWorker implements OpticalCharacterRecognitionServiceProvider {
 	/**
 	 * The prefix of the message keys in the resource bundle.
 	 */
@@ -238,7 +238,7 @@ public class CalamariRecognize extends OCRDServiceProviderWorker implements Opti
 	 * (non-Javadoc)
 	 * 
 	 * @see
-	 * de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.docker.OCRDServiceProviderWorker#
+	 * de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.docker.OCRDDockerServiceProviderWorker#
 	 * processorIdentifier()
 	 */
 	@Override
@@ -250,7 +250,7 @@ public class CalamariRecognize extends OCRDServiceProviderWorker implements Opti
 	 * (non-Javadoc)
 	 * 
 	 * @see
-	 * de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.docker.OCRDServiceProviderWorker#
+	 * de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.docker.OCRDDockerServiceProviderWorker#
 	 * processorDescription()
 	 */
 	@Override
@@ -426,7 +426,7 @@ public class CalamariRecognize extends OCRDServiceProviderWorker implements Opti
 	 */
 	@Override
 	public ProcessServiceProvider.Processor newProcessor() {
-		return new OCRDProcessorServiceProvider() {
+		return new OCRDDockerProcessorServiceProvider() {
 			/*
 			 * (non-Javadoc)
 			 * 

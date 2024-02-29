@@ -1,5 +1,5 @@
 /**
- * File:     OCRDProcessorServiceProvider.java
+ * File:     OCRDDockerProcessorServiceProvider.java
  * Package:  de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.docker
  * 
  * Author:   Herbert Baier (herbert.baier@uni-wuerzburg.de)
@@ -24,7 +24,7 @@ import de.uniwuerzburg.zpd.ocr4all.application.spi.util.SystemProcess;
  * @version 1.0
  * @since 1.8
  */
-public abstract class OCRDProcessorServiceProvider extends CoreProcessorServiceProvider {
+public abstract class OCRDDockerProcessorServiceProvider extends CoreProcessorServiceProvider {
 	/**
 	 * The docker process.
 	 */

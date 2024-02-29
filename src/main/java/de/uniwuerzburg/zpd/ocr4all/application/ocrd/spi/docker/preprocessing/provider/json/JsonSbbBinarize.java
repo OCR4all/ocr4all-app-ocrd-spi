@@ -7,7 +7,7 @@
  */
 package de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.docker.preprocessing.provider.json;
 
-import de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.docker.JsonOCRDServiceProviderOptResourceWorker;
+import de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.docker.OCRDDockerJsonServiceProviderOptResourceWorker;
 import de.uniwuerzburg.zpd.ocr4all.application.spi.PreprocessingServiceProvider;
 import de.uniwuerzburg.zpd.ocr4all.application.spi.env.ConfigurationServiceProvider;
 
@@ -34,7 +34,7 @@ import de.uniwuerzburg.zpd.ocr4all.application.spi.env.ConfigurationServiceProvi
  * @version 1.0
  * @since 1.8
  */
-public class JsonSbbBinarize extends JsonOCRDServiceProviderOptResourceWorker implements PreprocessingServiceProvider {
+public class JsonSbbBinarize extends OCRDDockerJsonServiceProviderOptResourceWorker implements PreprocessingServiceProvider {
 	/**
 	 * The model argument.
 	 */
@@ -122,7 +122,7 @@ public class JsonSbbBinarize extends JsonOCRDServiceProviderOptResourceWorker im
 	 * (non-Javadoc)
 	 * 
 	 * @see
-	 * de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.docker.OCRDServiceProviderWorker#
+	 * de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.docker.OCRDDockerServiceProviderWorker#
 	 * processorIdentifier()
 	 */
 	@Override
@@ -134,7 +134,7 @@ public class JsonSbbBinarize extends JsonOCRDServiceProviderOptResourceWorker im
 	 * (non-Javadoc)
 	 * 
 	 * @see
-	 * de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.docker.OCRDServiceProviderWorker#
+	 * de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.docker.OCRDDockerServiceProviderWorker#
 	 * processorDescription()
 	 */
 	@Override

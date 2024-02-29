@@ -122,7 +122,7 @@ public class JsonTesserocrFontshape extends JsonTesserocrRecognize {
 	 * (non-Javadoc)
 	 * 
 	 * @see
-	 * de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.docker.OCRDServiceProviderWorker#
+	 * de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.docker.OCRDDockerServiceProviderWorker#
 	 * processorIdentifier()
 	 */
 	@Override
@@ -134,7 +134,7 @@ public class JsonTesserocrFontshape extends JsonTesserocrRecognize {
 	 * (non-Javadoc)
 	 * 
 	 * @see
-	 * de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.docker.OCRDServiceProviderWorker#
+	 * de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.docker.OCRDDockerServiceProviderWorker#
 	 * processorDescription()
 	 */
 	@Override
@@ -179,7 +179,7 @@ public class JsonTesserocrFontshape extends JsonTesserocrRecognize {
 	 * (non-Javadoc)
 	 * 
 	 * @see
-	 * de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.docker.OCRDServiceProviderWorker#
+	 * de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.docker.OCRDDockerServiceProviderWorker#
 	 * getOptResources(de.uniwuerzburg.zpd.ocr4all.application.spi.env.Framework)
 	 */
 	@Override

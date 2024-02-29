@@ -7,7 +7,7 @@
  */
 package de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.docker.ocr.provider.json;
 
-import de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.docker.JsonOCRDServiceProviderOptResourceWorker;
+import de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.docker.OCRDDockerJsonServiceProviderOptResourceWorker;
 import de.uniwuerzburg.zpd.ocr4all.application.spi.OpticalCharacterRecognitionServiceProvider;
 import de.uniwuerzburg.zpd.ocr4all.application.spi.env.ConfigurationServiceProvider;
 
@@ -36,7 +36,7 @@ import de.uniwuerzburg.zpd.ocr4all.application.spi.env.ConfigurationServiceProvi
  * @version 1.0
  * @since 1.8
  */
-public class JsonCalamariRecognize extends JsonOCRDServiceProviderOptResourceWorker
+public class JsonCalamariRecognize extends OCRDDockerJsonServiceProviderOptResourceWorker
 		implements OpticalCharacterRecognitionServiceProvider {
 	/**
 	 * The model argument.
@@ -126,7 +126,7 @@ public class JsonCalamariRecognize extends JsonOCRDServiceProviderOptResourceWor
 	 * (non-Javadoc)
 	 * 
 	 * @see
-	 * de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.docker.OCRDServiceProviderWorker#
+	 * de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.docker.OCRDDockerServiceProviderWorker#
 	 * processorIdentifier()
 	 */
 	@Override
@@ -138,7 +138,7 @@ public class JsonCalamariRecognize extends JsonOCRDServiceProviderOptResourceWor
 	 * (non-Javadoc)
 	 * 
 	 * @see
-	 * de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.docker.OCRDServiceProviderWorker#
+	 * de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.docker.OCRDDockerServiceProviderWorker#
 	 * processorDescription()
 	 */
 	@Override
@@ -150,7 +150,7 @@ public class JsonCalamariRecognize extends JsonOCRDServiceProviderOptResourceWor
 	 * (non-Javadoc)
 	 * 
 	 * @see de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.docker.
-	 * JsonOCRDServiceProviderOptResourceWorker#getDefaultModel()
+	 * OCRDDockerJsonServiceProviderOptResourceWorker#getDefaultModel()
 	 */
 	@Override
 	protected ConfigurationServiceProvider.CollectionKey getDefaultModel() {

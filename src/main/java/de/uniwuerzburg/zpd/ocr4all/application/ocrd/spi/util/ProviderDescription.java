@@ -20,6 +20,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import de.uniwuerzburg.zpd.ocr4all.application.spi.model.BooleanField;
 import de.uniwuerzburg.zpd.ocr4all.application.spi.model.DecimalField;
@@ -29,6 +30,13 @@ import de.uniwuerzburg.zpd.ocr4all.application.spi.model.IntegerField;
 import de.uniwuerzburg.zpd.ocr4all.application.spi.model.Model;
 import de.uniwuerzburg.zpd.ocr4all.application.spi.model.SelectField;
 import de.uniwuerzburg.zpd.ocr4all.application.spi.model.StringField;
+import de.uniwuerzburg.zpd.ocr4all.application.spi.model.argument.Argument;
+import de.uniwuerzburg.zpd.ocr4all.application.spi.model.argument.BooleanArgument;
+import de.uniwuerzburg.zpd.ocr4all.application.spi.model.argument.DecimalArgument;
+import de.uniwuerzburg.zpd.ocr4all.application.spi.model.argument.IntegerArgument;
+import de.uniwuerzburg.zpd.ocr4all.application.spi.model.argument.ModelArgument;
+import de.uniwuerzburg.zpd.ocr4all.application.spi.model.argument.SelectArgument;
+import de.uniwuerzburg.zpd.ocr4all.application.spi.model.argument.StringArgument;
 
 /**
  * Defines provider descriptions.
@@ -235,7 +243,7 @@ public class ProviderDescription {
 	 * @version 1.0
 	 * @since 17
 	 */
-	public static class ModelFactory {
+	public class ModelFactory {
 		/**
 		 * the JSON content type.
 		 */
@@ -761,13 +769,115 @@ public class ProviderDescription {
 		}
 
 		/**
+		 * A functional interface that allows implementing classes to handle model
+		 * arguments.
+		 *
+		 * @author <a href="mailto:herbert.baier@uni-wuerzburg.de">Herbert Baier</a>
+		 * @version 1.0
+		 * @since 1.8
+		 */
+		@FunctionalInterface
+		public interface ModelArgumentCallback {
+			/**
+			 * Handles the argument.
+			 * 
+			 * @param argument                          The argument to handle.
+			 * @param jsonTypeObjectProcessorParameters The JSON processor parameters of
+			 *                                          type object.
+			 * @return The handled arguments. Null or empty if the argument should be
+			 *         ignored.
+			 * @since 1.8
+			 */
+			public List<Argument> handle(Argument argument, Set<String> jsonTypeObjectProcessorParameters);
+		}
+
+		/**
 		 * Returns the JSON processor parameters of type object.
 		 *
 		 * @return The JSON processor parameters of type object.
 		 * @since 1.8
 		 */
-		public Set<String> getJsonTypeObjectProcessorParameters() {
-			return new HashSet<>(jsonTypeObjectProcessorParameters);
+		public ObjectNode getJson(ModelArgument modelArgument,
+				Hashtable<String, ModelArgumentCallback> processorCallbacks, List<Argument> extraArguments)
+				throws IllegalArgumentException {
+			/*
+			 * The JSON processor arguments
+			 */
+			final ObjectNode processorArguments = objectMapper.createObjectNode();
+
+			List<Argument> arguments = new ArrayList<>();
+
+			if (extraArguments != null && !extraArguments.isEmpty())
+				for (Argument argument : extraArguments)
+					if (argument != null)
+						arguments.add(argument);
+
+			for (Argument argument : modelArgument.getArguments()) {
+				if (processorCallbacks != null && processorCallbacks.containsKey(argument.getArgument())) {
+					List<Argument> handledArguments = processorCallbacks.get(argument.getArgument()).handle(argument,
+							jsonTypeObjectProcessorParameters);
+
+					if (handledArguments != null && !handledArguments.isEmpty())
+						for (Argument handled : handledArguments)
+							if (handled != null)
+								arguments.add(handled);
+				} else
+					arguments.add(argument);
+			}
+
+			// Processes only the arguments that belong to the json description
+			Set<String> jsonArguments = new HashSet<>(modelFactory.getArguments());
+			for (Argument argument : arguments)
+				if (jsonArguments.contains(argument.getArgument())) {
+					if (argument instanceof SelectArgument) {
+						SelectArgument select = (SelectArgument) argument;
+
+						if (select.getValues().isPresent()) {
+							List<String> values = select.getValues().get();
+
+							if (values.size() == 1)
+								processorArguments.put(select.getArgument(), values.get(0));
+							else if (values.size() > 1)
+								throw new IllegalArgumentException(
+										"The select argument '" + select.getArgument() + "' allows only one value.");
+						}
+					} else if (argument instanceof StringArgument) {
+						StringArgument string = (StringArgument) argument;
+
+						if (string.getValue().isPresent()) {
+							if (jsonTypeObjectProcessorParameters.contains(string.getArgument())) {
+								try {
+									processorArguments.set(string.getArgument(),
+											objectMapper.readTree(string.getValue().get()));
+								} catch (JsonProcessingException e) {
+									throw new IllegalArgumentException("The JSON value of argument '"
+											+ string.getArgument() + "' can not be parsed - " + e.getMessage());
+								}
+							} else
+								processorArguments.put(string.getArgument(), string.getValue().get());
+						}
+
+					} else if (argument instanceof IntegerArgument) {
+						IntegerArgument integer = (IntegerArgument) argument;
+
+						if (integer.getValue().isPresent())
+							processorArguments.put(integer.getArgument(), (int) integer.getValue().get());
+					} else if (argument instanceof DecimalArgument) {
+						DecimalArgument decimal = (DecimalArgument) argument;
+
+						if (decimal.getValue().isPresent())
+							processorArguments.put(decimal.getArgument(), (float) decimal.getValue().get());
+					} else if (argument instanceof BooleanArgument) {
+						BooleanArgument bool = (BooleanArgument) argument;
+
+						if (bool.getValue().isPresent())
+							processorArguments.put(bool.getArgument(), (boolean) bool.getValue().get());
+					} else
+						throw new IllegalArgumentException(
+								"The argument of type '" + argument.getClass().getName() + "'" + " is not supported.");
+				}
+
+			return processorArguments;
 		}
 
 		/**

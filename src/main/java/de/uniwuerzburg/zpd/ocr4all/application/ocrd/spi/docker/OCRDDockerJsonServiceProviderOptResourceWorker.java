@@ -1,5 +1,5 @@
 /**
- * File:     JsonOCRDServiceProviderOptResourceWorker.java
+ * File:     OCRDDockerJsonServiceProviderOptResourceWorker.java
  * Package:  de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.docker
  * 
  * Author:   Herbert Baier (herbert.baier@uni-wuerzburg.de)
@@ -34,7 +34,7 @@ import de.uniwuerzburg.zpd.ocr4all.application.spi.env.Target;
  * @version 1.0
  * @since 1.8
  */
-public abstract class JsonOCRDServiceProviderOptResourceWorker extends JsonOCRDServiceProviderWorker {
+public abstract class OCRDDockerJsonServiceProviderOptResourceWorker extends OCRDDockerJsonServiceProviderWorker {
 	/**
 	 * The model argument.
 	 */
@@ -46,7 +46,7 @@ public abstract class JsonOCRDServiceProviderOptResourceWorker extends JsonOCRDS
 	 * @param modelArgument The model argument.
 	 * @since 1.8
 	 */
-	public JsonOCRDServiceProviderOptResourceWorker(String modelArgument) {
+	public OCRDDockerJsonServiceProviderOptResourceWorker(String modelArgument) {
 		super(true);
 
 		this.modelArgument = modelArgument;
@@ -83,7 +83,7 @@ public abstract class JsonOCRDServiceProviderOptResourceWorker extends JsonOCRDS
 	 * (non-Javadoc)
 	 * 
 	 * @see de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.docker.
-	 * JsonOCRDServiceProviderWorker#getModelCallbacks(de.uniwuerzburg.zpd.ocr4all.
+	 * OCRDDockerJsonServiceProviderWorker#getModelCallbacks(de.uniwuerzburg.zpd.ocr4all.
 	 * application.spi.env.Target, java.util.List)
 	 */
 	@Override

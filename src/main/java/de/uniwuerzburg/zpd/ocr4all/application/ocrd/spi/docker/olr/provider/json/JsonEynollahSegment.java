@@ -7,7 +7,7 @@
  */
 package de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.docker.olr.provider.json;
 
-import de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.docker.JsonOCRDServiceProviderOptResourceWorker;
+import de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.docker.OCRDDockerJsonServiceProviderOptResourceWorker;
 import de.uniwuerzburg.zpd.ocr4all.application.spi.OpticalLayoutRecognitionServiceProvider;
 import de.uniwuerzburg.zpd.ocr4all.application.spi.env.ConfigurationServiceProvider;
 
@@ -32,7 +32,7 @@ import de.uniwuerzburg.zpd.ocr4all.application.spi.env.ConfigurationServiceProvi
  * @version 1.0
  * @since 1.8
  */
-public class JsonEynollahSegment extends JsonOCRDServiceProviderOptResourceWorker
+public class JsonEynollahSegment extends OCRDDockerJsonServiceProviderOptResourceWorker
 		implements OpticalLayoutRecognitionServiceProvider {
 	/**
 	 * The model argument.
@@ -121,7 +121,7 @@ public class JsonEynollahSegment extends JsonOCRDServiceProviderOptResourceWorke
 	 * (non-Javadoc)
 	 * 
 	 * @see
-	 * de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.docker.OCRDServiceProviderWorker#
+	 * de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.docker.OCRDDockerServiceProviderWorker#
 	 * processorIdentifier()
 	 */
 	@Override
@@ -133,7 +133,7 @@ public class JsonEynollahSegment extends JsonOCRDServiceProviderOptResourceWorke
 	 * (non-Javadoc)
 	 * 
 	 * @see
-	 * de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.docker.OCRDServiceProviderWorker#
+	 * de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.docker.OCRDDockerServiceProviderWorker#
 	 * processorDescription()
 	 */
 	@Override

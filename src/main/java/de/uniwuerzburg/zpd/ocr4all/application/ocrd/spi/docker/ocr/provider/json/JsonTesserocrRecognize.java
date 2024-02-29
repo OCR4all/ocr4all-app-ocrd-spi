@@ -17,7 +17,7 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.Set;
 
-import de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.docker.JsonOCRDServiceProviderWorker;
+import de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.docker.OCRDDockerJsonServiceProviderWorker;
 import de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.util.ProviderDescription;
 import de.uniwuerzburg.zpd.ocr4all.application.spi.OpticalCharacterRecognitionServiceProvider;
 import de.uniwuerzburg.zpd.ocr4all.application.spi.core.CoreProcessorServiceProvider;
@@ -54,7 +54,7 @@ import de.uniwuerzburg.zpd.ocr4all.application.spi.model.argument.StringArgument
  * @version 1.0
  * @since 1.8
  */
-public class JsonTesserocrRecognize extends JsonOCRDServiceProviderWorker
+public class JsonTesserocrRecognize extends OCRDDockerJsonServiceProviderWorker
 		implements OpticalCharacterRecognitionServiceProvider {
 	/**
 	 * The Tesseract default model extension.
@@ -149,7 +149,7 @@ public class JsonTesserocrRecognize extends JsonOCRDServiceProviderWorker
 	 * (non-Javadoc)
 	 * 
 	 * @see de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.docker.
-	 * OCRDServiceProviderWorker# processorIdentifier()
+	 * OCRDDockerServiceProviderWorker# processorIdentifier()
 	 */
 	@Override
 	protected ConfigurationServiceProvider.CollectionKey processorIdentifier() {
@@ -160,7 +160,7 @@ public class JsonTesserocrRecognize extends JsonOCRDServiceProviderWorker
 	 * (non-Javadoc)
 	 * 
 	 * @see de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.docker.
-	 * OCRDServiceProviderWorker# processorDescription()
+	 * OCRDDockerServiceProviderWorker# processorDescription()
 	 */
 	@Override
 	protected ConfigurationServiceProvider.CollectionKey processorDescription() {
@@ -171,7 +171,7 @@ public class JsonTesserocrRecognize extends JsonOCRDServiceProviderWorker
 	 * (non-Javadoc)
 	 * 
 	 * @see de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.docker.
-	 * OCRDServiceProviderWorker#
+	 * OCRDDockerServiceProviderWorker#
 	 * getDockerResources(de.uniwuerzburg.zpd.ocr4all.application.spi.env.
 	 * ConfigurationServiceProvider)
 	 */
@@ -267,7 +267,7 @@ public class JsonTesserocrRecognize extends JsonOCRDServiceProviderWorker
 	 * (non-Javadoc)
 	 * 
 	 * @see de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.docker.
-	 * JsonOCRDServiceProviderWorker#getModelCallbacks(de.uniwuerzburg.zpd.ocr4all.
+	 * OCRDDockerJsonServiceProviderWorker#getModelCallbacks(de.uniwuerzburg.zpd.ocr4all.
 	 * application.spi.env.Target, java.util.List)
 	 */
 	@Override
@@ -280,7 +280,7 @@ public class JsonTesserocrRecognize extends JsonOCRDServiceProviderWorker
 				 * (non-Javadoc)
 				 * 
 				 * @see de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.docker.
-				 * JsonOCRDServiceProviderWorker.ModelFieldCallback#handle(de.uniwuerzburg.zpd.
+				 * OCRDDockerJsonServiceProviderWorker.ModelFieldCallback#handle(de.uniwuerzburg.zpd.
 				 * ocr4all.application.spi.model.Field)
 				 */
 				@Override
@@ -319,19 +319,19 @@ public class JsonTesserocrRecognize extends JsonOCRDServiceProviderWorker
 	 * (non-Javadoc)
 	 * 
 	 * @see de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.docker.
-	 * JsonOCRDServiceProviderWorker#getProcessorCallbacks(de.uniwuerzburg.zpd.
+	 * OCRDDockerJsonServiceProviderWorker#getProcessorCallbacks(de.uniwuerzburg.zpd.
 	 * ocr4all.application.spi.core.CoreProcessorServiceProvider, java.util.List)
 	 */
 	@Override
-	protected Hashtable<String, ModelArgumentCallback> getProcessorCallbacks(CoreProcessorServiceProvider processor,
-			List<String> arguments) {
+	protected Hashtable<String, ProviderDescription.ModelFactory.ModelArgumentCallback> getProcessorCallbacks(
+			CoreProcessorServiceProvider processor, List<String> arguments) {
 		if (arguments.contains(modelArgument)) {
-			ModelArgumentCallback modelsCallback = new ModelArgumentCallback() {
+			ProviderDescription.ModelFactory.ModelArgumentCallback modelsCallback = new ProviderDescription.ModelFactory.ModelArgumentCallback() {
 				/*
 				 * (non-Javadoc)
 				 * 
 				 * @see de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.docker.
-				 * JsonOCRDServiceProviderWorker.ModelArgumentCallback#handle(de.uniwuerzburg.
+				 * OCRDDockerJsonServiceProviderWorker.ModelArgumentCallback#handle(de.uniwuerzburg.
 				 * zpd.ocr4all.application.spi.model.argument.Argument, java.util.Set)
 				 */
 				@Override
@@ -360,7 +360,7 @@ public class JsonTesserocrRecognize extends JsonOCRDServiceProviderWorker
 				}
 			};
 
-			Hashtable<String, ModelArgumentCallback> callbacks = new Hashtable<>();
+			Hashtable<String, ProviderDescription.ModelFactory.ModelArgumentCallback> callbacks = new Hashtable<>();
 			callbacks.put(modelArgument, modelsCallback);
 
 			return callbacks;

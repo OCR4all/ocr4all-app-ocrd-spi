@@ -1,5 +1,5 @@
 /**
- * File:     OCRDServiceProviderWorker.java
+ * File:     OCRDDockerServiceProviderWorker.java
  * Package:  de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.docker
  * 
  * Author:   Herbert Baier (herbert.baier@uni-wuerzburg.de)
@@ -60,7 +60,7 @@ import de.uniwuerzburg.zpd.ocr4all.application.spi.util.SystemProcess;
  * @version 1.0
  * @since 1.8
  */
-public abstract class OCRDServiceProviderWorker extends ServiceProviderCore {
+public abstract class OCRDDockerServiceProviderWorker extends ServiceProviderCore {
 	/**
 	 * The base name of the resource bundle, a fully qualified class name.
 	 */
@@ -143,6 +143,14 @@ public abstract class OCRDServiceProviderWorker extends ServiceProviderCore {
 	}
 
 	/**
+	 * The JSON object mapper.
+	 */
+	protected final ObjectMapper objectMapper = new ObjectMapper();
+	{
+		objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+	}
+
+	/**
 	 * The prefix of the message keys in the resource bundle.
 	 */
 	protected final String resourceBundleKeyPrefix;
@@ -152,7 +160,7 @@ public abstract class OCRDServiceProviderWorker extends ServiceProviderCore {
 	 * 
 	 * @since 1.8
 	 */
-	public OCRDServiceProviderWorker() {
+	public OCRDDockerServiceProviderWorker() {
 		this(null);
 	}
 
@@ -162,7 +170,7 @@ public abstract class OCRDServiceProviderWorker extends ServiceProviderCore {
 	 * @param resourceBundleKeyPrefix The prefix of the keys in the resource bundle.
 	 * @since 1.8
 	 */
-	public OCRDServiceProviderWorker(String resourceBundleKeyPrefix) {
+	public OCRDDockerServiceProviderWorker(String resourceBundleKeyPrefix) {
 		super();
 
 		this.resourceBundleKeyPrefix = resourceBundleKeyPrefix == null ? "" : resourceBundleKeyPrefix.trim();
@@ -229,7 +237,7 @@ public abstract class OCRDServiceProviderWorker extends ServiceProviderCore {
 	 */
 	private static ResourceBundle getResourceBundle(Locale locale) {
 		return ResourceBundle.getBundle(resourceBundleBaseName, locale,
-				OCRDServiceProviderWorker.class.getClassLoader());
+				OCRDDockerServiceProviderWorker.class.getClassLoader());
 	}
 
 	/**
@@ -479,7 +487,7 @@ public abstract class OCRDServiceProviderWorker extends ServiceProviderCore {
 	 * @since 1.8
 	 */
 	protected ProcessServiceProvider.Processor.State run(Framework framework, Object arguments,
-			Set<String> unnecessaryArguments, OCRDProcessorServiceProvider.DockerProcess dockerProcess,
+			Set<String> unnecessaryArguments, OCRDDockerProcessorServiceProvider.DockerProcess dockerProcess,
 			ProcessorRunningState runningState, ProcessorExecution execution, Message standardOutput,
 			Message standardError, Progress progress, float baseProgress) {
 
@@ -507,7 +515,7 @@ public abstract class OCRDServiceProviderWorker extends ServiceProviderCore {
 	 * @since 1.8
 	 */
 	protected ProcessServiceProvider.Processor.State run(Framework framework, boolean isResources, Object arguments,
-			Set<String> unnecessaryArguments, OCRDProcessorServiceProvider.DockerProcess dockerProcess,
+			Set<String> unnecessaryArguments, OCRDDockerProcessorServiceProvider.DockerProcess dockerProcess,
 			ProcessorRunningState runningState, ProcessorExecution execution, Message standardOutput,
 			Message standardError, Progress progress, float baseProgress) {
 		try {
@@ -759,7 +767,7 @@ public abstract class OCRDServiceProviderWorker extends ServiceProviderCore {
 			 * (non-Javadoc)
 			 * 
 			 * @see de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.docker.
-			 * JsonOCRDServiceProviderWorker.ModelFieldCallback#handle(de.uniwuerzburg.zpd.
+			 * OCRDDockerJsonServiceProviderWorker.ModelFieldCallback#handle(de.uniwuerzburg.zpd.
 			 * ocr4all.application.spi.model.Field)
 			 */
 			@Override

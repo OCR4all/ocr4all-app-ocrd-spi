@@ -1,5 +1,5 @@
 /**
- * File:     JsonOCRDServiceProviderWorker.java
+ * File:     OCRDDockerJsonServiceProviderWorker.java
  * Package:  de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.docker
  * 
  * Author:   Herbert Baier (herbert.baier@uni-wuerzburg.de)
@@ -10,14 +10,11 @@ package de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.docker;
 import java.security.ProviderException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
-import java.util.Set;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.util.ProviderDescription;
@@ -31,12 +28,7 @@ import de.uniwuerzburg.zpd.ocr4all.application.spi.env.Target;
 import de.uniwuerzburg.zpd.ocr4all.application.spi.model.Entry;
 import de.uniwuerzburg.zpd.ocr4all.application.spi.model.Model;
 import de.uniwuerzburg.zpd.ocr4all.application.spi.model.argument.Argument;
-import de.uniwuerzburg.zpd.ocr4all.application.spi.model.argument.BooleanArgument;
-import de.uniwuerzburg.zpd.ocr4all.application.spi.model.argument.DecimalArgument;
-import de.uniwuerzburg.zpd.ocr4all.application.spi.model.argument.IntegerArgument;
 import de.uniwuerzburg.zpd.ocr4all.application.spi.model.argument.ModelArgument;
-import de.uniwuerzburg.zpd.ocr4all.application.spi.model.argument.SelectArgument;
-import de.uniwuerzburg.zpd.ocr4all.application.spi.model.argument.StringArgument;
 import de.uniwuerzburg.zpd.ocr4all.application.spi.util.SystemProcess;
 
 /**
@@ -57,7 +49,7 @@ import de.uniwuerzburg.zpd.ocr4all.application.spi.util.SystemProcess;
  * @version 1.0
  * @since 1.8
  */
-public abstract class JsonOCRDServiceProviderWorker extends OCRDServiceProviderWorker
+public abstract class OCRDDockerJsonServiceProviderWorker extends OCRDDockerServiceProviderWorker
 		implements ProcessServiceProvider {
 	/**
 	 * Defines service provider collection with keys and default values. Collection
@@ -135,7 +127,7 @@ public abstract class JsonOCRDServiceProviderWorker extends OCRDServiceProviderW
 	/**
 	 * The ProviderDescription.
 	 */
-	private de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.util.ProviderDescription providerDescription;
+	private ProviderDescription providerDescription;
 
 	/**
 	 * Creates an ocr-d service provider worker with JSON support and without
@@ -143,7 +135,7 @@ public abstract class JsonOCRDServiceProviderWorker extends OCRDServiceProviderW
 	 * 
 	 * @since 1.8
 	 */
-	public JsonOCRDServiceProviderWorker() {
+	public OCRDDockerJsonServiceProviderWorker() {
 		this(false);
 	}
 
@@ -153,7 +145,7 @@ public abstract class JsonOCRDServiceProviderWorker extends OCRDServiceProviderW
 	 * @param isResources True if resources folder is required.
 	 * @since 1.8
 	 */
-	public JsonOCRDServiceProviderWorker(boolean isResources) {
+	public OCRDDockerJsonServiceProviderWorker(boolean isResources) {
 		super(null);
 
 		this.isResources = isResources;
@@ -379,8 +371,8 @@ public abstract class JsonOCRDServiceProviderWorker extends OCRDServiceProviderW
 	 *         name and the value the desired argument handler.
 	 * @since 1.8
 	 */
-	protected Hashtable<String, ModelArgumentCallback> getProcessorCallbacks(CoreProcessorServiceProvider processor,
-			List<String> arguments) {
+	protected Hashtable<String, ProviderDescription.ModelFactory.ModelArgumentCallback> getProcessorCallbacks(
+			CoreProcessorServiceProvider processor, List<String> arguments) {
 		return null;
 	}
 
@@ -393,7 +385,7 @@ public abstract class JsonOCRDServiceProviderWorker extends OCRDServiceProviderW
 	@Override
 	public Processor newProcessor() {
 		return providerDescription == null || !providerDescription.isModelFactorySet() ? null
-				: new OCRDProcessorServiceProvider() {
+				: new OCRDDockerProcessorServiceProvider() {
 					/*
 					 * (non-Javadoc)
 					 * 
@@ -408,136 +400,33 @@ public abstract class JsonOCRDServiceProviderWorker extends OCRDServiceProviderW
 						if (!initialize(getProcessorIdentifier(), callback, framework))
 							return ProcessServiceProvider.Processor.State.canceled;
 
-						/*
-						 * The JSON processor arguments
-						 */
-						final ObjectNode processorArguments = objectMapper.createObjectNode();
+						ObjectNode arguments;
+						try {
+							/*
+							 * Parse the processor arguments
+							 */
+							updatedStandardOutput("Parse parameters.");
 
-						/*
-						 * Parse the processor arguments
-						 */
-						updatedStandardOutput("Parse parameters.");
+							final List<String> modelAarguments = providerDescription.getModelFactory().getArguments();
+							arguments = providerDescription.getModelFactory().getJson(modelArgument,
+									getProcessorCallbacks(this, modelAarguments),
+									extraArguments(this, modelAarguments));
+						} catch (Exception e) {
+							updatedStandardError(e.getMessage());
 
-						final Set<String> jsonTypeObjectProcessorParameters = modelFactory
-								.getJsonTypeObjectProcessorParameters();
-
-						List<Argument> arguments = new ArrayList<>();
-
-						List<Argument> extraArguments = extraArguments(this, modelFactory.getArguments());
-						if (extraArguments != null && !extraArguments.isEmpty())
-							for (Argument argument : extraArguments)
-								if (argument != null)
-									arguments.add(argument);
-
-						final Hashtable<String, ModelArgumentCallback> processorCallbacks = getProcessorCallbacks(this,
-								modelFactory.getArguments());
-
-						for (Argument argument : modelArgument.getArguments()) {
-							if (processorCallbacks != null && processorCallbacks.containsKey(argument.getArgument())) {
-								List<Argument> handledArguments = processorCallbacks.get(argument.getArgument())
-										.handle(argument, jsonTypeObjectProcessorParameters);
-
-								if (handledArguments != null && !handledArguments.isEmpty())
-									for (Argument handled : handledArguments)
-										if (handled != null)
-											arguments.add(handled);
-							} else
-								arguments.add(argument);
+							return ProcessServiceProvider.Processor.State.interrupted;
 						}
-
-						// Processes only the arguments that belong to the json description
-						Set<String> jsonArguments = new HashSet<>(modelFactory.getArguments());
-						for (Argument argument : arguments)
-							if (jsonArguments.contains(argument.getArgument())) {
-								if (argument instanceof SelectArgument) {
-									SelectArgument select = (SelectArgument) argument;
-
-									if (select.getValues().isPresent()) {
-										List<String> values = select.getValues().get();
-
-										if (values.size() == 1)
-											processorArguments.put(select.getArgument(), values.get(0));
-										else if (values.size() > 1) {
-											updatedStandardError("The select argument '" + select.getArgument()
-													+ "' allows only one value.");
-
-											return ProcessServiceProvider.Processor.State.interrupted;
-										}
-									}
-								} else if (argument instanceof StringArgument) {
-									StringArgument string = (StringArgument) argument;
-
-									if (string.getValue().isPresent()) {
-										if (jsonTypeObjectProcessorParameters.contains(string.getArgument())) {
-											try {
-												processorArguments.set(string.getArgument(),
-														objectMapper.readTree(string.getValue().get()));
-											} catch (JsonProcessingException e) {
-												updatedStandardError(
-														"The JSON value of argument '" + string.getArgument()
-																+ "' can not be parsed - " + e.getMessage());
-
-												return ProcessServiceProvider.Processor.State.interrupted;
-											}
-										} else
-											processorArguments.put(string.getArgument(), string.getValue().get());
-									}
-
-								} else if (argument instanceof IntegerArgument) {
-									IntegerArgument integer = (IntegerArgument) argument;
-
-									if (integer.getValue().isPresent())
-										processorArguments.put(integer.getArgument(), (int) integer.getValue().get());
-								} else if (argument instanceof DecimalArgument) {
-									DecimalArgument decimal = (DecimalArgument) argument;
-
-									if (decimal.getValue().isPresent())
-										processorArguments.put(decimal.getArgument(), (float) decimal.getValue().get());
-								} else if (argument instanceof BooleanArgument) {
-									BooleanArgument bool = (BooleanArgument) argument;
-
-									if (bool.getValue().isPresent())
-										processorArguments.put(bool.getArgument(), (boolean) bool.getValue().get());
-								} else {
-									updatedStandardError("The argument of type '" + argument.getClass().getName() + "'"
-											+ " is not supported.");
-
-									return ProcessServiceProvider.Processor.State.interrupted;
-								}
-							}
 
 						/*
 						 * Runs the processor
 						 */
-						return run(framework, isResources, processorArguments, null, dockerProcess, () -> isCanceled(),
+						return run(framework, isResources, arguments, null, dockerProcess, () -> isCanceled(),
 								() -> complete(), message -> updatedStandardOutput(message),
 								message -> updatedStandardError(message),
 								progress -> callback.updatedProgress(progress), 0.01F);
+
 					}
 				};
-	}
-
-	/**
-	 * A functional interface that allows implementing classes to handle model
-	 * arguments.
-	 *
-	 * @author <a href="mailto:herbert.baier@uni-wuerzburg.de">Herbert Baier</a>
-	 * @version 1.0
-	 * @since 1.8
-	 */
-	@FunctionalInterface
-	protected interface ModelArgumentCallback {
-		/**
-		 * Handles the argument.
-		 * 
-		 * @param argument                          The argument to handle.
-		 * @param jsonTypeObjectProcessorParameters The JSON processor parameters of
-		 *                                          type object.
-		 * @return The handled arguments. Null or empty if the argument should be
-		 *         ignored.
-		 * @since 1.8
-		 */
-		public List<Argument> handle(Argument argument, Set<String> jsonTypeObjectProcessorParameters);
 	}
 
 }
