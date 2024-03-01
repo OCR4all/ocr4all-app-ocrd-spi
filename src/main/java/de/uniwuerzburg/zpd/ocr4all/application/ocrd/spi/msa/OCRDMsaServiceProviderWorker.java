@@ -1,15 +1,13 @@
 /**
- * File:     OCRDDockerJsonServiceProviderWorker.java
- * Package:  de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.docker
+ * File:     OCRDMsaServiceProviderWorker.java
+ * Package:  de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.msa
  * 
  * Author:   Herbert Baier (herbert.baier@uni-wuerzburg.de)
- * Date:     08.07.2022
+ * Date:     01.03.2024
  */
-package de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.docker;
+package de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.msa;
 
 import java.security.ProviderException;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Locale;
@@ -17,107 +15,33 @@ import java.util.Optional;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
+import de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.core.OCRDServiceProviderWorker;
 import de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.util.ProviderDescription;
 import de.uniwuerzburg.zpd.ocr4all.application.spi.core.CoreProcessorServiceProvider;
 import de.uniwuerzburg.zpd.ocr4all.application.spi.core.ProcessServiceProvider;
-import de.uniwuerzburg.zpd.ocr4all.application.spi.env.ConfigurationServiceProvider;
 import de.uniwuerzburg.zpd.ocr4all.application.spi.env.Framework;
 import de.uniwuerzburg.zpd.ocr4all.application.spi.env.Premise;
-import de.uniwuerzburg.zpd.ocr4all.application.spi.env.SystemCommand;
 import de.uniwuerzburg.zpd.ocr4all.application.spi.env.Target;
 import de.uniwuerzburg.zpd.ocr4all.application.spi.model.Entry;
 import de.uniwuerzburg.zpd.ocr4all.application.spi.model.Model;
 import de.uniwuerzburg.zpd.ocr4all.application.spi.model.argument.Argument;
 import de.uniwuerzburg.zpd.ocr4all.application.spi.model.argument.ModelArgument;
-import de.uniwuerzburg.zpd.ocr4all.application.spi.util.SystemProcess;
 
 /**
- * Defines ocr-d docker service provider workers with JSON support. The
+ * Defines ocr-d microservice architecture (MSA) service provider workers. The
  * following properties of the service provider collection <b>ocr-d</b> override
  * the local default settings (<b>key</b>: <i>default value</i>):
  * <ul>
- * <li>json: -J</li>
- * <li>see {@link OCRDDockerServiceProviderWorker} for remainder settings</li>
+ * <li>TODO</li>
+ * <li>see {@link OCRDServiceProviderWorker} for remainder settings</li>
  * </ul>
+ *
  * 
  * @author <a href="mailto:herbert.baier@uni-wuerzburg.de">Herbert Baier</a>
  * @version 1.0
- * @since 1.8
+ * @since 17
  */
-public abstract class OCRDDockerJsonServiceProviderWorker extends OCRDDockerServiceProviderWorker
-		implements ProcessServiceProvider {
-	/**
-	 * Defines service provider collection with keys and default values. Collection
-	 * blank values are not allowed and their values are trimmed.
-	 *
-	 * @author <a href="mailto:herbert.baier@uni-wuerzburg.de">Herbert Baier</a>
-	 * @version 1.0
-	 * @since 1.8
-	 */
-	private enum ServiceProviderCollection implements ConfigurationServiceProvider.CollectionKey {
-		json("json", "-J");
-
-		/**
-		 * The key.
-		 */
-		private final String key;
-
-		/**
-		 * The default value.
-		 */
-		private final String defaultValue;
-
-		/**
-		 * Creates a service provider collection with a key and default value.
-		 * 
-		 * @param key          The key.
-		 * @param defaultValue The default value.
-		 * @since 1.8
-		 */
-		private ServiceProviderCollection(String key, String defaultValue) {
-			this.key = key;
-			this.defaultValue = defaultValue;
-		}
-
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see de.uniwuerzburg.zpd.ocr4all.application.spi.env.Framework.
-		 * ServiceProviderCollectionKey#getName()
-		 */
-		@Override
-		public String getName() {
-			return collectionName;
-		}
-
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see de.uniwuerzburg.zpd.ocr4all.application.spi.env.Framework.
-		 * ServiceProviderCollectionKey#getKey()
-		 */
-		@Override
-		public String getKey() {
-			return key;
-		}
-
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see de.uniwuerzburg.zpd.ocr4all.application.spi.env.Framework.
-		 * ServiceProviderCollectionKey#getDefaultValue()
-		 */
-		@Override
-		public String getDefaultValue() {
-			return defaultValue;
-		}
-
-	}
-
-	/**
-	 * The service provider name.
-	 */
-	private final boolean isResources;
+public abstract class OCRDMsaServiceProviderWorker extends OCRDServiceProviderWorker implements ProcessServiceProvider {
 
 	/**
 	 * The ProviderDescription.
@@ -125,25 +49,13 @@ public abstract class OCRDDockerJsonServiceProviderWorker extends OCRDDockerServ
 	private ProviderDescription providerDescription = null;
 
 	/**
-	 * Creates an ocr-d docker service provider worker with JSON support and without
-	 * resources.
+	 * Default constructor for an ocr-d microservice architecture (MSA) service
+	 * provider worker.
 	 * 
-	 * @since 1.8
+	 * @since 17
 	 */
-	public OCRDDockerJsonServiceProviderWorker() {
-		this(false);
-	}
-
-	/**
-	 * Creates an ocr-d service provider worker with JSON support.
-	 * 
-	 * @param isResources True if resources folder is required.
-	 * @since 1.8
-	 */
-	public OCRDDockerJsonServiceProviderWorker(boolean isResources) {
-		super(null);
-
-		this.isResources = isResources;
+	public OCRDMsaServiceProviderWorker() {
+		super();
 	}
 
 	/*
@@ -155,7 +67,7 @@ public abstract class OCRDDockerJsonServiceProviderWorker extends OCRDDockerServ
 	 */
 	@Override
 	public String getProvider() {
-		return super.getProvider() + "/json";
+		return super.getProvider() + "/msa";
 	}
 
 	/*
@@ -178,20 +90,7 @@ public abstract class OCRDDockerJsonServiceProviderWorker extends OCRDDockerServ
 	 */
 	@Override
 	public void initializeCallback() throws ProviderException {
-		SystemProcess process = getDockerProcess();
-
-		try {
-			process.execute(new ArrayList<>(Arrays.asList("run", "--rm", getDockerImage(), getProcessorIdentifier(),
-					ConfigurationServiceProvider.getValue(configuration, ServiceProviderCollection.json))));
-		} catch (Exception e) {
-			throw new ProviderException(e.getMessage());
-		}
-
-		if (process.getExitValue() == 0)
-			providerDescription = new ProviderDescription(process.getStandardOutput());
-		else
-			throw new ProviderException(
-					process.getStandardError().trim() + " (process exit code " + process.getExitValue() + ")");
+		// TODO
 	}
 
 	/*
@@ -272,8 +171,8 @@ public abstract class OCRDDockerJsonServiceProviderWorker extends OCRDDockerServ
 	 */
 	@Override
 	public Premise getPremise(Target target) {
-		return configuration.isSystemCommandAvailable(SystemCommand.Type.docker) ? new Premise()
-				: new Premise(Premise.State.block, locale -> "The required 'docker' command is not available.");
+		// TODO: msa is available
+		return new Premise();
 	}
 
 	/**
@@ -380,7 +279,7 @@ public abstract class OCRDDockerJsonServiceProviderWorker extends OCRDDockerServ
 	@Override
 	public Processor newProcessor() {
 		return providerDescription == null || !providerDescription.isModelFactorySet() ? null
-				: new OCRDDockerProcessorServiceProvider() {
+				: new OCRDMsaProcessorServiceProvider() {
 					/*
 					 * (non-Javadoc)
 					 * 
@@ -415,13 +314,10 @@ public abstract class OCRDDockerJsonServiceProviderWorker extends OCRDDockerServ
 						/*
 						 * Runs the processor
 						 */
-						return run(framework, isResources, arguments, null, dockerProcess, () -> isCanceled(),
-								() -> complete(), message -> updatedStandardOutput(message),
-								message -> updatedStandardError(message),
-								progress -> callback.updatedProgress(progress), 0.01F);
+						// TODO
+						return null;
 
 					}
 				};
 	}
-
 }

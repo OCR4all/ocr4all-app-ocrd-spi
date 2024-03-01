@@ -16,9 +16,10 @@ import de.uniwuerzburg.zpd.ocr4all.application.spi.env.Premise;
 import de.uniwuerzburg.zpd.ocr4all.application.spi.env.Target;
 
 /**
- * Defines ocr-d service provider workers with JSON and opt resource support.
- * The following properties of the service provider collection <b>ocr-d</b>
- * override the local default settings (<b>key</b>: <i>default value</i>):
+ * Defines ocr-d docker service provider workers with JSON and opt resource
+ * support. The following properties of the service provider collection
+ * <b>ocr-d</b> override the local default settings (<b>key</b>: <i>default
+ * value</i>):
  * <ul>
  * <li>json: -J</li>
  * <li>uid: &lt;effective system user ID. -1 if not defined&gt;</li>
@@ -39,7 +40,8 @@ public abstract class OCRDDockerJsonServiceProviderOptResourceWorker extends OCR
 	private final String modelArgument;
 
 	/**
-	 * Creates an ocr-d service provider worker with JSON and opt resource support.
+	 * Creates an ocr-d docker service provider worker with JSON and opt resource
+	 * support.
 	 * 
 	 * @param modelArgument The model argument.
 	 * @since 1.8
@@ -81,8 +83,8 @@ public abstract class OCRDDockerJsonServiceProviderOptResourceWorker extends OCR
 	 * (non-Javadoc)
 	 * 
 	 * @see de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.docker.
-	 * OCRDDockerJsonServiceProviderWorker#getModelCallbacks(de.uniwuerzburg.zpd.ocr4all.
-	 * application.spi.env.Target, java.util.List)
+	 * OCRDDockerJsonServiceProviderWorker#getModelCallbacks(de.uniwuerzburg.zpd.
+	 * ocr4all. application.spi.env.Target, java.util.List)
 	 */
 	@Override
 	protected Hashtable<String, ProviderDescription.ModelFactory.ModelFieldCallback> getModelCallbacks(Target target,
