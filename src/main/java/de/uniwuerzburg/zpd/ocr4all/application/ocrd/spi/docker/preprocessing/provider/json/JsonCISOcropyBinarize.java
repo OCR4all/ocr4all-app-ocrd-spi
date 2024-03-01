@@ -16,16 +16,9 @@ import de.uniwuerzburg.zpd.ocr4all.application.spi.env.ConfigurationServiceProvi
  * The following properties of the service provider collection <b>ocr-d</b>
  * override the local default settings (<b>key</b>: <i>default value</i>):
  * <ul>
- * <li>json: -J</li>
- * <li>uid: &lt;effective system user ID. -1 if not defined&gt;</li>
- * <li>gid: &lt;effective system group ID. -1 if not defined&gt;</li>
- * <li>opt-folder: ocr-d</li>
- * <li>opt-resources: resources</li>
- * <li>docker-image: ocrd/all:maximum</li>
- * <li>docker-resources: /usr/local/share/ocrd-resources</li>
- * <li>docker-stop-wait-kill-seconds: 2</li>
  * <li>cis-ocropy-binarize-json-id: ocrd-cis-ocropy-binarize</li>
  * <li>cis-ocropy-binarize-json-description: ocr-d cis ocropy binarize processor
+ * <li>see {@link OCRDDockerJsonServiceProviderWorker} for remainder settings</li>
  * </li>
  * </ul>
  *

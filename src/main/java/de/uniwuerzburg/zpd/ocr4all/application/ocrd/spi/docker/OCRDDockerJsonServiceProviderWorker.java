@@ -37,14 +37,9 @@ import de.uniwuerzburg.zpd.ocr4all.application.spi.util.SystemProcess;
  * default settings (<b>key</b>: <i>default value</i>):
  * <ul>
  * <li>json: -J</li>
- * <li>uid: &lt;effective system user ID. -1 if not defined&gt;</li>
- * <li>gid: &lt;effective system group ID. -1 if not defined&gt;</li>
- * <li>opt-folder: ocr-d</li>
- * <li>opt-resources: resources</li>
- * <li>docker-image: ocrd/all:maximum</li>
- * <li>docker-resources: /usr/local/share/ocrd-resources</li>
+ * <li>see {@link OCRDDockerServiceProviderWorker} for remainder settings</li>
  * </ul>
- *
+ * 
  * @author <a href="mailto:herbert.baier@uni-wuerzburg.de">Herbert Baier</a>
  * @version 1.0
  * @since 1.8

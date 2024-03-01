@@ -8,6 +8,7 @@
 package de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.docker.ocr.provider.json;
 
 import de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.docker.OCRDDockerJsonServiceProviderOptResourceWorker;
+import de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.docker.OCRDDockerJsonServiceProviderWorker;
 import de.uniwuerzburg.zpd.ocr4all.application.spi.OpticalCharacterRecognitionServiceProvider;
 import de.uniwuerzburg.zpd.ocr4all.application.spi.env.ConfigurationServiceProvider;
 
@@ -18,18 +19,11 @@ import de.uniwuerzburg.zpd.ocr4all.application.spi.env.ConfigurationServiceProvi
  * properties of the service provider collection <b>ocr-d</b> override the local
  * default settings (<b>key</b>: <i>default value</i>):
  * <ul>
- * <li>json: -J</li>
- * <li>uid: &lt;effective system user ID. -1 if not defined&gt;</li>
- * <li>gid: &lt;effective system group ID. -1 if not defined&gt;</li>
- * <li>opt-folder: ocr-d</li>
- * <li>opt-resources: resources</li>
- * <li>docker-image: ocrd/all:maximum</li>
- * <li>docker-resources: /usr/local/share/ocrd-resources</li>
- * <li>docker-stop-wait-kill-seconds: 2</li>
  * <li>calamari-recognize-json-id: ocrd-calamari-recognize</li>
  * <li>calamari-recognize-json-description: ocr-d calamari recognize
  * processor</li>
  * <li>calamari-recognize-json-default-model: null</li>
+ * <li>see {@link OCRDDockerJsonServiceProviderWorker} for remainder settings</li>
  * </ul>
  *
  * @author <a href="mailto:herbert.baier@uni-wuerzburg.de">Herbert Baier</a>

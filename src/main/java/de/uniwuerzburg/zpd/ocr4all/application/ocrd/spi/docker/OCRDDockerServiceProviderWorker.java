@@ -51,7 +51,7 @@ import de.uniwuerzburg.zpd.ocr4all.application.spi.util.SystemProcess;
  * <li>gid: &lt;effective system group ID. -1 if not defined&gt;</li>
  * <li>opt-folder: ocr-d</li>
  * <li>opt-resources: resources</li>
- * <li>docker-image: ocrd/all:maximum</li>
+ * <li>docker-image: ocrd/all:2023-04-02</li>
  * <li>docker-resources: /usr/local/share/ocrd-resources</li>
  * <li>docker-stop-wait-kill-seconds: 2</li>
  * </ul>
@@ -81,7 +81,7 @@ public abstract class OCRDDockerServiceProviderWorker extends ServiceProviderCor
 	 */
 	private enum ServiceProviderCollection implements ConfigurationServiceProvider.CollectionKey {
 		uid("uid", null), gid("gid", null), optFolder("opt-folder", "ocr-d"),
-		optResources("opt-resources", "resources"), dockerImage("docker-image", "ocrd/all:maximum"),
+		optResources("opt-resources", "resources"), dockerImage("docker-image", "ocrd/all:2023-04-02"),
 		dockerResources("docker-resources", "/usr/local/share/ocrd-resources"),
 		dockerStopWaitKillSeconds("docker-stop-wait-kill-seconds", "2");
 

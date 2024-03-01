@@ -36,18 +36,12 @@ import de.uniwuerzburg.zpd.ocr4all.application.spi.model.argument.StringArgument
  * The following properties of the service provider collection <b>ocr-d</b>
  * override the local default settings (<b>key</b>: <i>default value</i>):
  * <ul>
- * <li>json: -J</li>
- * <li>uid: &lt;effective system user ID. -1 if not defined&gt;</li>
- * <li>gid: &lt;effective system group ID. -1 if not defined&gt;</li>
- * <li>opt-folder: ocr-d</li>
- * <li>opt-resources: resources</li>
- * <li>docker-image: ocrd/all:maximum</li>
- * <li>docker-stop-wait-kill-seconds: 2</li>
  * <li>tesserocr-recognize-json-id: ocrd-tesserocr-recognize</li>
  * <li>tesserocr-recognize-json-description: ocr-d tesserocr recognize
  * processor</li>
  * <li>tesserocr-recognize-json-default-model: null</li>
  * <li>tesserocr-docker-resources: /usr/local/share/tessdata</li>
+ * <li>see {@link OCRDDockerJsonServiceProviderWorker} for remainder settings</li>
  * </ul>
  *
  * @author <a href="mailto:herbert.baier@uni-wuerzburg.de">Herbert Baier</a>
