@@ -47,7 +47,14 @@
 			<artifactId>ocr4all-app-spi</artifactId>
 			<version>${de.uni-wuerzburg.zpd.ocr4all.version}</version>
 			<scope>provided</scope>
-		</dependency>		
+		</dependency>
+		
+		<!-- ocr4all application ocr-d communication -->
+		<dependency>
+			<groupId>de.uni-wuerzburg.zpd</groupId>
+			<artifactId>ocr4all-app-ocrd-communication</artifactId>
+			<version>${de.uni-wuerzburg.zpd.ocr4all.version}</version>
+		</dependency>
 	</dependencies>
      
     <build>
