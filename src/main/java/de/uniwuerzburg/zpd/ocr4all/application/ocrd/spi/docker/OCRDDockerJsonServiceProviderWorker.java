@@ -177,7 +177,7 @@ public abstract class OCRDDockerJsonServiceProviderWorker extends OCRDDockerServ
 	 * initializeCallback()
 	 */
 	@Override
-	public void initializeCallback() throws ProviderException {
+	protected void initializeCallback() throws ProviderException {
 		SystemProcess process = getDockerProcess();
 
 		try {
@@ -201,7 +201,7 @@ public abstract class OCRDDockerJsonServiceProviderWorker extends OCRDDockerServ
 	 * startCallback()
 	 */
 	@Override
-	public void startCallback() throws ProviderException {
+	protected void startCallback() throws ProviderException {
 		if (providerDescription == null)
 			initializeCallback();
 	}

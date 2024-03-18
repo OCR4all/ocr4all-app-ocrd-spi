@@ -89,7 +89,7 @@ public abstract class OCRDMsaServiceProviderWorker extends OCRDServiceProviderWo
 	 * initializeCallback()
 	 */
 	@Override
-	public void initializeCallback() throws ProviderException {
+	protected void initializeCallback() throws ProviderException {
 		// TODO
 	}
 
@@ -100,7 +100,7 @@ public abstract class OCRDMsaServiceProviderWorker extends OCRDServiceProviderWo
 	 * startCallback()
 	 */
 	@Override
-	public void startCallback() throws ProviderException {
+	protected void startCallback() throws ProviderException {
 		if (providerDescription == null)
 			initializeCallback();
 	}
