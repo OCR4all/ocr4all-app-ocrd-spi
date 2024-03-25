@@ -9,7 +9,12 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-
+	<parent>
+		<groupId>org.springframework.boot</groupId>
+		<artifactId>spring-boot-starter-parent</artifactId>
+		<version>3.2.3</version>
+		<relativePath/> <!-- lookup parent from repository -->
+	</parent>
 	<groupId>de.uni-wuerzburg.zpd</groupId>
 	<artifactId>ocr4all-app-ocrd-spi</artifactId>
 	<packaging>jar</packaging>
@@ -19,27 +24,16 @@
 	<description>ocr4all application ocr-d service providers</description>
 
 	<properties>
-		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-
-		<maven.compiler.source>17</maven.compiler.source>
-		<maven.compiler.target>17</maven.compiler.target>
-		
-		<!-- use the respective Spring Boot version of the ocr4all-app project -->
-		<SpringBoot_ocr4all-app_com.fasterxml.jackson.core.jackson-databind.version>2.15.4</SpringBoot_ocr4all-app_com.fasterxml.jackson.core.jackson-databind.version>
-		
-		<org.apache.maven.plugins.maven-source-plugin.version>3.3.0</org.apache.maven.plugins.maven-source-plugin.version>
-		<org.apache.maven.plugins.maven-javadoc-plugin.version>3.6.3</org.apache.maven.plugins.maven-javadoc-plugin.version>
+		<java.version>17</java.version>
 		
 		<de.uni-wuerzburg.zpd.ocr4all.version>1.0-SNAPSHOT</de.uni-wuerzburg.zpd.ocr4all.version>
 	</properties>
 
-	<dependencies>
-		<!-- https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-databind -->
+	<dependencies>		
+		<!-- The dependency is excluded from end JAR using the spring boot maven plugin configuration -->
 		<dependency>
-			<groupId>com.fasterxml.jackson.core</groupId>
-			<artifactId>jackson-databind</artifactId>
-			<version>${SpringBoot_ocr4all-app_com.fasterxml.jackson.core.jackson-databind.version}</version>
-			<scope>provided</scope>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-web</artifactId>
 		</dependency>
 		
 		<!-- ocr4all application service provider interface -->
@@ -61,9 +55,21 @@
     <build>
 		<plugins>
 			<plugin>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-maven-plugin</artifactId>
+				<configuration>
+					<excludes>
+						<exclude>
+							<groupId>org.springframework.boot</groupId>
+							<artifactId>spring-boot-starter-web</artifactId>
+						</exclude>
+					</excludes>
+				</configuration>
+			</plugin>
+			
+			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-source-plugin</artifactId>
-				<version>${org.apache.maven.plugins.maven-source-plugin.version}</version>
 				<executions>
 					<execution>
 						<id>attach-sources</id>
@@ -76,7 +82,6 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-javadoc-plugin</artifactId>
-				<version>${org.apache.maven.plugins.maven-javadoc-plugin.version}</version>
 				<executions>
 					<execution>
 						<id>attach-javadocs</id>

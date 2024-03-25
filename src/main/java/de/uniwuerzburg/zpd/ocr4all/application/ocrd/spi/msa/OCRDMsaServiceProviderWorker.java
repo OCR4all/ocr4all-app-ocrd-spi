@@ -13,8 +13,11 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
 
+import org.springframework.web.client.RestTemplate;
+
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
+import de.uniwuerzburg.zpd.ocr4all.application.ocrd.communication.api.DescriptionResponse;
 import de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.core.OCRDServiceProviderWorker;
 import de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.util.ProviderDescription;
 import de.uniwuerzburg.zpd.ocr4all.application.spi.core.CoreProcessorServiceProvider;
@@ -42,6 +45,31 @@ import de.uniwuerzburg.zpd.ocr4all.application.spi.model.argument.ModelArgument;
  * @since 17
  */
 public abstract class OCRDMsaServiceProviderWorker extends OCRDServiceProviderWorker implements ProcessServiceProvider {
+	/**
+	 * The api context path.
+	 */
+	public static final String apiContextPath = "/api";
+
+	/**
+	 * The api version 1.0 prefix path.
+	 */
+	public static final String apiContextPathVersion_1_0 = apiContextPath + "/v1.0/";
+
+	/**
+	 * The scheduler controller context path.
+	 */
+	private static final String schedulerControllerContextPath = apiContextPathVersion_1_0 + "scheduler/";
+
+	/**
+	 * The processor controller context path.
+	 */
+	private static final String processorControllerContextPath = apiContextPathVersion_1_0 + "processor/";
+
+	/**
+	 * The processor json description request mapping.
+	 */
+	private static final String jsonDescriptionRequestMapping = processorControllerContextPath
+			+ "description/json/{processor}";
 
 	/**
 	 * The ProviderDescription.
@@ -49,13 +77,28 @@ public abstract class OCRDMsaServiceProviderWorker extends OCRDServiceProviderWo
 	private ProviderDescription providerDescription = null;
 
 	/**
+	 * the synchronous client to perform HTTP requests
+	 */
+	protected final RestTemplate restTemplate;
+
+	/**
+	 * The url.
+	 */
+	protected final String url;
+
+	/**
 	 * Default constructor for an ocr-d microservice architecture (MSA) service
 	 * provider worker.
 	 * 
+	 * @param restTemplate
+	 * @param url
 	 * @since 17
 	 */
-	public OCRDMsaServiceProviderWorker() {
+	public OCRDMsaServiceProviderWorker(RestTemplate restTemplate, String url) {
 		super();
+
+		this.restTemplate = restTemplate;
+		this.url = url;
 	}
 
 	/*
@@ -90,7 +133,13 @@ public abstract class OCRDMsaServiceProviderWorker extends OCRDServiceProviderWo
 	 */
 	@Override
 	protected void initializeCallback() throws ProviderException {
-		// TODO
+		try {
+			providerDescription = new ProviderDescription(restTemplate.getForObject(url + jsonDescriptionRequestMapping,
+					DescriptionResponse.class, getProcessorIdentifier()).getDescription());
+		} catch (Exception e) {
+			// TODO: handle exception -> deactivate SPI!
+			throw new ProviderException(e.getMessage());
+		}
 	}
 
 	/*
@@ -103,6 +152,7 @@ public abstract class OCRDMsaServiceProviderWorker extends OCRDServiceProviderWo
 	protected void startCallback() throws ProviderException {
 		if (providerDescription == null)
 			initializeCallback();
+		// TODO: handle exception -> deactivate SPI!
 	}
 
 	/*
@@ -114,6 +164,7 @@ public abstract class OCRDMsaServiceProviderWorker extends OCRDServiceProviderWo
 	@Override
 	public void restartCallback() throws ProviderException {
 		startCallback();
+		// TODO: handle exception -> deactivate SPI!
 	}
 
 	/*
@@ -171,6 +222,13 @@ public abstract class OCRDMsaServiceProviderWorker extends OCRDServiceProviderWo
 	 */
 	@Override
 	public Premise getPremise(Target target) {
+		try {
+			restTemplate.getForObject(url + jsonDescriptionRequestMapping, DescriptionResponse.class,
+					getProcessorIdentifier()).getDescription();
+		} catch (Exception e) {
+			// TODO: handle exception -> deactivate SPI!
+			return new Premise(Premise.State.block, null);
+		}
 		// TODO: msa is available
 		return new Premise();
 	}
@@ -314,7 +372,15 @@ public abstract class OCRDMsaServiceProviderWorker extends OCRDServiceProviderWo
 						/*
 						 * Runs the processor
 						 */
+
 						// TODO
+
+						/*
+						 * restTemplate.getForObject(URL_ACCOUNTS +
+						 * "/processor/description/json/{processor}", DescriptionResponse.class,
+						 * Collections.singletonMap("id", "123"));
+						 */
+
 						return null;
 
 					}
