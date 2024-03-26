@@ -13,7 +13,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
 
-import org.springframework.web.client.RestTemplate;
+import org.springframework.http.MediaType;
+import org.springframework.web.client.RestClient;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
@@ -46,6 +47,11 @@ import de.uniwuerzburg.zpd.ocr4all.application.spi.model.argument.ModelArgument;
  */
 public abstract class OCRDMsaServiceProviderWorker extends OCRDServiceProviderWorker implements ProcessServiceProvider {
 	/**
+	 * The application layer protocol.
+	 */
+	public static final String applicationLayerProtocol = "http://";
+
+	/**
 	 * The api context path.
 	 */
 	public static final String apiContextPath = "/api";
@@ -66,6 +72,11 @@ public abstract class OCRDMsaServiceProviderWorker extends OCRDServiceProviderWo
 	private static final String processorControllerContextPath = apiContextPathVersion_1_0 + "processor/";
 
 	/**
+	 * The ping request mapping.
+	 */
+	public static final String pingRequestMapping = schedulerControllerContextPath + "ping";
+
+	/**
 	 * The processor json description request mapping.
 	 */
 	private static final String jsonDescriptionRequestMapping = processorControllerContextPath
@@ -77,28 +88,22 @@ public abstract class OCRDMsaServiceProviderWorker extends OCRDServiceProviderWo
 	private ProviderDescription providerDescription = null;
 
 	/**
-	 * the synchronous client to perform HTTP requests
+	 * The client to perform HTTP requests.
 	 */
-	protected final RestTemplate restTemplate;
-
-	/**
-	 * The url.
-	 */
-	protected final String url;
+	protected final RestClient restClient;
 
 	/**
 	 * Default constructor for an ocr-d microservice architecture (MSA) service
 	 * provider worker.
 	 * 
-	 * @param restTemplate
+	 * @param restClient
 	 * @param url
 	 * @since 17
 	 */
-	public OCRDMsaServiceProviderWorker(RestTemplate restTemplate, String url) {
+	public OCRDMsaServiceProviderWorker(String url) {
 		super();
 
-		this.restTemplate = restTemplate;
-		this.url = url;
+		restClient = RestClient.builder().baseUrl(applicationLayerProtocol + url).build();
 	}
 
 	/*
@@ -134,8 +139,11 @@ public abstract class OCRDMsaServiceProviderWorker extends OCRDServiceProviderWo
 	@Override
 	protected void initializeCallback() throws ProviderException {
 		try {
-			providerDescription = new ProviderDescription(restTemplate.getForObject(url + jsonDescriptionRequestMapping,
-					DescriptionResponse.class, getProcessorIdentifier()).getDescription());
+			providerDescription = new ProviderDescription(restClient.get()
+					.uri(jsonDescriptionRequestMapping, getProcessorIdentifier()).accept(MediaType.APPLICATION_JSON)
+					.retrieve().body(DescriptionResponse.class).getDescription());
+
+			// TODO: for error use method .onStatus(...)
 		} catch (Exception e) {
 			// TODO: handle exception -> deactivate SPI!
 			throw new ProviderException(e.getMessage());
@@ -223,14 +231,16 @@ public abstract class OCRDMsaServiceProviderWorker extends OCRDServiceProviderWo
 	@Override
 	public Premise getPremise(Target target) {
 		try {
-			restTemplate.getForObject(url + jsonDescriptionRequestMapping, DescriptionResponse.class,
-					getProcessorIdentifier()).getDescription();
+			restClient.get().uri(pingRequestMapping).retrieve().toBodilessEntity();
+
+			// TODO: for error use method .onStatus(...)
+
+			// TODO: msa is available
+			return new Premise();
 		} catch (Exception e) {
 			// TODO: handle exception -> deactivate SPI!
 			return new Premise(Premise.State.block, null);
 		}
-		// TODO: msa is available
-		return new Premise();
 	}
 
 	/**
@@ -349,6 +359,8 @@ public abstract class OCRDMsaServiceProviderWorker extends OCRDServiceProviderWo
 					 */
 					@Override
 					public State execute(Callback callback, Framework framework, ModelArgument modelArgument) {
+						// TODO: ping -> trouble interrupt!
+
 						if (!initialize(getProcessorIdentifier(), callback, framework))
 							return ProcessServiceProvider.Processor.State.canceled;
 
@@ -374,12 +386,6 @@ public abstract class OCRDMsaServiceProviderWorker extends OCRDServiceProviderWo
 						 */
 
 						// TODO
-
-						/*
-						 * restTemplate.getForObject(URL_ACCOUNTS +
-						 * "/processor/description/json/{processor}", DescriptionResponse.class,
-						 * Collections.singletonMap("id", "123"));
-						 */
 
 						return null;
 
