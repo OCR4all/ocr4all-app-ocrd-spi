@@ -11,7 +11,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -20,13 +19,11 @@ import java.util.Locale;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 import java.util.Set;
-import java.util.UUID;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 
 import de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.core.OCRDServiceProviderWorker;
+import de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.util.OCRDUtils;
 import de.uniwuerzburg.zpd.ocr4all.application.spi.core.ProcessServiceProvider;
 import de.uniwuerzburg.zpd.ocr4all.application.spi.env.ConfigurationServiceProvider;
 import de.uniwuerzburg.zpd.ocr4all.application.spi.env.Framework;
@@ -437,140 +434,62 @@ public abstract class OCRDDockerServiceProviderWorker extends OCRDServiceProvide
 			Set<String> unnecessaryArguments, OCRDDockerProcessorServiceProvider.DockerProcess dockerProcess,
 			ProcessorRunningState runningState, ProcessorExecution execution, Message standardOutput,
 			Message standardError, Progress progress, float baseProgress) {
-		try {
-			standardOutput.update("Using processor parameters " + objectMapper.writeValueAsString(arguments) + ".");
-		} catch (JsonProcessingException ex) {
-			standardError.update("Troubles creating JSON from parameters - " + ex.getMessage() + ".");
-		}
-
-		// TODO: ok
 		if (unnecessaryArguments != null && !unnecessaryArguments.isEmpty())
 			standardOutput.update("Ignored unnecessary parameters: " + unnecessaryArguments + ".");
 
-		if (runningState.isCanceled())
-			return ProcessServiceProvider.Processor.State.canceled;
+		return run(framework, arguments, runningState, execution, standardOutput, standardError, progress, baseProgress,
+				(metsFileGroup, argumentsJsonSerialization) -> {
+					String dockerName = "ocr4all-" + OCRDUtils.getUUID();
 
-		progress.update(baseProgress);
+					List<String> processorArguments;
 
-		// Processor workspace path
-		final Path processorWorkspaceRelativePath = framework.getOutputRelativeProcessorWorkspace();
-		if (processorWorkspaceRelativePath == null) {
-			standardError.update("Inconsistent processor workspace path.");
+					try {
+						processorArguments = getProcessorArguments(framework, isResources, dockerName, arguments,
+								metsFileGroup);
+					} catch (IOException e) {
+						standardError
+								.update("troubles running " + getProcessorDescription() + " - " + e.getMessage() + ".");
 
-			return ProcessServiceProvider.Processor.State.interrupted;
-		}
+						return ProcessServiceProvider.Processor.State.interrupted;
+					}
 
-		final Path metsPath = framework.getMets();
-		if (metsPath == null) {
-			standardError.update("Missed required mets file path.");
+					dockerProcess
+							.configure(
+									getDockerProcess(framework), getDockerProcess(), Arrays
+											.asList("stop",
+													"--time=" + ConfigurationServiceProvider.getValue(configuration,
+															ServiceProviderCollection.dockerStopWaitKillSeconds),
+													dockerName));
 
-			return ProcessServiceProvider.Processor.State.interrupted;
-		}
+					standardOutput.update("Execute docker process '" + dockerProcess.getProcess().getCommand()
+							+ "' with parameters: " + processorArguments + ".");
 
-		final MetsUtils.FrameworkFileGroup metsFileGroup = MetsUtils.getFileGroup(framework);
-		// TODO: begin 2 ok
-		String dockerName = "ocr4all-" + UUID.randomUUID().toString();
+					ProcessServiceProvider.Processor.State state = null;
 
-		List<String> processorArguments;
+					try {
+						dockerProcess.getProcess().execute(processorArguments);
 
-		try {
-			processorArguments = getProcessorArguments(framework, isResources, dockerName, arguments, metsFileGroup);
-		} catch (IOException e) {
-			standardError.update("troubles running " + getProcessorDescription() + " - " + e.getMessage() + ".");
+						updateProcessorMessages(dockerProcess.getProcess(), standardOutput, standardError);
 
-			return ProcessServiceProvider.Processor.State.interrupted;
-		}
+						if (runningState.isCanceled())
+							state = ProcessServiceProvider.Processor.State.canceled;
+						else if (dockerProcess.getProcess().getExitValue() != 0) {
+							standardError.update("Cannot run " + getProcessorDescription() + ", exit code "
+									+ dockerProcess.getProcess().getExitValue() + ".");
 
-		dockerProcess.configure(getDockerProcess(framework), getDockerProcess(),
-				Arrays.asList("stop", "--time=" + ConfigurationServiceProvider.getValue(configuration,
-						ServiceProviderCollection.dockerStopWaitKillSeconds), dockerName));
+							state = ProcessServiceProvider.Processor.State.interrupted;
+						}
+					} catch (IOException e) {
+						updateProcessorMessages(dockerProcess.getProcess(), standardOutput, standardError);
 
-		standardOutput.update("Execute docker process '" + dockerProcess.getProcess().getCommand()
-				+ "' with parameters: " + processorArguments + ".");
+						standardError
+								.update("troubles running " + getProcessorDescription() + " - " + e.getMessage() + ".");
 
-		ProcessServiceProvider.Processor.State state = null;
+						state = ProcessServiceProvider.Processor.State.interrupted;
+					}
 
-		try {
-			dockerProcess.getProcess().execute(processorArguments);
-
-			updateProcessorMessages(dockerProcess.getProcess(), standardOutput, standardError);
-
-			if (runningState.isCanceled())
-				state = ProcessServiceProvider.Processor.State.canceled;
-			else if (dockerProcess.getProcess().getExitValue() != 0) {
-				standardError.update("Cannot run " + getProcessorDescription() + ", exit code "
-						+ dockerProcess.getProcess().getExitValue() + ".");
-
-				state = ProcessServiceProvider.Processor.State.interrupted;
-			}
-		} catch (IOException e) {
-			updateProcessorMessages(dockerProcess.getProcess(), standardOutput, standardError);
-
-			standardError.update("troubles running " + getProcessorDescription() + " - " + e.getMessage() + ".");
-
-			state = ProcessServiceProvider.Processor.State.interrupted;
-		}
-
-		// TODO: end 2 ok
-		
-		if (state == null)
-			progress.update(0.097F);
-
-		// Update paths in xml files
-		standardOutput.update("Update paths in xml files.");
-		try {
-			for (Path file : getFiles(
-					Paths.get(framework.getProcessorWorkspace().toString(), metsFileGroup.getOutput()), "xml"))
-				try (Stream<String> lines = Files.lines(file)) {
-					Files.write(file,
-							lines.map(line -> line.replace("=\"" + metsFileGroup.getOutput() + "/",
-									"=\"" + processorWorkspaceRelativePath.toString() + "/"))
-									.collect(Collectors.joining("\n")).getBytes());
-				}
-		} catch (IOException e) {
-			standardError
-					.update("troubles updating " + getProcessorDescription() + " xml files - " + e.getMessage() + ".");
-
-			if (state == null)
-				state = ProcessServiceProvider.Processor.State.interrupted;
-		}
-
-		if (state == null)
-			progress.update(0.098F);
-
-		// Move processor output directory to snapshot sandbox
-		standardOutput.update("Move processor output directory to snapshot sandbox.");
-		try {
-			Files.move(Paths.get(framework.getProcessorWorkspace().toString(), metsFileGroup.getOutput()),
-					framework.getOutput(), StandardCopyOption.REPLACE_EXISTING);
-
-		} catch (IOException e) {
-			standardError.update("troubles moving " + getProcessorDescription()
-					+ " output directory to snapshot sandbox - " + e.getMessage() + ".");
-
-			if (state == null)
-				state = ProcessServiceProvider.Processor.State.interrupted;
-		}
-
-		if (state == null)
-			progress.update(0.099F);
-
-		// Update paths in mets file
-		standardOutput.update("Update paths in mets file.");
-		try (Stream<String> lines = Files.lines(metsPath)) {
-			Files.write(metsPath,
-					lines.map(line -> line.replace("=\"" + metsFileGroup.getOutput() + "/",
-							"=\"" + processorWorkspaceRelativePath.toString() + "/")).collect(Collectors.joining("\n"))
-							.getBytes());
-		} catch (IOException e) {
-			standardError
-					.update("troubles updating " + getProcessorDescription() + " mets file - " + e.getMessage() + ".");
-
-			if (state == null)
-				state = ProcessServiceProvider.Processor.State.interrupted;
-		}
-
-		return state == null ? execution.complete() : state;
+					return state;
+				});
 	}
 
 	/**

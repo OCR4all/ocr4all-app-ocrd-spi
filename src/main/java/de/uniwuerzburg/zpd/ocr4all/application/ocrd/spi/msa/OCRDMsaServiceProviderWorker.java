@@ -403,9 +403,17 @@ public abstract class OCRDMsaServiceProviderWorker extends OCRDServiceProviderWo
 						 * Runs the processor
 						 */
 
-						// TODO
+						return run(framework, arguments, () -> isCanceled(), () -> complete(),
+								message -> updatedStandardOutput(message), message -> updatedStandardError(message),
+								progress -> callback.updatedProgress(progress), 0.01F,
+								(metsFileGroup, argumentsJsonSerialization) -> {
 
-						return null;
+									ProcessServiceProvider.Processor.State state = null;
+
+									// TODO
+
+									return state;
+								});
 
 					}
 				};

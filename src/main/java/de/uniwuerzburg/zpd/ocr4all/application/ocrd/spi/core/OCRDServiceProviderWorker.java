@@ -478,11 +478,15 @@ public abstract class OCRDServiceProviderWorker extends ServiceProviderCore {
 	protected ProcessServiceProvider.Processor.State run(Framework framework, Object arguments,
 			ProcessorRunningState runningState, ProcessorExecution execution, Message standardOutput,
 			Message standardError, Progress progress, float baseProgress, ProcessorLogic processorLogic) {
-		try {
-			standardOutput.update("Using processor parameters " + objectMapper.writeValueAsString(arguments) + ".");
-		} catch (JsonProcessingException ex) {
-			standardError.update("Troubles creating JSON from parameters - " + ex.getMessage() + ".");
-		}
+		String argumentsJsonSerialization = null;
+		if (arguments != null)
+			try {
+				argumentsJsonSerialization = objectMapper.writeValueAsString(arguments);
+
+				standardOutput.update("Using processor parameters " + argumentsJsonSerialization + ".");
+			} catch (JsonProcessingException ex) {
+				standardError.update("Troubles creating JSON from parameters - " + ex.getMessage() + ".");
+			}
 
 		if (runningState.isCanceled())
 			return ProcessServiceProvider.Processor.State.canceled;
@@ -507,7 +511,8 @@ public abstract class OCRDServiceProviderWorker extends ServiceProviderCore {
 		final MetsUtils.FrameworkFileGroup metsFileGroup = MetsUtils.getFileGroup(framework);
 
 		// Perform processor logic
-		ProcessServiceProvider.Processor.State state = processorLogic.perform(metsFileGroup, arguments);
+		ProcessServiceProvider.Processor.State state = processorLogic.execute(metsFileGroup,
+				argumentsJsonSerialization);
 
 		if (state == null)
 			progress.update(0.097F);
@@ -570,7 +575,7 @@ public abstract class OCRDServiceProviderWorker extends ServiceProviderCore {
 	}
 
 	/**
-	 * Defines callback to perform processor logic.
+	 * Defines callback to execute processor logic.
 	 *
 	 * @author <a href="mailto:herbert.baier@uni-wuerzburg.de">Herbert Baier</a>
 	 * @version 1.0
@@ -579,15 +584,16 @@ public abstract class OCRDServiceProviderWorker extends ServiceProviderCore {
 	@FunctionalInterface
 	protected interface ProcessorLogic {
 		/**
-		 * Performs the perform processor logic.
+		 * Executes the processor logic.
 		 * 
-		 * @param metsFileGroup The mets file groups for framework.
-		 * @param arguments     The processor arguments.
+		 * @param metsFileGroup              The mets file groups for framework.
+		 * @param argumentsJsonSerialization The json serialization of the processor
+		 *                                   arguments as a String.
 		 * @return The processor execution state.
 		 * @since 17
 		 */
-		public ProcessServiceProvider.Processor.State perform(MetsUtils.FrameworkFileGroup metsFileGroup,
-				Object arguments);
+		public ProcessServiceProvider.Processor.State execute(MetsUtils.FrameworkFileGroup metsFileGroup,
+				String argumentsJsonSerialization);
 	}
 
 	/**
