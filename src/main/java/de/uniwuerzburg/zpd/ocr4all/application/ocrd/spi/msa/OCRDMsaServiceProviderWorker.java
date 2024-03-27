@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
 
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
 import org.springframework.web.client.RestClient;
 
@@ -138,16 +139,16 @@ public abstract class OCRDMsaServiceProviderWorker extends OCRDServiceProviderWo
 	 */
 	@Override
 	protected void initializeCallback() throws ProviderException {
-		try {
-			providerDescription = new ProviderDescription(restClient.get()
-					.uri(jsonDescriptionRequestMapping, getProcessorIdentifier()).accept(MediaType.APPLICATION_JSON)
-					.retrieve().body(DescriptionResponse.class).getDescription());
+		providerDescription = new ProviderDescription(restClient.get()
+				.uri(jsonDescriptionRequestMapping, getProcessorIdentifier()).accept(MediaType.APPLICATION_JSON)
+				.retrieve().onStatus(HttpStatusCode::is4xxClientError, (request, response) -> {
+					throw new ProviderException("HTTP client error status " + response.getStatusCode() + " ("
+							+ response.getStatusText() + "): " + response.getHeaders());
+				}).onStatus(HttpStatusCode::is5xxServerError, (request, response) -> {
+					throw new ProviderException("HTTP server error status " + response.getStatusCode() + " ("
+							+ response.getStatusText() + "): " + response.getHeaders());
+				}).body(DescriptionResponse.class).getDescription());
 
-			// TODO: for error use method .onStatus(...)
-		} catch (Exception e) {
-			// TODO: handle exception -> deactivate SPI!
-			throw new ProviderException(e.getMessage());
-		}
 	}
 
 	/*
@@ -160,7 +161,6 @@ public abstract class OCRDMsaServiceProviderWorker extends OCRDServiceProviderWo
 	protected void startCallback() throws ProviderException {
 		if (providerDescription == null)
 			initializeCallback();
-		// TODO: handle exception -> deactivate SPI!
 	}
 
 	/*
@@ -172,7 +172,6 @@ public abstract class OCRDMsaServiceProviderWorker extends OCRDServiceProviderWo
 	@Override
 	public void restartCallback() throws ProviderException {
 		startCallback();
-		// TODO: handle exception -> deactivate SPI!
 	}
 
 	/*
@@ -221,6 +220,23 @@ public abstract class OCRDMsaServiceProviderWorker extends OCRDServiceProviderWo
 				: "JSON processor description:\n" + providerDescription.getJson();
 	}
 
+	/**
+	 * Ping the client to check the status of an HTTP request.
+	 * 
+	 * @throws ProviderException Throws on HTTP request troubles.
+	 * @since 17
+	 */
+	private void ping() throws ProviderException {
+		restClient.get().uri(pingRequestMapping).retrieve()
+				.onStatus(HttpStatusCode::is4xxClientError, (request, response) -> {
+					throw new ProviderException("HTTP client error status " + response.getStatusCode() + " ("
+							+ response.getStatusText() + "): " + response.getHeaders());
+				}).onStatus(HttpStatusCode::is5xxServerError, (request, response) -> {
+					throw new ProviderException("HTTP server error status " + response.getStatusCode() + " ("
+							+ response.getStatusText() + "): " + response.getHeaders());
+				}).toBodilessEntity();
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -231,15 +247,11 @@ public abstract class OCRDMsaServiceProviderWorker extends OCRDServiceProviderWo
 	@Override
 	public Premise getPremise(Target target) {
 		try {
-			restClient.get().uri(pingRequestMapping).retrieve().toBodilessEntity();
+			ping();
 
-			// TODO: for error use method .onStatus(...)
-
-			// TODO: msa is available
 			return new Premise();
-		} catch (Exception e) {
-			// TODO: handle exception -> deactivate SPI!
-			return new Premise(Premise.State.block, null);
+		} catch (ProviderException e) {
+			return new Premise(Premise.State.block, locale -> e.getMessage());
 		}
 	}
 
@@ -359,7 +371,13 @@ public abstract class OCRDMsaServiceProviderWorker extends OCRDServiceProviderWo
 					 */
 					@Override
 					public State execute(Callback callback, Framework framework, ModelArgument modelArgument) {
-						// TODO: ping -> trouble interrupt!
+						try {
+							ping();
+						} catch (ProviderException e) {
+							updatedStandardError(e.getMessage());
+
+							return ProcessServiceProvider.Processor.State.interrupted;
+						}
 
 						if (!initialize(getProcessorIdentifier(), callback, framework))
 							return ProcessServiceProvider.Processor.State.canceled;

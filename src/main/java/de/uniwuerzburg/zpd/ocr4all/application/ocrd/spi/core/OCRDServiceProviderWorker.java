@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -19,10 +20,12 @@ import java.util.Locale;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.util.ProviderDescription;
+import de.uniwuerzburg.zpd.ocr4all.application.spi.core.ProcessServiceProvider;
 import de.uniwuerzburg.zpd.ocr4all.application.spi.core.ServiceProviderCore;
 import de.uniwuerzburg.zpd.ocr4all.application.spi.env.ConfigurationServiceProvider;
 import de.uniwuerzburg.zpd.ocr4all.application.spi.env.Framework;
@@ -30,6 +33,7 @@ import de.uniwuerzburg.zpd.ocr4all.application.spi.env.Target;
 import de.uniwuerzburg.zpd.ocr4all.application.spi.model.Field;
 import de.uniwuerzburg.zpd.ocr4all.application.spi.model.SelectField;
 import de.uniwuerzburg.zpd.ocr4all.application.spi.model.StringField;
+import de.uniwuerzburg.zpd.ocr4all.application.spi.util.MetsUtils;
 import de.uniwuerzburg.zpd.ocr4all.application.spi.util.SystemProcess;
 
 /**
@@ -454,6 +458,190 @@ public abstract class OCRDServiceProviderWorker extends ServiceProviderCore {
 						&& (fileExtension == null || p.toString().toLowerCase().endsWith(fileExtension));
 			}).collect(Collectors.toList());
 		}
+	}
+
+	/**
+	 * Runs the ocr-d processor.
+	 * 
+	 * @param framework      The framework.
+	 * @param arguments      The processor arguments.
+	 * @param runningState   The callback for processor running state.
+	 * @param execution      The callback for processor execution.
+	 * @param standardOutput The callback for standard output.
+	 * @param standardError  The callback for standard error.
+	 * @param progress       The callback for progress.
+	 * @param baseProgress   The base progress.
+	 * @param processorLogic The callback to perform the processor logic.
+	 * @return The processor execution state.
+	 * @since 1.8
+	 */
+	protected ProcessServiceProvider.Processor.State run(Framework framework, Object arguments,
+			ProcessorRunningState runningState, ProcessorExecution execution, Message standardOutput,
+			Message standardError, Progress progress, float baseProgress, ProcessorLogic processorLogic) {
+		try {
+			standardOutput.update("Using processor parameters " + objectMapper.writeValueAsString(arguments) + ".");
+		} catch (JsonProcessingException ex) {
+			standardError.update("Troubles creating JSON from parameters - " + ex.getMessage() + ".");
+		}
+
+		if (runningState.isCanceled())
+			return ProcessServiceProvider.Processor.State.canceled;
+
+		progress.update(baseProgress);
+
+		// Processor workspace path
+		final Path processorWorkspaceRelativePath = framework.getOutputRelativeProcessorWorkspace();
+		if (processorWorkspaceRelativePath == null) {
+			standardError.update("Inconsistent processor workspace path.");
+
+			return ProcessServiceProvider.Processor.State.interrupted;
+		}
+
+		final Path metsPath = framework.getMets();
+		if (metsPath == null) {
+			standardError.update("Missed required mets file path.");
+
+			return ProcessServiceProvider.Processor.State.interrupted;
+		}
+
+		final MetsUtils.FrameworkFileGroup metsFileGroup = MetsUtils.getFileGroup(framework);
+
+		// Perform processor logic
+		ProcessServiceProvider.Processor.State state = processorLogic.perform(metsFileGroup, arguments);
+
+		if (state == null)
+			progress.update(0.097F);
+
+		// Update paths in xml files
+		standardOutput.update("Update paths in xml files.");
+		try {
+			for (Path file : getFiles(
+					Paths.get(framework.getProcessorWorkspace().toString(), metsFileGroup.getOutput()), "xml"))
+				try (Stream<String> lines = Files.lines(file)) {
+					Files.write(file,
+							lines.map(line -> line.replace("=\"" + metsFileGroup.getOutput() + "/",
+									"=\"" + processorWorkspaceRelativePath.toString() + "/"))
+									.collect(Collectors.joining("\n")).getBytes());
+				}
+		} catch (IOException e) {
+			standardError
+					.update("troubles updating " + getProcessorDescription() + " xml files - " + e.getMessage() + ".");
+
+			if (state == null)
+				state = ProcessServiceProvider.Processor.State.interrupted;
+		}
+
+		if (state == null)
+			progress.update(0.098F);
+
+		// Move processor output directory to snapshot sandbox
+		standardOutput.update("Move processor output directory to snapshot sandbox.");
+		try {
+			Files.move(Paths.get(framework.getProcessorWorkspace().toString(), metsFileGroup.getOutput()),
+					framework.getOutput(), StandardCopyOption.REPLACE_EXISTING);
+
+		} catch (IOException e) {
+			standardError.update("troubles moving " + getProcessorDescription()
+					+ " output directory to snapshot sandbox - " + e.getMessage() + ".");
+
+			if (state == null)
+				state = ProcessServiceProvider.Processor.State.interrupted;
+		}
+
+		if (state == null)
+			progress.update(0.099F);
+
+		// Update paths in mets file
+		standardOutput.update("Update paths in mets file.");
+		try (Stream<String> lines = Files.lines(metsPath)) {
+			Files.write(metsPath,
+					lines.map(line -> line.replace("=\"" + metsFileGroup.getOutput() + "/",
+							"=\"" + processorWorkspaceRelativePath.toString() + "/")).collect(Collectors.joining("\n"))
+							.getBytes());
+		} catch (IOException e) {
+			standardError
+					.update("troubles updating " + getProcessorDescription() + " mets file - " + e.getMessage() + ".");
+
+			if (state == null)
+				state = ProcessServiceProvider.Processor.State.interrupted;
+		}
+
+		return state == null ? execution.complete() : state;
+	}
+
+	/**
+	 * Defines callback to perform processor logic.
+	 *
+	 * @author <a href="mailto:herbert.baier@uni-wuerzburg.de">Herbert Baier</a>
+	 * @version 1.0
+	 * @since 1.8
+	 */
+	@FunctionalInterface
+	protected interface ProcessorLogic {
+		/**
+		 * Performs the perform processor logic.
+		 * 
+		 * @param metsFileGroup The mets file groups for framework.
+		 * @param arguments     The processor arguments.
+		 * @return The processor execution state.
+		 * @since 17
+		 */
+		public ProcessServiceProvider.Processor.State perform(MetsUtils.FrameworkFileGroup metsFileGroup,
+				Object arguments);
+	}
+
+	/**
+	 * Defines callback for progresses.
+	 *
+	 * @author <a href="mailto:herbert.baier@uni-wuerzburg.de">Herbert Baier</a>
+	 * @version 1.0
+	 * @since 1.8
+	 */
+	@FunctionalInterface
+	protected interface Progress {
+		/**
+		 * Updates the progress.
+		 * 
+		 * @param value The progress value.
+		 * @since 1.8
+		 */
+		public void update(float value);
+	}
+
+	/**
+	 * Defines callback for processor running state.
+	 *
+	 * @author <a href="mailto:herbert.baier@uni-wuerzburg.de">Herbert Baier</a>
+	 * @version 1.0
+	 * @since 1.8
+	 */
+	@FunctionalInterface
+	protected interface ProcessorRunningState {
+		/**
+		 * Returns true if the processor was canceled.
+		 * 
+		 * @return True if the processor was canceled.
+		 * @since 1.8
+		 */
+		public boolean isCanceled();
+	}
+
+	/**
+	 * Defines callback for processor execution.
+	 *
+	 * @author <a href="mailto:herbert.baier@uni-wuerzburg.de">Herbert Baier</a>
+	 * @version 1.0
+	 * @since 1.8
+	 */
+	@FunctionalInterface
+	protected interface ProcessorExecution {
+		/**
+		 * Completes the execution of the processor.
+		 * 
+		 * @return The process execution state.
+		 * @since 1.8
+		 */
+		public ProcessServiceProvider.Processor.State complete();
 	}
 
 }

@@ -443,6 +443,7 @@ public abstract class OCRDDockerServiceProviderWorker extends OCRDServiceProvide
 			standardError.update("Troubles creating JSON from parameters - " + ex.getMessage() + ".");
 		}
 
+		// TODO: ok
 		if (unnecessaryArguments != null && !unnecessaryArguments.isEmpty())
 			standardOutput.update("Ignored unnecessary parameters: " + unnecessaryArguments + ".");
 
@@ -467,6 +468,7 @@ public abstract class OCRDDockerServiceProviderWorker extends OCRDServiceProvide
 		}
 
 		final MetsUtils.FrameworkFileGroup metsFileGroup = MetsUtils.getFileGroup(framework);
+		// TODO: begin 2 ok
 		String dockerName = "ocr4all-" + UUID.randomUUID().toString();
 
 		List<String> processorArguments;
@@ -509,6 +511,8 @@ public abstract class OCRDDockerServiceProviderWorker extends OCRDServiceProvide
 			state = ProcessServiceProvider.Processor.State.interrupted;
 		}
 
+		// TODO: end 2 ok
+		
 		if (state == null)
 			progress.update(0.097F);
 
@@ -591,60 +595,6 @@ public abstract class OCRDDockerServiceProviderWorker extends OCRDServiceProvide
 				.get(ConfigurationServiceProvider.getValue(configuration, ServiceProviderCollection.dockerResources),
 						ConfigurationServiceProvider.getValue(configuration, processorIdentifier()))
 				.normalize();
-	}
-
-	/**
-	 * Defines callback for progresses.
-	 *
-	 * @author <a href="mailto:herbert.baier@uni-wuerzburg.de">Herbert Baier</a>
-	 * @version 1.0
-	 * @since 1.8
-	 */
-	@FunctionalInterface
-	protected interface Progress {
-		/**
-		 * Updates the progress.
-		 * 
-		 * @param value The progress value.
-		 * @since 1.8
-		 */
-		public void update(float value);
-	}
-
-	/**
-	 * Defines callback for processor running state.
-	 *
-	 * @author <a href="mailto:herbert.baier@uni-wuerzburg.de">Herbert Baier</a>
-	 * @version 1.0
-	 * @since 1.8
-	 */
-	@FunctionalInterface
-	protected interface ProcessorRunningState {
-		/**
-		 * Returns true if the processor was canceled.
-		 * 
-		 * @return True if the processor was canceled.
-		 * @since 1.8
-		 */
-		public boolean isCanceled();
-	}
-
-	/**
-	 * Defines callback for processor execution.
-	 *
-	 * @author <a href="mailto:herbert.baier@uni-wuerzburg.de">Herbert Baier</a>
-	 * @version 1.0
-	 * @since 1.8
-	 */
-	@FunctionalInterface
-	protected interface ProcessorExecution {
-		/**
-		 * Completes the execution of the processor.
-		 * 
-		 * @return The process execution state.
-		 * @since 1.8
-		 */
-		public ProcessServiceProvider.Processor.State complete();
 	}
 
 }
