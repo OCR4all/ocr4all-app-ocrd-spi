@@ -44,6 +44,14 @@
 			<scope>provided</scope>
 		</dependency>
 		
+		<!-- ocr4all application communication -->
+		<dependency>
+			<groupId>de.uni-wuerzburg.zpd</groupId>
+			<artifactId>ocr4all-app-communication</artifactId>
+			<version>${de.uni-wuerzburg.zpd.ocr4all.version}</version>
+			<scope>provided</scope>
+		</dependency>
+		
 		<!-- ocr4all application ocr-d communication -->
 		<dependency>
 			<groupId>de.uni-wuerzburg.zpd</groupId>

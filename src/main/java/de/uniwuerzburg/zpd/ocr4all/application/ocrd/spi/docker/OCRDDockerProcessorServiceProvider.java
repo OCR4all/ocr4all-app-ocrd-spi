@@ -15,10 +15,9 @@ import de.uniwuerzburg.zpd.ocr4all.application.spi.core.ProcessServiceProvider;
 import de.uniwuerzburg.zpd.ocr4all.application.spi.util.SystemProcess;
 
 /**
- * Defines core processors for docker service providers for OCRD. When
- * implementing the required method
- * {@link ProcessServiceProvider.Processor#execute}, this class should be
- * initialized by calling the method
+ * Defines processors for docker service providers for OCRD. When implementing
+ * the required method {@link ProcessServiceProvider.Processor#execute}, this
+ * class should be initialized by calling the method
  * {@link CoreProcessorServiceProvider#initialize} at the beginning and
  * completed by calling the method
  * {@link CoreProcessorServiceProvider#complete}.

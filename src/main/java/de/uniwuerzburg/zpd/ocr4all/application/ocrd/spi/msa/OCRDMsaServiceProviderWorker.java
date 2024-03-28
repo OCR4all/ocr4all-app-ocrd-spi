@@ -7,7 +7,9 @@
  */
 package de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.msa;
 
+import java.nio.file.Path;
 import java.security.ProviderException;
+import java.util.Arrays;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Locale;
@@ -19,12 +21,16 @@ import org.springframework.web.client.RestClient;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
+import de.uniwuerzburg.zpd.ocr4all.application.communication.message.spi.EventSPI;
 import de.uniwuerzburg.zpd.ocr4all.application.ocrd.communication.api.DescriptionResponse;
+import de.uniwuerzburg.zpd.ocr4all.application.ocrd.communication.api.ProcessRequest;
 import de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.core.OCRDServiceProviderWorker;
 import de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.util.ProviderDescription;
 import de.uniwuerzburg.zpd.ocr4all.application.spi.core.CoreProcessorServiceProvider;
 import de.uniwuerzburg.zpd.ocr4all.application.spi.core.ProcessServiceProvider;
+import de.uniwuerzburg.zpd.ocr4all.application.spi.env.ConfigurationServiceProvider;
 import de.uniwuerzburg.zpd.ocr4all.application.spi.env.Framework;
+import de.uniwuerzburg.zpd.ocr4all.application.spi.env.MicroserviceArchitecture;
 import de.uniwuerzburg.zpd.ocr4all.application.spi.env.Premise;
 import de.uniwuerzburg.zpd.ocr4all.application.spi.env.Target;
 import de.uniwuerzburg.zpd.ocr4all.application.spi.model.Entry;
@@ -37,7 +43,8 @@ import de.uniwuerzburg.zpd.ocr4all.application.spi.model.argument.ModelArgument;
  * following properties of the service provider collection <b>ocr-d</b> override
  * the local default settings (<b>key</b>: <i>default value</i>):
  * <ul>
- * <li>TODO</li>
+ * <li>msa-host-id: ocrd</li>
+ * <li>msa-host-protocol: http</li>
  * <li>see {@link OCRDServiceProviderWorker} for remainder settings</li>
  * </ul>
  *
@@ -47,11 +54,6 @@ import de.uniwuerzburg.zpd.ocr4all.application.spi.model.argument.ModelArgument;
  * @since 17
  */
 public abstract class OCRDMsaServiceProviderWorker extends OCRDServiceProviderWorker implements ProcessServiceProvider {
-	/**
-	 * The application layer protocol.
-	 */
-	public static final String applicationLayerProtocol = "http://";
-
 	/**
 	 * The api context path.
 	 */
@@ -84,6 +86,74 @@ public abstract class OCRDMsaServiceProviderWorker extends OCRDServiceProviderWo
 			+ "description/json/{processor}";
 
 	/**
+	 * Defines service provider collection with keys and default values. Collection
+	 * blank values are not allowed and their values are trimmed.
+	 *
+	 * @author <a href="mailto:herbert.baier@uni-wuerzburg.de">Herbert Baier</a>
+	 * @version 1.0
+	 * @since 1.8
+	 */
+	private enum ServiceProviderCollection implements ConfigurationServiceProvider.CollectionKey {
+		hostId("msa-host-id", "ocrd"), applicationLayerProtocol("msa-host-protocol", "http");
+
+		/**
+		 * The key.
+		 */
+		private final String key;
+
+		/**
+		 * The default value.
+		 */
+		private final String defaultValue;
+
+		/**
+		 * Creates a service provider collection with a key and default value.
+		 * 
+		 * @param key          The key.
+		 * @param defaultValue The default value.
+		 * @since 1.8
+		 */
+		private ServiceProviderCollection(String key, String defaultValue) {
+			this.key = key;
+			this.defaultValue = defaultValue;
+		}
+
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see de.uniwuerzburg.zpd.ocr4all.application.spi.env.Framework.
+		 * ServiceProviderCollectionKey#getName()
+		 */
+		@Override
+		public String getName() {
+			return collectionName;
+		}
+
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see de.uniwuerzburg.zpd.ocr4all.application.spi.env.Framework.
+		 * ServiceProviderCollectionKey#getKey()
+		 */
+		@Override
+		public String getKey() {
+			return key;
+		}
+
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see de.uniwuerzburg.zpd.ocr4all.application.spi.env.Framework.
+		 * ServiceProviderCollectionKey#getDefaultValue()
+		 */
+		@Override
+		public String getDefaultValue() {
+			return defaultValue;
+		}
+
+	}
+
+	/**
 	 * The ProviderDescription.
 	 */
 	private ProviderDescription providerDescription = null;
@@ -91,20 +161,16 @@ public abstract class OCRDMsaServiceProviderWorker extends OCRDServiceProviderWo
 	/**
 	 * The client to perform HTTP requests.
 	 */
-	protected final RestClient restClient;
+	protected RestClient restClient = null;
 
 	/**
 	 * Default constructor for an ocr-d microservice architecture (MSA) service
 	 * provider worker.
 	 * 
-	 * @param restClient
-	 * @param url
 	 * @since 17
 	 */
-	public OCRDMsaServiceProviderWorker(String url) {
+	public OCRDMsaServiceProviderWorker() {
 		super();
-
-		restClient = RestClient.builder().baseUrl(applicationLayerProtocol + url).build();
 	}
 
 	/*
@@ -139,6 +205,17 @@ public abstract class OCRDMsaServiceProviderWorker extends OCRDServiceProviderWo
 	 */
 	@Override
 	protected void initializeCallback() throws ProviderException {
+		final String hostId = configuration.getValue(ServiceProviderCollection.hostId);
+
+		MicroserviceArchitecture.Host host = microserviceArchitecture.getHost(hostId);
+
+		if (host == null)
+			throw new ProviderException("unknown host configuration for msa id " + hostId + ".");
+
+		restClient = RestClient.builder().baseUrl(
+				configuration.getValue(ServiceProviderCollection.applicationLayerProtocol) + "://" + host.getUrl())
+				.build();
+
 		providerDescription = new ProviderDescription(restClient.get()
 				.uri(jsonDescriptionRequestMapping, getProcessorIdentifier()).accept(MediaType.APPLICATION_JSON)
 				.retrieve().onStatus(HttpStatusCode::is4xxClientError, (request, response) -> {
@@ -359,7 +436,20 @@ public abstract class OCRDMsaServiceProviderWorker extends OCRDServiceProviderWo
 	@Override
 	public Processor newProcessor() {
 		return providerDescription == null || !providerDescription.isModelFactorySet() ? null
-				: new OCRDMsaProcessorServiceProvider() {
+				: new OCRDMsaProcessorServiceProvider(microserviceArchitecture.getEventController()) {
+					/*
+					 * (non-Javadoc)
+					 * 
+					 * @see de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.msa.
+					 * OCRDMsaProcessorServiceProvider#handle(de.uniwuerzburg.zpd.ocr4all.
+					 * application.communication.message.spi.EventSPI)
+					 */
+					@Override
+					protected void handle(EventSPI event) {
+						// TODO Auto-generated method stub
+
+					}
+
 					/*
 					 * (non-Javadoc)
 					 * 
@@ -371,6 +461,12 @@ public abstract class OCRDMsaServiceProviderWorker extends OCRDServiceProviderWo
 					 */
 					@Override
 					public State execute(Callback callback, Framework framework, ModelArgument modelArgument) {
+						if (framework == null) {
+							updatedStandardError("no framework is defined for the processor.");
+
+							return ProcessServiceProvider.Processor.State.interrupted;
+						}
+
 						try {
 							ping();
 						} catch (ProviderException e) {
@@ -399,18 +495,34 @@ public abstract class OCRDMsaServiceProviderWorker extends OCRDServiceProviderWo
 							return ProcessServiceProvider.Processor.State.interrupted;
 						}
 
+						Path pathProject = framework.getProjects();
+						Path pathWorkspace = framework.getProcessorWorkspace();
+						if (!pathWorkspace.startsWith(pathProject) || pathWorkspace.equals(pathProject)) {
+							updatedStandardError("invalid working directory '" + pathWorkspace.toString()
+									+ "' for the processor, since it does not includes project directory '"
+									+ pathProject.toString() + "'.");
+
+							return ProcessServiceProvider.Processor.State.interrupted;
+						}
+
 						/*
 						 * Runs the processor
 						 */
-
 						return run(framework, arguments, () -> isCanceled(), () -> complete(),
 								message -> updatedStandardOutput(message), message -> updatedStandardError(message),
 								progress -> callback.updatedProgress(progress), 0.01F,
 								(metsFileGroup, argumentsJsonSerialization) -> {
+									registerEventHandler();
 
+									// TODO: call rest API and handle events -> method void handle(EventSPI event)
 									ProcessServiceProvider.Processor.State state = null;
 
-									// TODO
+									ProcessRequest processRequest = new ProcessRequest(key, getProcessorIdentifier(),
+											pathWorkspace.toString().substring(pathProject.toString().length() + 1),
+											metsFileGroup.getInput(), metsFileGroup.getOutput(),
+											Arrays.asList("-p", argumentsJsonSerialization));
+
+									unregisterEventHandler();
 
 									return state;
 								});

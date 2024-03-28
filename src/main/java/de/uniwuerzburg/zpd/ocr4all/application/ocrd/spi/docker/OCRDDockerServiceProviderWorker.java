@@ -330,6 +330,30 @@ public abstract class OCRDDockerServiceProviderWorker extends OCRDServiceProvide
 	}
 
 	/**
+	 * Returns the docker resources folder.
+	 * 
+	 * @return The docker resources folder.
+	 * @since 1.8
+	 */
+	protected Path getDockerResources() {
+		return getDockerResources(configuration);
+	}
+
+	/**
+	 * Returns the docker resources folder.
+	 * 
+	 * @param configuration The service provider configuration.
+	 * @return The docker resources folder.
+	 * @since 1.8
+	 */
+	protected Path getDockerResources(ConfigurationServiceProvider configuration) {
+		return Paths
+				.get(ConfigurationServiceProvider.getValue(configuration, ServiceProviderCollection.dockerResources),
+						ConfigurationServiceProvider.getValue(configuration, processorIdentifier()))
+				.normalize();
+	}
+
+	/**
 	 * Returns the ocr-d arguments for the docker process.
 	 * 
 	 * @param framework     The framework.
@@ -343,7 +367,7 @@ public abstract class OCRDDockerServiceProviderWorker extends OCRDServiceProvide
 	 *                                 problems.
 	 * @since 1.8
 	 */
-	protected List<String> getProcessorArguments(Framework framework, boolean isResources, String dockerName,
+	private List<String> getProcessorArguments(Framework framework, boolean isResources, String dockerName,
 			Object arguments, MetsUtils.FrameworkFileGroup metsFileGroup) throws JsonProcessingException {
 		// Get the effective system user/group id
 		String uid = configuration.getValue(ServiceProviderCollection.uid);
@@ -490,30 +514,6 @@ public abstract class OCRDDockerServiceProviderWorker extends OCRDServiceProvide
 
 					return state;
 				});
-	}
-
-	/**
-	 * Returns the docker resources folder.
-	 * 
-	 * @return The docker resources folder.
-	 * @since 1.8
-	 */
-	protected Path getDockerResources() {
-		return getDockerResources(configuration);
-	}
-
-	/**
-	 * Returns the docker resources folder.
-	 * 
-	 * @param configuration The service provider configuration.
-	 * @return The docker resources folder.
-	 * @since 1.8
-	 */
-	protected Path getDockerResources(ConfigurationServiceProvider configuration) {
-		return Paths
-				.get(ConfigurationServiceProvider.getValue(configuration, ServiceProviderCollection.dockerResources),
-						ConfigurationServiceProvider.getValue(configuration, processorIdentifier()))
-				.normalize();
 	}
 
 }
