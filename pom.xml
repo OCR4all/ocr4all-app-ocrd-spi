@@ -44,6 +44,13 @@
 			<scope>provided</scope>
 		</dependency>
 		
+		<!-- ocr4all application msa -->
+		<dependency>
+			<groupId>de.uni-wuerzburg.zpd</groupId>
+			<artifactId>ocr4all-app-msa</artifactId>
+			<version>${de.uni-wuerzburg.zpd.ocr4all.version}</version>
+		</dependency>
+
 		<!-- ocr4all application communication -->
 		<dependency>
 			<groupId>de.uni-wuerzburg.zpd</groupId>

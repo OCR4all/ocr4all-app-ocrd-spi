@@ -22,6 +22,7 @@ import org.springframework.web.client.RestClient;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import de.uniwuerzburg.zpd.ocr4all.application.communication.message.spi.EventSPI;
+import de.uniwuerzburg.zpd.ocr4all.application.msa.api.domain.JobResponse;
 import de.uniwuerzburg.zpd.ocr4all.application.ocrd.communication.api.DescriptionResponse;
 import de.uniwuerzburg.zpd.ocr4all.application.ocrd.communication.api.ProcessRequest;
 import de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.core.OCRDServiceProviderWorker;
@@ -84,6 +85,11 @@ public abstract class OCRDMsaServiceProviderWorker extends OCRDServiceProviderWo
 	 */
 	private static final String jsonDescriptionRequestMapping = processorControllerContextPath
 			+ "description/json/{processor}";
+
+	/**
+	 * The processor json description request mapping.
+	 */
+	private static final String executeRequestMapping = processorControllerContextPath + "execute";
 
 	/**
 	 * Defines service provider collection with keys and default values. Collection
@@ -446,7 +452,7 @@ public abstract class OCRDMsaServiceProviderWorker extends OCRDServiceProviderWo
 					 */
 					@Override
 					protected void handle(EventSPI event) {
-						// TODO Auto-generated method stub
+						// TODO inform thread and log message
 
 					}
 
@@ -495,12 +501,10 @@ public abstract class OCRDMsaServiceProviderWorker extends OCRDServiceProviderWo
 							return ProcessServiceProvider.Processor.State.interrupted;
 						}
 
-						Path pathProject = framework.getProjects();
-						Path pathWorkspace = framework.getProcessorWorkspace();
-						if (!pathWorkspace.startsWith(pathProject) || pathWorkspace.equals(pathProject)) {
-							updatedStandardError("invalid working directory '" + pathWorkspace.toString()
-									+ "' for the processor, since it does not includes project directory '"
-									+ pathProject.toString() + "'.");
+						final Path pathProcessor = framework.getProcessorWorkspaceRelativeProjects();
+						if (pathProcessor == null) {
+							updatedStandardError("invalid working directory '"
+									+ framework.getProcessorWorkspace().toString() + "' for the processor.");
 
 							return ProcessServiceProvider.Processor.State.interrupted;
 						}
@@ -517,10 +521,30 @@ public abstract class OCRDMsaServiceProviderWorker extends OCRDServiceProviderWo
 									// TODO: call rest API and handle events -> method void handle(EventSPI event)
 									ProcessServiceProvider.Processor.State state = null;
 
-									ProcessRequest processRequest = new ProcessRequest(key, getProcessorIdentifier(),
-											pathWorkspace.toString().substring(pathProject.toString().length() + 1),
+									final ProcessRequest processRequest = new ProcessRequest(key,
+											getProcessorIdentifier(), pathProcessor.toString(),
 											metsFileGroup.getInput(), metsFileGroup.getOutput(),
 											Arrays.asList("-p", argumentsJsonSerialization));
+
+									JobResponse jobResponse;
+									try {
+										jobResponse = restClient.post().uri(executeRequestMapping)
+												.contentType(MediaType.APPLICATION_JSON).body(processRequest)
+												.accept(MediaType.APPLICATION_JSON).retrieve()
+												.onStatus(HttpStatusCode::is4xxClientError, (request, response) -> {
+													throw new ProviderException("HTTP client error status "
+															+ response.getStatusCode() + " (" + response.getStatusText()
+															+ "): " + response.getHeaders());
+												}).onStatus(HttpStatusCode::is5xxServerError, (request, response) -> {
+													throw new ProviderException("HTTP server error status "
+															+ response.getStatusCode() + " (" + response.getStatusText()
+															+ "): " + response.getHeaders());
+												}).body(JobResponse.class);
+									} catch (Exception e) {
+										updatedStandardError("could not start processor - " + e.getMessage());
+
+										return ProcessServiceProvider.Processor.State.interrupted;
+									}
 
 									unregisterEventHandler();
 
