@@ -468,7 +468,8 @@ public abstract class OCRDMsaServiceProviderWorker extends OCRDServiceProviderWo
 					@Override
 					public State execute(Callback callback, Framework framework, ModelArgument modelArgument) {
 						if (framework == null) {
-							updatedStandardError("no framework is defined for the processor.");
+							updatedStandardError(
+									"no framework is defined for the processor '" + getProcessorIdentifier() + "'.");
 
 							return ProcessServiceProvider.Processor.State.interrupted;
 						}
@@ -476,7 +477,8 @@ public abstract class OCRDMsaServiceProviderWorker extends OCRDServiceProviderWo
 						try {
 							ping();
 						} catch (ProviderException e) {
-							updatedStandardError(e.getMessage());
+							updatedStandardError("trouble contacting the processor '" + getProcessorIdentifier()
+									+ "' - " + e.getMessage());
 
 							return ProcessServiceProvider.Processor.State.interrupted;
 						}
@@ -503,8 +505,9 @@ public abstract class OCRDMsaServiceProviderWorker extends OCRDServiceProviderWo
 
 						final Path pathProcessor = framework.getProcessorWorkspaceRelativeProjects();
 						if (pathProcessor == null) {
-							updatedStandardError("invalid working directory '"
-									+ framework.getProcessorWorkspace().toString() + "' for the processor.");
+							updatedStandardError(
+									"invalid working directory '" + framework.getProcessorWorkspace().toString()
+											+ "' for processor '" + getProcessorIdentifier() + "'.");
 
 							return ProcessServiceProvider.Processor.State.interrupted;
 						}
@@ -541,7 +544,8 @@ public abstract class OCRDMsaServiceProviderWorker extends OCRDServiceProviderWo
 															+ "): " + response.getHeaders());
 												}).body(JobResponse.class);
 									} catch (Exception e) {
-										updatedStandardError("could not start processor - " + e.getMessage());
+										updatedStandardError("could not execute processor '" + getProcessorIdentifier()
+												+ "' - " + e.getMessage());
 
 										return ProcessServiceProvider.Processor.State.interrupted;
 									}
