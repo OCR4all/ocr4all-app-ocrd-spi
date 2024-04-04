@@ -11,9 +11,11 @@ import java.nio.file.Path;
 import java.security.ProviderException;
 import java.util.Arrays;
 import java.util.Hashtable;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
+import java.util.Queue;
 
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
@@ -443,6 +445,11 @@ public abstract class OCRDMsaServiceProviderWorker extends OCRDServiceProviderWo
 	public Processor newProcessor() {
 		return providerDescription == null || !providerDescription.isModelFactorySet() ? null
 				: new OCRDMsaProcessorServiceProvider(microserviceArchitecture.getEventController()) {
+					/**
+					 * The queue of events to be handled.
+					 */
+					Queue<EventSPI> queue = new LinkedList<>();
+
 					/*
 					 * (non-Javadoc)
 					 * 
@@ -452,8 +459,9 @@ public abstract class OCRDMsaServiceProviderWorker extends OCRDServiceProviderWo
 					 */
 					@Override
 					protected void handle(EventSPI event) {
-						// TODO inform thread and log message
-
+						synchronized (queue) {
+							queue.add(event);
+						}
 					}
 
 					/*
