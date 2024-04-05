@@ -23,6 +23,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import de.uniwuerzburg.zpd.ocr4all.application.communication.message.spi.EventSPI;
 import de.uniwuerzburg.zpd.ocr4all.application.communication.msa.api.domain.JobResponse;
+import de.uniwuerzburg.zpd.ocr4all.application.communication.msa.api.domain.SystemJobResponse;
 import de.uniwuerzburg.zpd.ocr4all.application.ocrd.communication.api.DescriptionResponse;
 import de.uniwuerzburg.zpd.ocr4all.application.ocrd.communication.api.ProcessRequest;
 import de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.core.OCRDServiceProviderWorker;
@@ -46,6 +47,7 @@ import de.uniwuerzburg.zpd.ocr4all.application.spi.model.argument.ModelArgument;
  * <ul>
  * <li>msa-host-id: ocrd</li>
  * <li>msa-host-protocol: http</li>
+ * <li>msa-timeout-active-processor: 3000</li>
  * <li>see {@link OCRDServiceProviderWorker} for remainder settings</li>
  * </ul>
  *
@@ -83,7 +85,17 @@ public abstract class OCRDMsaServiceProviderWorker extends OCRDServiceProviderWo
 	/**
 	 * The job request mapping.
 	 */
-	public static final String jobRequestMapping = schedulerControllerContextPath + "job/{job}";
+	public static final String jobRequestMapping = schedulerControllerContextPath + "job/{id}";
+
+	/**
+	 * The system job request mapping.
+	 */
+	public static final String systemJobRequestMapping = processorControllerContextPath + "job/{id}";
+
+	/**
+	 * The expunge job request mapping.
+	 */
+	public static final String expungeJobRequestMapping = schedulerControllerContextPath + "expunge/{id}";
 
 	/**
 	 * The processor json description request mapping.
@@ -105,7 +117,8 @@ public abstract class OCRDMsaServiceProviderWorker extends OCRDServiceProviderWo
 	 * @since 1.8
 	 */
 	private enum ServiceProviderCollection implements ConfigurationServiceProvider.CollectionKey {
-		hostId("msa-host-id", "ocrd"), applicationLayerProtocol("msa-host-protocol", "http");
+		hostId("msa-host-id", "ocrd"), applicationLayerProtocol("msa-host-protocol", "http"),
+		timeoutActiveProcessor("msa-timeout-active-processor", "3000");
 
 		/**
 		 * The key.
@@ -175,6 +188,11 @@ public abstract class OCRDMsaServiceProviderWorker extends OCRDServiceProviderWo
 	protected RestClient restClient = null;
 
 	/**
+	 * The timeout for the active processor.
+	 */
+	protected final long timeoutActiveProcessor;
+
+	/**
 	 * Default constructor for an ocr-d microservice architecture (MSA) service
 	 * provider worker.
 	 * 
@@ -182,6 +200,16 @@ public abstract class OCRDMsaServiceProviderWorker extends OCRDServiceProviderWo
 	 */
 	public OCRDMsaServiceProviderWorker() {
 		super();
+
+		long timeoutActiveProcessor;
+		try {
+			timeoutActiveProcessor = Long
+					.parseLong(configuration.getValue(ServiceProviderCollection.applicationLayerProtocol));
+		} catch (Exception e) {
+			timeoutActiveProcessor = 3000;
+		}
+
+		this.timeoutActiveProcessor = timeoutActiveProcessor > 0 ? timeoutActiveProcessor : 0;
 	}
 
 	/*
@@ -568,7 +596,7 @@ public abstract class OCRDMsaServiceProviderWorker extends OCRDServiceProviderWo
 									while (!jobResponse.getState().isDone()) {
 										thread = new Thread(() -> {
 											try {
-												Thread.sleep(3000);
+												Thread.sleep(timeoutActiveProcessor);
 											} catch (InterruptedException e) {
 												// Nothing to do
 											}
@@ -604,22 +632,81 @@ public abstract class OCRDMsaServiceProviderWorker extends OCRDServiceProviderWo
 
 											return ProcessServiceProvider.Processor.State.interrupted;
 										}
-
 									}
 
 									unregisterEventHandler();
 
-									switch (jobResponse.getState()) {
-									case canceled:
-										return ProcessServiceProvider.Processor.State.canceled;
-									case completed:
-										return ProcessServiceProvider.Processor.State.completed;
-									case interrupted:
-									default:
-										return ProcessServiceProvider.Processor.State.interrupted;
+									try {
+										SystemJobResponse systemJobResponse = restClient.get()
+												.uri(systemJobRequestMapping, jobResponse.getId())
+												.accept(MediaType.APPLICATION_JSON).retrieve()
+												.onStatus(HttpStatusCode::is4xxClientError, (request, response) -> {
+													throw new ProviderException("HTTP client error status "
+															+ response.getStatusCode() + " (" + response.getStatusText()
+															+ "): " + response.getHeaders());
+												}).onStatus(HttpStatusCode::is5xxServerError, (request, response) -> {
+													throw new ProviderException("HTTP server error status "
+															+ response.getStatusCode() + " (" + response.getStatusText()
+															+ "): " + response.getHeaders());
+												}).body(SystemJobResponse.class);
+
+										if (systemJobResponse.getStandardOutput() != null
+												&& !systemJobResponse.getStandardOutput().isBlank())
+											updatedStandardOutput(systemJobResponse.getStandardOutput());
+
+										if (systemJobResponse.getStandardError() != null
+												&& !systemJobResponse.getStandardError().isBlank())
+											updatedStandardError(systemJobResponse.getStandardError());
+
+										if (systemJobResponse.getExitValue() > 0)
+											updatedStandardError(
+													"System process exit code " + systemJobResponse.getExitValue());
+
+										try {
+											restClient.get().uri(expungeJobRequestMapping, jobResponse.getId())
+													.retrieve()
+													.onStatus(HttpStatusCode::is4xxClientError, (request, response) -> {
+														throw new ProviderException(
+																"HTTP client error status " + response.getStatusCode()
+																		+ " (" + response.getStatusText() + "): "
+																		+ response.getHeaders());
+													})
+													.onStatus(HttpStatusCode::is5xxServerError, (request, response) -> {
+														throw new ProviderException(
+																"HTTP server error status " + response.getStatusCode()
+																		+ " (" + response.getStatusText() + "): "
+																		+ response.getHeaders());
+													}).toBodilessEntity();
+										} catch (Exception e) {
+											updatedStandardError("could not expunge the job of the processor '"
+													+ getProcessorIdentifier() + "' - " + e.getMessage());
+										}
+
+										switch (systemJobResponse.getState()) {
+										case canceled:
+											return ProcessServiceProvider.Processor.State.canceled;
+										case completed:
+											return ProcessServiceProvider.Processor.State.completed;
+										case interrupted:
+										default:
+											return ProcessServiceProvider.Processor.State.interrupted;
+										}
+									} catch (Exception e) {
+										updatedStandardError("could not restore the system job of the processor '"
+												+ getProcessorIdentifier() + "' - " + e.getMessage());
+
+										switch (jobResponse.getState()) {
+										case canceled:
+											return ProcessServiceProvider.Processor.State.canceled;
+										case completed:
+											return ProcessServiceProvider.Processor.State.completed;
+										case interrupted:
+										default:
+											return ProcessServiceProvider.Processor.State.interrupted;
+										}
+
 									}
 								});
-
 					}
 				};
 	}
