@@ -24,7 +24,7 @@ import org.springframework.web.client.RestClient;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import de.uniwuerzburg.zpd.ocr4all.application.communication.message.spi.EventSPI;
-import de.uniwuerzburg.zpd.ocr4all.application.msa.api.domain.JobResponse;
+import de.uniwuerzburg.zpd.ocr4all.application.communication.msa.api.domain.JobResponse;
 import de.uniwuerzburg.zpd.ocr4all.application.ocrd.communication.api.DescriptionResponse;
 import de.uniwuerzburg.zpd.ocr4all.application.ocrd.communication.api.ProcessRequest;
 import de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.core.OCRDServiceProviderWorker;

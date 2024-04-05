@@ -44,13 +44,6 @@
 			<scope>provided</scope>
 		</dependency>
 		
-		<!-- ocr4all application msa -->
-		<dependency>
-			<groupId>de.uni-wuerzburg.zpd</groupId>
-			<artifactId>ocr4all-app-msa</artifactId>
-			<version>${de.uni-wuerzburg.zpd.ocr4all.version}</version>
-		</dependency>
-
 		<!-- ocr4all application communication -->
 		<dependency>
 			<groupId>de.uni-wuerzburg.zpd</groupId>
@@ -69,18 +62,18 @@
      
     <build>
 		<plugins>
-			<plugin>
-				<groupId>org.springframework.boot</groupId>
-				<artifactId>spring-boot-maven-plugin</artifactId>
-				<configuration>
-					<excludes>
-						<exclude>
-							<groupId>org.springframework.boot</groupId>
-							<artifactId>spring-boot-starter-web</artifactId>
-						</exclude>
-					</excludes>
-				</configuration>
-			</plugin>
+<!--			<plugin>-->
+<!--				<groupId>org.springframework.boot</groupId>-->
+<!--				<artifactId>spring-boot-maven-plugin</artifactId>-->
+<!--				<configuration>-->
+<!--					<excludes>-->
+<!--						<exclude>-->
+<!--							<groupId>org.springframework.boot</groupId>-->
+<!--							<artifactId>spring-boot-starter-web</artifactId>-->
+<!--						</exclude>-->
+<!--					</excludes>-->
+<!--				</configuration>-->
+<!--			</plugin>-->
 			
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
