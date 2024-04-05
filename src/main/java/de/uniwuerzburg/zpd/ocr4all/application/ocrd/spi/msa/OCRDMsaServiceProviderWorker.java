@@ -11,11 +11,9 @@ import java.nio.file.Path;
 import java.security.ProviderException;
 import java.util.Arrays;
 import java.util.Hashtable;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
-import java.util.Queue;
 
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
@@ -81,6 +79,11 @@ public abstract class OCRDMsaServiceProviderWorker extends OCRDServiceProviderWo
 	 * The ping request mapping.
 	 */
 	public static final String pingRequestMapping = schedulerControllerContextPath + "ping";
+
+	/**
+	 * The job request mapping.
+	 */
+	public static final String jobRequestMapping = schedulerControllerContextPath + "job/{job}";
 
 	/**
 	 * The processor json description request mapping.
@@ -446,9 +449,9 @@ public abstract class OCRDMsaServiceProviderWorker extends OCRDServiceProviderWo
 		return providerDescription == null || !providerDescription.isModelFactorySet() ? null
 				: new OCRDMsaProcessorServiceProvider(microserviceArchitecture.getEventController()) {
 					/**
-					 * The queue of events to be handled.
+					 * The timeout thread.
 					 */
-					Queue<EventSPI> queue = new LinkedList<>();
+					private Thread thread = null;
 
 					/*
 					 * (non-Javadoc)
@@ -459,9 +462,16 @@ public abstract class OCRDMsaServiceProviderWorker extends OCRDServiceProviderWo
 					 */
 					@Override
 					protected void handle(EventSPI event) {
-						synchronized (queue) {
-							queue.add(event);
-						}
+						final String message = "Received event " + event.getType().name() + " (" + event.getCreatedAt()
+								+ "): " + event.getMessage();
+
+						if (event.getType().equals(EventSPI.Type.interrupted))
+							updatedStandardError(message);
+						else
+							updatedStandardOutput(message);
+
+						if (thread != null && thread.isAlive() && !thread.isInterrupted())
+							thread.interrupt();
 					}
 
 					/*
@@ -529,9 +539,6 @@ public abstract class OCRDMsaServiceProviderWorker extends OCRDServiceProviderWo
 								(metsFileGroup, argumentsJsonSerialization) -> {
 									registerEventHandler();
 
-									// TODO: call rest API and handle events -> method void handle(EventSPI event)
-									ProcessServiceProvider.Processor.State state = null;
-
 									final ProcessRequest processRequest = new ProcessRequest(key,
 											getProcessorIdentifier(), pathProcessor.toString(),
 											metsFileGroup.getInput(), metsFileGroup.getOutput(),
@@ -558,9 +565,59 @@ public abstract class OCRDMsaServiceProviderWorker extends OCRDServiceProviderWo
 										return ProcessServiceProvider.Processor.State.interrupted;
 									}
 
+									while (!jobResponse.getState().isDone()) {
+										thread = new Thread(() -> {
+											try {
+												Thread.sleep(3000);
+											} catch (InterruptedException e) {
+												// Nothing to do
+											}
+										});
+
+										thread.start();
+
+										// Wait for a timeout or a new event
+										try {
+											thread.join();
+										} catch (InterruptedException e) {
+											// Nothing to do
+										}
+
+										try {
+											jobResponse = restClient.get().uri(jobRequestMapping, jobResponse.getId())
+													.accept(MediaType.APPLICATION_JSON).retrieve()
+													.onStatus(HttpStatusCode::is4xxClientError, (request, response) -> {
+														throw new ProviderException(
+																"HTTP client error status " + response.getStatusCode()
+																		+ " (" + response.getStatusText() + "): "
+																		+ response.getHeaders());
+													})
+													.onStatus(HttpStatusCode::is5xxServerError, (request, response) -> {
+														throw new ProviderException(
+																"HTTP server error status " + response.getStatusCode()
+																		+ " (" + response.getStatusText() + "): "
+																		+ response.getHeaders());
+													}).body(JobResponse.class);
+										} catch (Exception e) {
+											updatedStandardError("could not restore the job of the processor '"
+													+ getProcessorIdentifier() + "' - " + e.getMessage());
+
+											return ProcessServiceProvider.Processor.State.interrupted;
+										}
+
+									}
+
 									unregisterEventHandler();
 
-									return state;
+									switch (jobResponse.getState()) {
+									case canceled:
+										return ProcessServiceProvider.Processor.State.canceled;
+									case completed:
+										return ProcessServiceProvider.Processor.State.completed;
+									case interrupted:
+									default:
+										return ProcessServiceProvider.Processor.State.interrupted;
+									}
 								});
 
 					}
