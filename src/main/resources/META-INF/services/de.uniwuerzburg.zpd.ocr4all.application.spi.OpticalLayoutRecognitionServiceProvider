@@ -1,11 +1,12 @@
+# docker json processors
+#de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.docker.olr.provider.json.JsonTesserocrSegment
+#de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.docker.olr.provider.json.JsonTesserocrSegmentLine
+#de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.docker.olr.provider.json.JsonTesserocrSegmentRegion
+#de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.docker.olr.provider.json.JsonTesserocrSegmentWord
+# Not working well
+#de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.docker.olr.provider.json.JsonCISOcropySegment
+#de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.docker.olr.provider.json.JsonEynollahSegment
+# old docker processors
 #de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.docker.olr.provider.TesserocrSegmentRegion
 #de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.docker.olr.provider.TesserocrSegmentLine
 #de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.docker.olr.provider.CISOcropySegment
-# json processors
-de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.docker.olr.provider.json.JsonTesserocrSegment
-de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.docker.olr.provider.json.JsonTesserocrSegmentLine
-de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.docker.olr.provider.json.JsonTesserocrSegmentRegion
-de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.docker.olr.provider.json.JsonTesserocrSegmentWord
-# Not working well
-de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.docker.olr.provider.json.JsonCISOcropySegment
-de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.docker.olr.provider.json.JsonEynollahSegment

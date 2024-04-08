@@ -47,7 +47,7 @@ import de.uniwuerzburg.zpd.ocr4all.application.spi.model.argument.ModelArgument;
  * <ul>
  * <li>msa-host-id: ocrd</li>
  * <li>msa-host-protocol: http</li>
- * <li>msa-timeout-active-processor: 3000</li>
+ * <li>msa-timeout-active-processor: 15000</li>
  * <li>see {@link OCRDServiceProviderWorker} for remainder settings</li>
  * </ul>
  *
@@ -118,7 +118,7 @@ public abstract class OCRDMsaServiceProviderWorker extends OCRDServiceProviderWo
 	 */
 	private enum ServiceProviderCollection implements ConfigurationServiceProvider.CollectionKey {
 		hostId("msa-host-id", "ocrd"), applicationLayerProtocol("msa-host-protocol", "http"),
-		timeoutActiveProcessor("msa-timeout-active-processor", "3000");
+		timeoutActiveProcessor("msa-timeout-active-processor", "15000");
 
 		/**
 		 * The key.
@@ -178,6 +178,11 @@ public abstract class OCRDMsaServiceProviderWorker extends OCRDServiceProviderWo
 	}
 
 	/**
+	 * The logger.
+	 */
+	protected final org.slf4j.Logger logger;
+
+	/**
 	 * The ProviderDescription.
 	 */
 	private ProviderDescription providerDescription = null;
@@ -198,15 +203,17 @@ public abstract class OCRDMsaServiceProviderWorker extends OCRDServiceProviderWo
 	 * 
 	 * @since 17
 	 */
-	public OCRDMsaServiceProviderWorker() {
+	public OCRDMsaServiceProviderWorker(Class<?> logger) {
 		super();
+
+		this.logger = org.slf4j.LoggerFactory.getLogger(logger);
 
 		long timeoutActiveProcessor;
 		try {
 			timeoutActiveProcessor = Long
-					.parseLong(configuration.getValue(ServiceProviderCollection.applicationLayerProtocol));
+					.parseLong(configuration.getValue(ServiceProviderCollection.timeoutActiveProcessor));
 		} catch (Exception e) {
-			timeoutActiveProcessor = 3000;
+			timeoutActiveProcessor = Long.parseLong(ServiceProviderCollection.timeoutActiveProcessor.getDefaultValue());
 		}
 
 		this.timeoutActiveProcessor = timeoutActiveProcessor > 0 ? timeoutActiveProcessor : 0;
@@ -255,16 +262,21 @@ public abstract class OCRDMsaServiceProviderWorker extends OCRDServiceProviderWo
 				configuration.getValue(ServiceProviderCollection.applicationLayerProtocol) + "://" + host.getUrl())
 				.build();
 
-		providerDescription = new ProviderDescription(restClient.get()
-				.uri(jsonDescriptionRequestMapping, getProcessorIdentifier()).accept(MediaType.APPLICATION_JSON)
-				.retrieve().onStatus(HttpStatusCode::is4xxClientError, (request, response) -> {
-					throw new ProviderException("HTTP client error status " + response.getStatusCode() + " ("
-							+ response.getStatusText() + "): " + response.getHeaders());
-				}).onStatus(HttpStatusCode::is5xxServerError, (request, response) -> {
-					throw new ProviderException("HTTP server error status " + response.getStatusCode() + " ("
-							+ response.getStatusText() + "): " + response.getHeaders());
-				}).body(DescriptionResponse.class).getDescription());
+		try {
+			providerDescription = new ProviderDescription(restClient.get()
+					.uri(jsonDescriptionRequestMapping, getProcessorIdentifier()).accept(MediaType.APPLICATION_JSON)
+					.retrieve().onStatus(HttpStatusCode::is4xxClientError, (request, response) -> {
+						throw new ProviderException("HTTP client error status " + response.getStatusCode() + " ("
+								+ response.getStatusText() + "): " + response.getHeaders());
+					}).onStatus(HttpStatusCode::is5xxServerError, (request, response) -> {
+						throw new ProviderException("HTTP server error status " + response.getStatusCode() + " ("
+								+ response.getStatusText() + "): " + response.getHeaders());
+					}).body(DescriptionResponse.class).getDescription());
+		} catch (Exception e) {
+			logger.warn("provider " + getProcessorIdentifier() + " could not be initialized - " + e.getMessage());
 
+			throw e;
+		}
 	}
 
 	/*
@@ -367,7 +379,11 @@ public abstract class OCRDMsaServiceProviderWorker extends OCRDServiceProviderWo
 
 			return new Premise();
 		} catch (ProviderException e) {
-			return new Premise(Premise.State.block, locale -> e.getMessage());
+			final String message = "trouble contacting ocrd msa - " + e.getMessage();
+
+			logger.warn(getProcessorIdentifier() + ": " + message);
+
+			return new Premise(Premise.State.block, locale -> message);
 		}
 	}
 
@@ -481,6 +497,38 @@ public abstract class OCRDMsaServiceProviderWorker extends OCRDServiceProviderWo
 					 */
 					private Thread thread = null;
 
+					/**
+					 * Logs the trouble.
+					 * 
+					 * @param message The trouble message.
+					 * @since 17
+					 */
+					private void logTrouble(String message) {
+						logger.warn(getProcessorIdentifier() + ": " + message);
+						updatedStandardError(message);
+					}
+
+					/**
+					 * Maps the msa job state to the execution process state and returns it. The msa
+					 * job has to be done.
+					 * 
+					 * @param state The msa job state.
+					 * @return The state of the execution of the process.
+					 * @since 17
+					 */
+					private State map(de.uniwuerzburg.zpd.ocr4all.application.communication.msa.job.State state) {
+						switch (state) {
+						case canceled:
+							return ProcessServiceProvider.Processor.State.canceled;
+						case completed:
+							return ProcessServiceProvider.Processor.State.completed;
+						case interrupted:
+						default:
+							return ProcessServiceProvider.Processor.State.interrupted;
+						}
+
+					}
+
 					/*
 					 * (non-Javadoc)
 					 * 
@@ -490,8 +538,10 @@ public abstract class OCRDMsaServiceProviderWorker extends OCRDServiceProviderWo
 					 */
 					@Override
 					protected void handle(EventSPI event) {
-						final String message = "Received event " + event.getType().name() + " (" + event.getCreatedAt()
-								+ "): " + event.getMessage();
+						final String message = "received event " + event.getType().name() + " (" + event.getCreatedAt()
+								+ ") - " + event.getMessage();
+
+						logger.debug(getProcessorIdentifier() + ": " + message);
 
 						if (event.getType().equals(EventSPI.Type.interrupted))
 							updatedStandardError(message);
@@ -514,8 +564,7 @@ public abstract class OCRDMsaServiceProviderWorker extends OCRDServiceProviderWo
 					@Override
 					public State execute(Callback callback, Framework framework, ModelArgument modelArgument) {
 						if (framework == null) {
-							updatedStandardError(
-									"no framework is defined for the processor '" + getProcessorIdentifier() + "'.");
+							updatedStandardError("undefined framework.");
 
 							return ProcessServiceProvider.Processor.State.interrupted;
 						}
@@ -523,8 +572,7 @@ public abstract class OCRDMsaServiceProviderWorker extends OCRDServiceProviderWo
 						try {
 							ping();
 						} catch (ProviderException e) {
-							updatedStandardError("trouble contacting the processor '" + getProcessorIdentifier()
-									+ "' - " + e.getMessage());
+							logTrouble("trouble contacting ocrd msa - " + e.getMessage());
 
 							return ProcessServiceProvider.Processor.State.interrupted;
 						}
@@ -551,9 +599,8 @@ public abstract class OCRDMsaServiceProviderWorker extends OCRDServiceProviderWo
 
 						final Path pathProcessor = framework.getProcessorWorkspaceRelativeProjects();
 						if (pathProcessor == null) {
-							updatedStandardError(
-									"invalid working directory '" + framework.getProcessorWorkspace().toString()
-											+ "' for processor '" + getProcessorIdentifier() + "'.");
+							logTrouble("invalid working directory '" + framework.getProcessorWorkspace().toString()
+									+ "'.");
 
 							return ProcessServiceProvider.Processor.State.interrupted;
 						}
@@ -565,13 +612,22 @@ public abstract class OCRDMsaServiceProviderWorker extends OCRDServiceProviderWo
 								message -> updatedStandardOutput(message), message -> updatedStandardError(message),
 								progress -> callback.updatedProgress(progress), 0.01F,
 								(metsFileGroup, argumentsJsonSerialization) -> {
+									// register event handler
 									registerEventHandler();
+
+									logger.debug(
+											getProcessorIdentifier() + ": process request - key " + key + ", home '"
+													+ pathProcessor.toString(),
+											"', input '" + metsFileGroup.getInput() + "', output '"
+													+ metsFileGroup.getOutput() + "', arguments '"
+													+ argumentsJsonSerialization + "'.");
 
 									final ProcessRequest processRequest = new ProcessRequest(key,
 											getProcessorIdentifier(), pathProcessor.toString(),
 											metsFileGroup.getInput(), metsFileGroup.getOutput(),
 											Arrays.asList("-p", argumentsJsonSerialization));
 
+									// start the job
 									JobResponse jobResponse;
 									try {
 										jobResponse = restClient.post().uri(executeRequestMapping)
@@ -587,18 +643,28 @@ public abstract class OCRDMsaServiceProviderWorker extends OCRDServiceProviderWo
 															+ "): " + response.getHeaders());
 												}).body(JobResponse.class);
 									} catch (Exception e) {
-										updatedStandardError("could not execute processor '" + getProcessorIdentifier()
-												+ "' - " + e.getMessage());
+										logTrouble("could not execute processor, key " + key + " - '" + e.getMessage());
 
 										return ProcessServiceProvider.Processor.State.interrupted;
 									}
 
+									final int jobId = jobResponse.getId();
+
+									logger.debug(
+											getProcessorIdentifier() + ": running job " + jobId + ", key " + key + ".");
+
+									// wait until the job is done
 									while (!jobResponse.getState().isDone()) {
 										thread = new Thread(() -> {
 											try {
+												logger.debug("thread wait: job " + jobId + ", key " + key + ".");
+
 												Thread.sleep(timeoutActiveProcessor);
+
+												logger.debug("thread timeout: job " + jobId + ", key " + key + ".");
 											} catch (InterruptedException e) {
-												// Nothing to do
+												logger.debug("thread interrupted by event: job " + jobId + ", key "
+														+ key + ".");
 											}
 										});
 
@@ -611,8 +677,9 @@ public abstract class OCRDMsaServiceProviderWorker extends OCRDServiceProviderWo
 											// Nothing to do
 										}
 
+										// restore the current job status
 										try {
-											jobResponse = restClient.get().uri(jobRequestMapping, jobResponse.getId())
+											jobResponse = restClient.get().uri(jobRequestMapping, jobId)
 													.accept(MediaType.APPLICATION_JSON).retrieve()
 													.onStatus(HttpStatusCode::is4xxClientError, (request, response) -> {
 														throw new ProviderException(
@@ -627,19 +694,21 @@ public abstract class OCRDMsaServiceProviderWorker extends OCRDServiceProviderWo
 																		+ response.getHeaders());
 													}).body(JobResponse.class);
 										} catch (Exception e) {
-											updatedStandardError("could not restore the job of the processor '"
-													+ getProcessorIdentifier() + "' - " + e.getMessage());
+											logTrouble("could not restore the job " + jobId + ", key " + key + " - "
+													+ e.getMessage());
 
 											return ProcessServiceProvider.Processor.State.interrupted;
 										}
 									}
 
+									// job is done, unregister event handler
 									unregisterEventHandler();
 
+									// restore the system job information
 									try {
 										SystemJobResponse systemJobResponse = restClient.get()
-												.uri(systemJobRequestMapping, jobResponse.getId())
-												.accept(MediaType.APPLICATION_JSON).retrieve()
+												.uri(systemJobRequestMapping, jobId).accept(MediaType.APPLICATION_JSON)
+												.retrieve()
 												.onStatus(HttpStatusCode::is4xxClientError, (request, response) -> {
 													throw new ProviderException("HTTP client error status "
 															+ response.getStatusCode() + " (" + response.getStatusText()
@@ -660,11 +729,10 @@ public abstract class OCRDMsaServiceProviderWorker extends OCRDServiceProviderWo
 
 										if (systemJobResponse.getExitValue() > 0)
 											updatedStandardError(
-													"System process exit code " + systemJobResponse.getExitValue());
+													"processor exit code: " + systemJobResponse.getExitValue());
 
 										try {
-											restClient.get().uri(expungeJobRequestMapping, jobResponse.getId())
-													.retrieve()
+											restClient.get().uri(expungeJobRequestMapping, jobId).retrieve()
 													.onStatus(HttpStatusCode::is4xxClientError, (request, response) -> {
 														throw new ProviderException(
 																"HTTP client error status " + response.getStatusCode()
@@ -678,33 +746,16 @@ public abstract class OCRDMsaServiceProviderWorker extends OCRDServiceProviderWo
 																		+ response.getHeaders());
 													}).toBodilessEntity();
 										} catch (Exception e) {
-											updatedStandardError("could not expunge the job of the processor '"
-													+ getProcessorIdentifier() + "' - " + e.getMessage());
+											logTrouble("could not expunge the job " + jobId + ", key " + key + " - "
+													+ e.getMessage());
 										}
 
-										switch (systemJobResponse.getState()) {
-										case canceled:
-											return ProcessServiceProvider.Processor.State.canceled;
-										case completed:
-											return ProcessServiceProvider.Processor.State.completed;
-										case interrupted:
-										default:
-											return ProcessServiceProvider.Processor.State.interrupted;
-										}
+										return map(systemJobResponse.getState());
 									} catch (Exception e) {
-										updatedStandardError("could not restore the system job of the processor '"
-												+ getProcessorIdentifier() + "' - " + e.getMessage());
+										logTrouble("could not restore system information of the job " + jobId + ", key "
+												+ key + " - " + e.getMessage());
 
-										switch (jobResponse.getState()) {
-										case canceled:
-											return ProcessServiceProvider.Processor.State.canceled;
-										case completed:
-											return ProcessServiceProvider.Processor.State.completed;
-										case interrupted:
-										default:
-											return ProcessServiceProvider.Processor.State.interrupted;
-										}
-
+										return map(jobResponse.getState());
 									}
 								});
 					}
