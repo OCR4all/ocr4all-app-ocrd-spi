@@ -1,24 +1,24 @@
 /**
- * File:     MsaCISOcropyBinarize.java
- * Package:  de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.msa.preprocessing
+ * File:     MsaEynollahSegment.java
+ * Package:  de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.msa.olr
  * 
  * Author:   Herbert Baier (herbert.baier@uni-wuerzburg.de)
- * Date:     08.04.2024
+ * Date:     09.04.2024
  */
-package de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.msa.preprocessing;
+package de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.msa.olr;
 
 import de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.msa.OCRDMsaServiceProviderWorker;
-import de.uniwuerzburg.zpd.ocr4all.application.spi.PreprocessingServiceProvider;
+import de.uniwuerzburg.zpd.ocr4all.application.spi.OpticalLayoutRecognitionServiceProvider;
 import de.uniwuerzburg.zpd.ocr4all.application.spi.env.ConfigurationServiceProvider;
 
 /**
  * Defines service providers for the ocr-d microservice architecture (MSA) of
- * the cis ocropy binarize processor. The following properties of the service
+ * the eynollah segment processor. The following properties of the service
  * provider collection <b>ocr-d</b> override the local default settings
  * (<b>key</b>: <i>default value</i>):
  * <ul>
- * <li>msa-cis-ocropy-binarize-id: ocrd-cis-ocropy-binarize</li>
- * <li>msa-cis-ocropy-binarize-description: ocr-d cis ocropy binarize processor
+ * <li>msa-eynollah-segment-id: ocrd-eynollah-segment</li>
+ * <li>msa-eynollah-segment-description: ocr-d eynollah segment processor
  * <li>see {@link OCRDMsaServiceProviderWorker} for remainder settings</li></li>
  * </ul>
  *
@@ -26,7 +26,8 @@ import de.uniwuerzburg.zpd.ocr4all.application.spi.env.ConfigurationServiceProvi
  * @version 1.0
  * @since 17
  */
-public class MsaCISOcropyBinarize extends OCRDMsaServiceProviderWorker implements PreprocessingServiceProvider {
+public class MsaEynollahSegment extends OCRDMsaServiceProviderWorker
+		implements OpticalLayoutRecognitionServiceProvider {
 	/**
 	 * Defines service provider collection with keys and default values. Collection
 	 * blank values are not allowed and their values are trimmed.
@@ -36,8 +37,8 @@ public class MsaCISOcropyBinarize extends OCRDMsaServiceProviderWorker implement
 	 * @since 1.8
 	 */
 	private enum ServiceProviderCollection implements ConfigurationServiceProvider.CollectionKey {
-		processorIdentifier("msa-cis-ocropy-binarize-id", "ocrd-cis-ocropy-binarize"),
-		processorDescription("msa-cis-ocropy-binarize-description", "ocr-d cis ocropy binarize processor");
+		processorIdentifier("msa-eynollah-segment-id", "ocrd-eynollah-segment"),
+		processorDescription("msa-eynollah-segment-description", "ocr-d eynollah segment processor");
 
 		/**
 		 * The key.
@@ -100,12 +101,12 @@ public class MsaCISOcropyBinarize extends OCRDMsaServiceProviderWorker implement
 
 	/**
 	 * Default constructor for a service providers for the ocr-d microservice
-	 * architecture (MSA) of the cis ocropy binarize processor.
+	 * architecture (MSA) of the eynollah segment processor.
 	 * 
 	 * @since 17
 	 */
-	public MsaCISOcropyBinarize() {
-		super(MsaCISOcropyBinarize.class);
+	public MsaEynollahSegment() {
+		super(MsaEynollahSegment.class);
 	}
 
 	/*
@@ -149,7 +150,7 @@ public class MsaCISOcropyBinarize extends OCRDMsaServiceProviderWorker implement
 	 */
 	@Override
 	public int getIndex() {
-		return 1000;
+		return 2200;
 	}
 
 }

@@ -1,5 +1,11 @@
 # msa processors
 de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.msa.preprocessing.MsaCISOcropyBinarize
+de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.msa.preprocessing.MsaCISOcropyDenoise
+de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.msa.preprocessing.MsaCISOcropyDeskew
+de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.msa.preprocessing.MsaTesserocrBinarize
+de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.msa.preprocessing.MsaTesserocrCrop
+de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.msa.preprocessing.MsaTesserocrDeskew
+de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.msa.preprocessing.MsaOlenaBinarize
 # docker json processors
 #de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.docker.preprocessing.provider.json.JsonCISOcropyDeskew
 #de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.docker.preprocessing.provider.json.JsonCISOcropyBinarize

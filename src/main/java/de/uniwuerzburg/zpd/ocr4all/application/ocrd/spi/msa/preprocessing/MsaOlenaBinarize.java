@@ -1,9 +1,9 @@
 /**
- * File:     MsaCISOcropyBinarize.java
+ * File:     MsaOlenaBinarize.java
  * Package:  de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.msa.preprocessing
  * 
  * Author:   Herbert Baier (herbert.baier@uni-wuerzburg.de)
- * Date:     08.04.2024
+ * Date:     09.04.2024
  */
 package de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.msa.preprocessing;
 
@@ -13,12 +13,12 @@ import de.uniwuerzburg.zpd.ocr4all.application.spi.env.ConfigurationServiceProvi
 
 /**
  * Defines service providers for the ocr-d microservice architecture (MSA) of
- * the cis ocropy binarize processor. The following properties of the service
+ * the Olena/SCRIBO binarize processor. The following properties of the service
  * provider collection <b>ocr-d</b> override the local default settings
  * (<b>key</b>: <i>default value</i>):
  * <ul>
- * <li>msa-cis-ocropy-binarize-id: ocrd-cis-ocropy-binarize</li>
- * <li>msa-cis-ocropy-binarize-description: ocr-d cis ocropy binarize processor
+ * <li>msa-olena-binarize-id: ocrd-olena-binarize</li>
+ * <li>msa-olena-binarize-description: ocr-d Olena/SCRIBO binarize processor
  * <li>see {@link OCRDMsaServiceProviderWorker} for remainder settings</li></li>
  * </ul>
  *
@@ -26,7 +26,7 @@ import de.uniwuerzburg.zpd.ocr4all.application.spi.env.ConfigurationServiceProvi
  * @version 1.0
  * @since 17
  */
-public class MsaCISOcropyBinarize extends OCRDMsaServiceProviderWorker implements PreprocessingServiceProvider {
+public class MsaOlenaBinarize extends OCRDMsaServiceProviderWorker implements PreprocessingServiceProvider {
 	/**
 	 * Defines service provider collection with keys and default values. Collection
 	 * blank values are not allowed and their values are trimmed.
@@ -36,8 +36,8 @@ public class MsaCISOcropyBinarize extends OCRDMsaServiceProviderWorker implement
 	 * @since 1.8
 	 */
 	private enum ServiceProviderCollection implements ConfigurationServiceProvider.CollectionKey {
-		processorIdentifier("msa-cis-ocropy-binarize-id", "ocrd-cis-ocropy-binarize"),
-		processorDescription("msa-cis-ocropy-binarize-description", "ocr-d cis ocropy binarize processor");
+		processorIdentifier("msa-olena-binarize-id", "ocrd-olena-binarize"),
+		processorDescription("msa-olena-binarize-description", "ocr-d Olena/SCRIBO binarize processor");
 
 		/**
 		 * The key.
@@ -100,12 +100,12 @@ public class MsaCISOcropyBinarize extends OCRDMsaServiceProviderWorker implement
 
 	/**
 	 * Default constructor for a service providers for the ocr-d microservice
-	 * architecture (MSA) of the cis ocropy binarize processor.
+	 * architecture (MSA) of the Olena/SCRIBO binarize processor.
 	 * 
 	 * @since 17
 	 */
-	public MsaCISOcropyBinarize() {
-		super(MsaCISOcropyBinarize.class);
+	public MsaOlenaBinarize() {
+		super(MsaOlenaBinarize.class);
 	}
 
 	/*
@@ -149,7 +149,7 @@ public class MsaCISOcropyBinarize extends OCRDMsaServiceProviderWorker implement
 	 */
 	@Override
 	public int getIndex() {
-		return 1000;
+		return 1200;
 	}
 
 }
