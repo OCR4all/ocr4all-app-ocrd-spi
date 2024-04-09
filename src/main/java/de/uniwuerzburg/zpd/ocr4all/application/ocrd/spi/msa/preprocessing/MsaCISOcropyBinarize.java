@@ -7,7 +7,6 @@
  */
 package de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.msa.preprocessing;
 
-import de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.docker.OCRDDockerJsonServiceProviderWorker;
 import de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.msa.OCRDMsaServiceProviderWorker;
 import de.uniwuerzburg.zpd.ocr4all.application.spi.PreprocessingServiceProvider;
 import de.uniwuerzburg.zpd.ocr4all.application.spi.env.ConfigurationServiceProvider;
@@ -20,8 +19,7 @@ import de.uniwuerzburg.zpd.ocr4all.application.spi.env.ConfigurationServiceProvi
  * <ul>
  * <li>msa-cis-ocropy-binarize-id: ocrd-cis-ocropy-binarize</li>
  * <li>msa-cis-ocropy-binarize-description: ocr-d cis ocropy binarize processor
- * <li>see {@link OCRDDockerJsonServiceProviderWorker} for remainder
- * settings</li></li>
+ * <li>see {@link OCRDMsaServiceProviderWorker} for remainder settings</li></li>
  * </ul>
  *
  * @author <a href="mailto:herbert.baier@uni-wuerzburg.de">Herbert Baier</a>

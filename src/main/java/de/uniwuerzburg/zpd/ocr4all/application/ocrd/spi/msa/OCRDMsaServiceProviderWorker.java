@@ -258,9 +258,8 @@ public abstract class OCRDMsaServiceProviderWorker extends OCRDServiceProviderWo
 		if (host == null)
 			throw new ProviderException("unknown host configuration for msa id " + hostId + ".");
 
-		restClient = RestClient.builder().baseUrl(
-				configuration.getValue(ServiceProviderCollection.applicationLayerProtocol) + "://" + host.getUrl())
-				.build();
+		restClient = RestClient.create(
+				configuration.getValue(ServiceProviderCollection.applicationLayerProtocol) + "://" + host.getUrl());
 
 		try {
 			providerDescription = new ProviderDescription(restClient.get()
