@@ -19,8 +19,8 @@ import de.uniwuerzburg.zpd.ocr4all.application.spi.env.ConfigurationServiceProvi
  * <ul>
  * <li>msa-fileformat-transform-id: ocrd-fileformat-transform</li>
  * <li>msa-fileformat-transform-description: ocr-d file format transform
- * processor
- * <li>see {@link OCRDMsaServiceProviderWorker} for remainder settings</li></li>
+ * processor</li>
+ * <li>see {@link OCRDMsaServiceProviderWorker} for remainder settings</li>
  * </ul>
  *
  * @author <a href="mailto:herbert.baier@uni-wuerzburg.de">Herbert Baier</a>

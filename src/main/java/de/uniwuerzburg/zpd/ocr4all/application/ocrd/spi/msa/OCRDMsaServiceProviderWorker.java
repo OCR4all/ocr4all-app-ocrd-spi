@@ -201,6 +201,7 @@ public abstract class OCRDMsaServiceProviderWorker extends OCRDServiceProviderWo
 	 * Default constructor for an ocr-d microservice architecture (MSA) service
 	 * provider worker.
 	 * 
+	 * @param logger The logger class.
 	 * @since 17
 	 */
 	public OCRDMsaServiceProviderWorker(Class<?> logger) {

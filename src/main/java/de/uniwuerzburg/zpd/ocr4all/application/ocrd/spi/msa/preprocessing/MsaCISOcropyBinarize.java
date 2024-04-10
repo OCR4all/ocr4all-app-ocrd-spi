@@ -18,8 +18,8 @@ import de.uniwuerzburg.zpd.ocr4all.application.spi.env.ConfigurationServiceProvi
  * (<b>key</b>: <i>default value</i>):
  * <ul>
  * <li>msa-cis-ocropy-binarize-id: ocrd-cis-ocropy-binarize</li>
- * <li>msa-cis-ocropy-binarize-description: ocr-d cis ocropy binarize processor
- * <li>see {@link OCRDMsaServiceProviderWorker} for remainder settings</li></li>
+ * <li>msa-cis-ocropy-binarize-description: ocr-d cis ocropy binarize processor</li>
+ * <li>see {@link OCRDMsaServiceProviderWorker} for remainder settings</li>
  * </ul>
  *
  * @author <a href="mailto:herbert.baier@uni-wuerzburg.de">Herbert Baier</a>

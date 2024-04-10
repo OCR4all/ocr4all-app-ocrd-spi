@@ -18,8 +18,8 @@ import de.uniwuerzburg.zpd.ocr4all.application.spi.env.ConfigurationServiceProvi
  * (<b>key</b>: <i>default value</i>):
  * <ul>
  * <li>msa-cis-ocropy-deskew-id: ocrd-cis-ocropy-deskew</li>
- * <li>msa-cis-ocropy-deskew-description: ocr-d cis ocropy deskew processor
- * <li>see {@link OCRDMsaServiceProviderWorker} for remainder settings</li></li>
+ * <li>msa-cis-ocropy-deskew-description: ocr-d cis ocropy deskew processor</li>
+ * <li>see {@link OCRDMsaServiceProviderWorker} for remainder settings</li>
  * </ul>
  *
  * @author <a href="mailto:herbert.baier@uni-wuerzburg.de">Herbert Baier</a>

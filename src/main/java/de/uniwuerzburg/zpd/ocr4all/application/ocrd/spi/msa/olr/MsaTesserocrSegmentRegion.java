@@ -13,14 +13,14 @@ import de.uniwuerzburg.zpd.ocr4all.application.spi.env.ConfigurationServiceProvi
 
 /**
  * Defines service providers for the ocr-d microservice architecture (MSA) of
- * the Tesserocr segment region processor. The following properties of the service
- * provider collection <b>ocr-d</b> override the local default settings
+ * the Tesserocr segment region processor. The following properties of the
+ * service provider collection <b>ocr-d</b> override the local default settings
  * (<b>key</b>: <i>default value</i>):
  * <ul>
  * <li>msa-tesserocr-segment-region-id: ocrd-tesserocr-segment-region</li>
  * <li>msa-tesserocr-segment-region-description: ocr-d Tesserocr segment region
- * processor
- * <li>see {@link OCRDMsaServiceProviderWorker} for remainder settings</li></li>
+ * processor</li>
+ * <li>see {@link OCRDMsaServiceProviderWorker} for remainder settings</li>
  * </ul>
  *
  * @author <a href="mailto:herbert.baier@uni-wuerzburg.de">Herbert Baier</a>

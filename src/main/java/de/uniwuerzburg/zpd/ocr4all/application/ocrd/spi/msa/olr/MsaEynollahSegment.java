@@ -7,6 +7,7 @@
  */
 package de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.msa.olr;
 
+import de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.msa.OCRDMsaServiceProviderModelWorker;
 import de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.msa.OCRDMsaServiceProviderWorker;
 import de.uniwuerzburg.zpd.ocr4all.application.spi.OpticalLayoutRecognitionServiceProvider;
 import de.uniwuerzburg.zpd.ocr4all.application.spi.env.ConfigurationServiceProvider;
@@ -18,16 +19,21 @@ import de.uniwuerzburg.zpd.ocr4all.application.spi.env.ConfigurationServiceProvi
  * (<b>key</b>: <i>default value</i>):
  * <ul>
  * <li>msa-eynollah-segment-id: ocrd-eynollah-segment</li>
- * <li>msa-eynollah-segment-description: ocr-d eynollah segment processor
- * <li>see {@link OCRDMsaServiceProviderWorker} for remainder settings</li></li>
+ * <li>msa-eynollah-segment-description: ocr-d eynollah segment processor</li>
+ * <li>see {@link OCRDMsaServiceProviderWorker} for remainder settings</li>
  * </ul>
  *
  * @author <a href="mailto:herbert.baier@uni-wuerzburg.de">Herbert Baier</a>
  * @version 1.0
  * @since 17
  */
-public class MsaEynollahSegment extends OCRDMsaServiceProviderWorker
+public class MsaEynollahSegment extends OCRDMsaServiceProviderModelWorker
 		implements OpticalLayoutRecognitionServiceProvider {
+	/**
+	 * The model argument.
+	 */
+	private static final String modelArgument = "models";
+
 	/**
 	 * Defines service provider collection with keys and default values. Collection
 	 * blank values are not allowed and their values are trimmed.
@@ -106,7 +112,7 @@ public class MsaEynollahSegment extends OCRDMsaServiceProviderWorker
 	 * @since 17
 	 */
 	public MsaEynollahSegment() {
-		super(MsaEynollahSegment.class);
+		super(MsaEynollahSegment.class, modelArgument);
 	}
 
 	/*

@@ -1,25 +1,27 @@
 /**
- * File:     MsaTesserocrSegmentLine.java
- * Package:  de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.msa.olr
+ * File:     MsaCalamariRecognize.java
+ * Package:  de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.msa.ocr
  * 
  * Author:   Herbert Baier (herbert.baier@uni-wuerzburg.de)
- * Date:     09.04.2024
+ * Date:     10.04.2024
  */
-package de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.msa.olr;
+package de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.msa.ocr;
 
+import de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.msa.OCRDMsaServiceProviderModelWorker;
 import de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.msa.OCRDMsaServiceProviderWorker;
-import de.uniwuerzburg.zpd.ocr4all.application.spi.OpticalLayoutRecognitionServiceProvider;
+import de.uniwuerzburg.zpd.ocr4all.application.spi.OpticalCharacterRecognitionServiceProvider;
 import de.uniwuerzburg.zpd.ocr4all.application.spi.env.ConfigurationServiceProvider;
 
 /**
  * Defines service providers for the ocr-d microservice architecture (MSA) of
- * the Tesserocr segment line processor. The following properties of the service
+ * the Calamari recognize processor. The following properties of the service
  * provider collection <b>ocr-d</b> override the local default settings
  * (<b>key</b>: <i>default value</i>):
  * <ul>
- * <li>msa-tesserocr-segment-line-id: ocrd-tesserocr-segment-line</li>
- * <li>msa-tesserocr-segment-line-description: ocr-d Tesserocr segment line
+ * <li>msa-calamari-recognize-id: ocrd-calamari-recognize</li>
+ * <li>msa-calamari-recognize-description: ocr-d Calamari recognize
  * processor</li>
+ * <li>msa-calamari-recognize-default-model: «null»</li>
  * <li>see {@link OCRDMsaServiceProviderWorker} for remainder settings</li>
  * </ul>
  *
@@ -27,8 +29,13 @@ import de.uniwuerzburg.zpd.ocr4all.application.spi.env.ConfigurationServiceProvi
  * @version 1.0
  * @since 17
  */
-public class MsaTesserocrSegmentLine extends OCRDMsaServiceProviderWorker
-		implements OpticalLayoutRecognitionServiceProvider {
+public class MsaCalamariRecognize extends OCRDMsaServiceProviderModelWorker
+		implements OpticalCharacterRecognitionServiceProvider {
+	/**
+	 * The model argument.
+	 */
+	private static final String modelArgument = "checkpoint_dir";
+
 	/**
 	 * Defines service provider collection with keys and default values. Collection
 	 * blank values are not allowed and their values are trimmed.
@@ -38,8 +45,9 @@ public class MsaTesserocrSegmentLine extends OCRDMsaServiceProviderWorker
 	 * @since 1.8
 	 */
 	private enum ServiceProviderCollection implements ConfigurationServiceProvider.CollectionKey {
-		processorIdentifier("msa-tesserocr-segment-line-id", "ocrd-tesserocr-segment-line"),
-		processorDescription("msa-tesserocr-segment-line-description", "ocr-d Tesserocr segment line processor");
+		processorIdentifier("msa-calamari-recognize-id", "ocrd-calamari-recognize"),
+		processorDescription("msa-calamari-recognize-description", "ocr-d Calamari recognize processor"),
+		defaultModel("msa-calamari-recognize-default-model", null);
 
 		/**
 		 * The key.
@@ -102,12 +110,12 @@ public class MsaTesserocrSegmentLine extends OCRDMsaServiceProviderWorker
 
 	/**
 	 * Default constructor for a service providers for the ocr-d microservice
-	 * architecture (MSA) of the Tesserocr segment line processor.
+	 * architecture (MSA) of the Calamari recognize processor.
 	 * 
 	 * @since 17
 	 */
-	public MsaTesserocrSegmentLine() {
-		super(MsaTesserocrSegmentLine.class);
+	public MsaCalamariRecognize() {
+		super(MsaCalamariRecognize.class, modelArgument);
 	}
 
 	/*
@@ -135,6 +143,17 @@ public class MsaTesserocrSegmentLine extends OCRDMsaServiceProviderWorker
 	/*
 	 * (non-Javadoc)
 	 * 
+	 * @see de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.msa.
+	 * OCRDMsaServiceProviderModelWorker#getDefaultModel()
+	 */
+	@Override
+	protected ConfigurationServiceProvider.CollectionKey getDefaultModel() {
+		return ServiceProviderCollection.defaultModel;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see
 	 * de.uniwuerzburg.zpd.ocr4all.application.spi.core.ServiceProvider#getVersion()
 	 */
@@ -151,7 +170,7 @@ public class MsaTesserocrSegmentLine extends OCRDMsaServiceProviderWorker
 	 */
 	@Override
 	public int getIndex() {
-		return 2210;
+		return 3000;
 	}
 
 }

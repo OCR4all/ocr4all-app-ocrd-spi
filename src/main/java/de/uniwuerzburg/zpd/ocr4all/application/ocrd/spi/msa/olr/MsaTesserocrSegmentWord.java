@@ -19,8 +19,8 @@ import de.uniwuerzburg.zpd.ocr4all.application.spi.env.ConfigurationServiceProvi
  * <ul>
  * <li>msa-tesserocr-segment-word-id: ocrd-tesserocr-segment-word</li>
  * <li>msa-tesserocr-segment-word-description: ocr-d Tesserocr segment word
- * processor
- * <li>see {@link OCRDMsaServiceProviderWorker} for remainder settings</li></li>
+ * processor</li>
+ * <li>see {@link OCRDMsaServiceProviderWorker} for remainder settings</li>
  * </ul>
  *
  * @author <a href="mailto:herbert.baier@uni-wuerzburg.de">Herbert Baier</a>
