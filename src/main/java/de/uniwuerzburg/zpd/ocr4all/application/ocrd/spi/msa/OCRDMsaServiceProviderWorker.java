@@ -512,16 +512,18 @@ public abstract class OCRDMsaServiceProviderWorker extends OCRDServiceProviderWo
 					 * Maps the msa job state to the execution process state and returns it. The msa
 					 * job has to be done.
 					 * 
-					 * @param state The msa job state.
+					 * @param isSystemJobResponse True if it is a system job response.
+					 * @param state               The msa job state.
 					 * @return The state of the execution of the process.
 					 * @since 17
 					 */
-					private State map(de.uniwuerzburg.zpd.ocr4all.application.communication.msa.job.State state) {
+					private State map(boolean isSystemJobResponse,
+							de.uniwuerzburg.zpd.ocr4all.application.communication.msa.job.State state) {
 						switch (state) {
 						case canceled:
 							return ProcessServiceProvider.Processor.State.canceled;
 						case completed:
-							return ProcessServiceProvider.Processor.State.completed;
+							return isSystemJobResponse ? null : ProcessServiceProvider.Processor.State.completed;
 						case interrupted:
 						default:
 							return ProcessServiceProvider.Processor.State.interrupted;
@@ -750,12 +752,12 @@ public abstract class OCRDMsaServiceProviderWorker extends OCRDServiceProviderWo
 													+ e.getMessage());
 										}
 
-										return map(systemJobResponse.getState());
+										return map(true, systemJobResponse.getState());
 									} catch (Exception e) {
 										logTrouble("could not restore system information of the job " + jobId + ", key "
 												+ key + " - " + e.getMessage());
 
-										return map(jobResponse.getState());
+										return map(false, jobResponse.getState());
 									}
 								});
 					}
