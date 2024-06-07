@@ -589,7 +589,8 @@ public abstract class OCRDServiceProviderWorker extends ServiceProviderCore {
 		 * @param metsFileGroup              The mets file groups for framework.
 		 * @param argumentsJsonSerialization The json serialization of the processor
 		 *                                   arguments as a String.
-		 * @return The processor execution state.
+		 * @return Null if the process executed successfully without any errors.
+		 *         Otherwise, the processor trouble execution state.
 		 * @since 17
 		 */
 		public ProcessServiceProvider.Processor.State execute(MetsUtils.FrameworkFileGroup metsFileGroup,
