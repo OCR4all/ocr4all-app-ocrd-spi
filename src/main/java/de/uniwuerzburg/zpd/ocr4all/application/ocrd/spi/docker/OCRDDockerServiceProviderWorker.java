@@ -23,12 +23,12 @@ import java.util.Set;
 import com.fasterxml.jackson.core.JsonProcessingException;
 
 import de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.core.OCRDServiceProviderWorker;
-import de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.util.OCRDUtils;
 import de.uniwuerzburg.zpd.ocr4all.application.spi.core.ProcessServiceProvider;
 import de.uniwuerzburg.zpd.ocr4all.application.spi.env.ConfigurationServiceProvider;
 import de.uniwuerzburg.zpd.ocr4all.application.spi.env.Framework;
 import de.uniwuerzburg.zpd.ocr4all.application.spi.env.SystemCommand;
 import de.uniwuerzburg.zpd.ocr4all.application.spi.util.MetsUtils;
+import de.uniwuerzburg.zpd.ocr4all.application.spi.util.SPIUtils;
 import de.uniwuerzburg.zpd.ocr4all.application.spi.util.SystemProcess;
 
 /**
@@ -463,7 +463,7 @@ public abstract class OCRDDockerServiceProviderWorker extends OCRDServiceProvide
 
 		return run(framework, arguments, runningState, execution, standardOutput, standardError, progress, baseProgress,
 				(metsFileGroup, argumentsJsonSerialization) -> {
-					String dockerName = "ocr4all-" + OCRDUtils.getUUID();
+					String dockerName = "ocr4all-" + SPIUtils.getUUID();
 
 					List<String> processorArguments;
 

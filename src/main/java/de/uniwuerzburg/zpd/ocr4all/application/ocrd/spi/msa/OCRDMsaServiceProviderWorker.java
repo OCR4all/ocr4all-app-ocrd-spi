@@ -29,6 +29,7 @@ import de.uniwuerzburg.zpd.ocr4all.application.ocrd.communication.api.ProcessReq
 import de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.core.OCRDServiceProviderWorker;
 import de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.util.ProviderDescription;
 import de.uniwuerzburg.zpd.ocr4all.application.spi.core.CoreProcessorServiceProvider;
+import de.uniwuerzburg.zpd.ocr4all.application.spi.core.MsaProcessorServiceProvider;
 import de.uniwuerzburg.zpd.ocr4all.application.spi.core.ProcessServiceProvider;
 import de.uniwuerzburg.zpd.ocr4all.application.spi.env.ConfigurationServiceProvider;
 import de.uniwuerzburg.zpd.ocr4all.application.spi.env.Framework;
@@ -491,7 +492,7 @@ public abstract class OCRDMsaServiceProviderWorker extends OCRDServiceProviderWo
 	@Override
 	public Processor newProcessor() {
 		return providerDescription == null || !providerDescription.isModelFactorySet() ? null
-				: new OCRDMsaProcessorServiceProvider(microserviceArchitecture.getEventController()) {
+				: new MsaProcessorServiceProvider(microserviceArchitecture.getEventController()) {
 					/**
 					 * The timeout thread.
 					 */
