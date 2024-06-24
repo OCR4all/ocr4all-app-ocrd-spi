@@ -52,7 +52,8 @@ import de.uniwuerzburg.zpd.ocr4all.application.spi.model.argument.StringArgument
  * @version 1.0
  * @since 1.8
  */
-public class CalamariRecognize extends OCRDDockerServiceProviderWorker implements OpticalCharacterRecognitionServiceProvider {
+public class CalamariRecognize extends OCRDDockerServiceProviderWorker
+		implements OpticalCharacterRecognitionServiceProvider {
 	/**
 	 * The prefix of the message keys in the resource bundle.
 	 */
@@ -231,9 +232,8 @@ public class CalamariRecognize extends OCRDDockerServiceProviderWorker implement
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.docker.OCRDDockerServiceProviderWorker#
-	 * processorIdentifier()
+	 * @see de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.docker.
+	 * OCRDDockerServiceProviderWorker# processorIdentifier()
 	 */
 	@Override
 	protected ConfigurationServiceProvider.CollectionKey processorIdentifier() {
@@ -243,9 +243,8 @@ public class CalamariRecognize extends OCRDDockerServiceProviderWorker implement
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.docker.OCRDDockerServiceProviderWorker#
-	 * processorDescription()
+	 * @see de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.docker.
+	 * OCRDDockerServiceProviderWorker# processorDescription()
 	 */
 	@Override
 	protected ConfigurationServiceProvider.CollectionKey processorDescription() {
@@ -419,7 +418,7 @@ public class CalamariRecognize extends OCRDDockerServiceProviderWorker implement
 	 * newProcessor()
 	 */
 	@Override
-	public ProcessServiceProvider.Processor newProcessor() {
+	public ProcessServiceProvider.Processor<Framework> newProcessor() {
 		return new OCRDDockerProcessorServiceProvider() {
 			/*
 			 * (non-Javadoc)

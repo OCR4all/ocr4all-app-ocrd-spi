@@ -378,7 +378,7 @@ public abstract class OCRDDockerJsonServiceProviderWorker extends OCRDDockerServ
 	 * newProcessor()
 	 */
 	@Override
-	public Processor newProcessor() {
+	public Processor<Framework> newProcessor() {
 		return providerDescription == null || !providerDescription.isModelFactorySet() ? null
 				: new OCRDDockerProcessorServiceProvider() {
 					/*

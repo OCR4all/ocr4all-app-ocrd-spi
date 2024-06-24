@@ -490,7 +490,7 @@ public abstract class OCRDMsaServiceProviderWorker extends OCRDServiceProviderWo
 	 * newProcessor()
 	 */
 	@Override
-	public Processor newProcessor() {
+	public Processor<Framework> newProcessor() {
 		return providerDescription == null || !providerDescription.isModelFactorySet() ? null
 				: new MsaProcessorServiceProvider(microserviceArchitecture.getEventController()) {
 					/**
