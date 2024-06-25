@@ -19,7 +19,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.util.ProviderDescription;
 import de.uniwuerzburg.zpd.ocr4all.application.spi.core.CoreProcessorServiceProvider;
-import de.uniwuerzburg.zpd.ocr4all.application.spi.core.ProcessServiceProvider;
+import de.uniwuerzburg.zpd.ocr4all.application.spi.core.ProcessorServiceProvider;
 import de.uniwuerzburg.zpd.ocr4all.application.spi.env.ConfigurationServiceProvider;
 import de.uniwuerzburg.zpd.ocr4all.application.spi.env.ProcessFramework;
 import de.uniwuerzburg.zpd.ocr4all.application.spi.env.Premise;
@@ -45,7 +45,7 @@ import de.uniwuerzburg.zpd.ocr4all.application.spi.util.SystemProcess;
  * @since 1.8
  */
 public abstract class OCRDDockerJsonServiceProviderWorker extends OCRDDockerServiceProviderWorker
-		implements ProcessServiceProvider {
+		implements ProcessorServiceProvider<ProcessFramework> {
 	/**
 	 * Defines service provider collection with keys and default values. Collection
 	 * blank values are not allowed and their values are trimmed.
@@ -384,8 +384,8 @@ public abstract class OCRDDockerJsonServiceProviderWorker extends OCRDDockerServ
 					/*
 					 * (non-Javadoc)
 					 * 
-					 * @see
-					 * de.uniwuerzburg.zpd.ocr4all.application.spi.ProcessServiceProvider.Processor#
+					 * @see de.uniwuerzburg.zpd.ocr4all.application.spi.ProcessorServiceProvider.
+					 * Processor#
 					 * execute(de.uniwuerzburg.zpd.ocr4all.application.spi.ProcessServiceProvider.
 					 * Processor.Callback, de.uniwuerzburg.zpd.ocr4all.application.spi.Framework,
 					 * de.uniwuerzburg.zpd.ocr4all.application.spi.model.argument.ModelArgument)
@@ -393,7 +393,7 @@ public abstract class OCRDDockerJsonServiceProviderWorker extends OCRDDockerServ
 					@Override
 					public State execute(Callback callback, ProcessFramework framework, ModelArgument modelArgument) {
 						if (!initialize(getProcessorIdentifier(), callback, framework))
-							return ProcessServiceProvider.Processor.State.canceled;
+							return ProcessorServiceProvider.Processor.State.canceled;
 
 						ObjectNode arguments;
 						try {
@@ -409,7 +409,7 @@ public abstract class OCRDDockerJsonServiceProviderWorker extends OCRDDockerServ
 						} catch (Exception e) {
 							updatedStandardError(e.getMessage());
 
-							return ProcessServiceProvider.Processor.State.interrupted;
+							return ProcessorServiceProvider.Processor.State.interrupted;
 						}
 
 						/*

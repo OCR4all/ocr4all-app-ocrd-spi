@@ -19,10 +19,10 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.docker.OCRDDockerProcessorServiceProvider;
 import de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.docker.OCRDDockerServiceProviderWorker;
 import de.uniwuerzburg.zpd.ocr4all.application.spi.OpticalLayoutRecognitionServiceProvider;
-import de.uniwuerzburg.zpd.ocr4all.application.spi.core.ProcessServiceProvider;
+import de.uniwuerzburg.zpd.ocr4all.application.spi.core.ProcessorServiceProvider;
 import de.uniwuerzburg.zpd.ocr4all.application.spi.env.ConfigurationServiceProvider;
-import de.uniwuerzburg.zpd.ocr4all.application.spi.env.ProcessFramework;
 import de.uniwuerzburg.zpd.ocr4all.application.spi.env.Premise;
+import de.uniwuerzburg.zpd.ocr4all.application.spi.env.ProcessFramework;
 import de.uniwuerzburg.zpd.ocr4all.application.spi.env.SystemCommand;
 import de.uniwuerzburg.zpd.ocr4all.application.spi.env.Target;
 import de.uniwuerzburg.zpd.ocr4all.application.spi.model.BooleanField;
@@ -326,14 +326,14 @@ public class TesserocrSegmentLine extends OCRDDockerServiceProviderWorker
 	 * newProcessor()
 	 */
 	@Override
-	public ProcessServiceProvider.Processor<ProcessFramework> newProcessor() {
+	public ProcessorServiceProvider.Processor<ProcessFramework> newProcessor() {
 
 		return new OCRDDockerProcessorServiceProvider() {
 			/*
 			 * (non-Javadoc)
 			 * 
-			 * @see
-			 * de.uniwuerzburg.zpd.ocr4all.application.spi.ProcessServiceProvider.Processor#
+			 * @see de.uniwuerzburg.zpd.ocr4all.application.spi.ProcessorServiceProvider.
+			 * Processor#
 			 * execute(de.uniwuerzburg.zpd.ocr4all.application.spi.ProcessServiceProvider.
 			 * Processor.Callback, de.uniwuerzburg.zpd.ocr4all.application.spi.Framework,
 			 * de.uniwuerzburg.zpd.ocr4all.application.spi.model.argument.ModelArgument)
@@ -341,7 +341,7 @@ public class TesserocrSegmentLine extends OCRDDockerServiceProviderWorker
 			@Override
 			public State execute(Callback callback, ProcessFramework framework, ModelArgument modelArgument) {
 				if (!initialize(getProcessorIdentifier(), callback, framework))
-					return ProcessServiceProvider.Processor.State.canceled;
+					return ProcessorServiceProvider.Processor.State.canceled;
 
 				/*
 				 * Available arguments
@@ -368,7 +368,7 @@ public class TesserocrSegmentLine extends OCRDDockerServiceProviderWorker
 					} catch (ClassCastException e) {
 						updatedStandardError("The argument '" + Field.dpi.getName() + "' is not of integer type.");
 
-						return ProcessServiceProvider.Processor.State.interrupted;
+						return ProcessorServiceProvider.Processor.State.interrupted;
 					}
 
 				/*
@@ -385,7 +385,7 @@ public class TesserocrSegmentLine extends OCRDDockerServiceProviderWorker
 						updatedStandardError(
 								"The argument '" + Field.overwriteLines.getName() + "' is not of boolean type.");
 
-						return ProcessServiceProvider.Processor.State.interrupted;
+						return ProcessorServiceProvider.Processor.State.interrupted;
 					}
 
 				/*
@@ -403,13 +403,13 @@ public class TesserocrSegmentLine extends OCRDDockerServiceProviderWorker
 								updatedStandardError("The padding value " + processorArgument.getPadding()
 										+ " can not be negative.");
 
-								return ProcessServiceProvider.Processor.State.interrupted;
+								return ProcessorServiceProvider.Processor.State.interrupted;
 							}
 						}
 					} catch (ClassCastException e) {
 						updatedStandardError("The argument '" + Field.padding.getName() + "' is not of integer type.");
 
-						return ProcessServiceProvider.Processor.State.interrupted;
+						return ProcessorServiceProvider.Processor.State.interrupted;
 					}
 
 				/*
@@ -426,7 +426,7 @@ public class TesserocrSegmentLine extends OCRDDockerServiceProviderWorker
 						updatedStandardError(
 								"The argument '" + Field.shrinkPolygons.getName() + "' is not of boolean type.");
 
-						return ProcessServiceProvider.Processor.State.interrupted;
+						return ProcessorServiceProvider.Processor.State.interrupted;
 					}
 
 				/*

@@ -23,7 +23,7 @@ import java.util.Set;
 import com.fasterxml.jackson.core.JsonProcessingException;
 
 import de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.core.OCRDServiceProviderWorker;
-import de.uniwuerzburg.zpd.ocr4all.application.spi.core.ProcessServiceProvider;
+import de.uniwuerzburg.zpd.ocr4all.application.spi.core.ProcessorServiceProvider;
 import de.uniwuerzburg.zpd.ocr4all.application.spi.env.ConfigurationServiceProvider;
 import de.uniwuerzburg.zpd.ocr4all.application.spi.env.ProcessFramework;
 import de.uniwuerzburg.zpd.ocr4all.application.spi.env.SystemCommand;
@@ -426,7 +426,7 @@ public abstract class OCRDDockerServiceProviderWorker extends OCRDServiceProvide
 	 * @return The processor execution state.
 	 * @since 1.8
 	 */
-	protected ProcessServiceProvider.Processor.State run(ProcessFramework framework, Object arguments,
+	protected ProcessorServiceProvider.Processor.State run(ProcessFramework framework, Object arguments,
 			Set<String> unnecessaryArguments, OCRDDockerProcessorServiceProvider.DockerProcess dockerProcess,
 			ProcessorRunningState runningState, ProcessorExecution execution, Message standardOutput,
 			Message standardError, Progress progress, float baseProgress) {
@@ -454,7 +454,7 @@ public abstract class OCRDDockerServiceProviderWorker extends OCRDServiceProvide
 	 * @return The processor execution state.
 	 * @since 1.8
 	 */
-	protected ProcessServiceProvider.Processor.State run(ProcessFramework framework, boolean isResources,
+	protected ProcessorServiceProvider.Processor.State run(ProcessFramework framework, boolean isResources,
 			Object arguments, Set<String> unnecessaryArguments,
 			OCRDDockerProcessorServiceProvider.DockerProcess dockerProcess, ProcessorRunningState runningState,
 			ProcessorExecution execution, Message standardOutput, Message standardError, Progress progress,
@@ -475,7 +475,7 @@ public abstract class OCRDDockerServiceProviderWorker extends OCRDServiceProvide
 						standardError
 								.update("troubles running " + getProcessorDescription() + " - " + e.getMessage() + ".");
 
-						return ProcessServiceProvider.Processor.State.interrupted;
+						return ProcessorServiceProvider.Processor.State.interrupted;
 					}
 
 					dockerProcess
@@ -489,7 +489,7 @@ public abstract class OCRDDockerServiceProviderWorker extends OCRDServiceProvide
 					standardOutput.update("Execute docker process '" + dockerProcess.getProcess().getCommand()
 							+ "' with parameters: " + processorArguments + ".");
 
-					ProcessServiceProvider.Processor.State state = null;
+					ProcessorServiceProvider.Processor.State state = null;
 
 					try {
 						dockerProcess.getProcess().execute(processorArguments);
@@ -497,12 +497,12 @@ public abstract class OCRDDockerServiceProviderWorker extends OCRDServiceProvide
 						updateProcessorMessages(dockerProcess.getProcess(), standardOutput, standardError);
 
 						if (runningState.isCanceled())
-							state = ProcessServiceProvider.Processor.State.canceled;
+							state = ProcessorServiceProvider.Processor.State.canceled;
 						else if (dockerProcess.getProcess().getExitValue() != 0) {
 							standardError.update("Cannot run " + getProcessorDescription() + ", exit code "
 									+ dockerProcess.getProcess().getExitValue() + ".");
 
-							state = ProcessServiceProvider.Processor.State.interrupted;
+							state = ProcessorServiceProvider.Processor.State.interrupted;
 						}
 					} catch (IOException e) {
 						updateProcessorMessages(dockerProcess.getProcess(), standardOutput, standardError);
@@ -510,7 +510,7 @@ public abstract class OCRDDockerServiceProviderWorker extends OCRDServiceProvide
 						standardError
 								.update("troubles running " + getProcessorDescription() + " - " + e.getMessage() + ".");
 
-						state = ProcessServiceProvider.Processor.State.interrupted;
+						state = ProcessorServiceProvider.Processor.State.interrupted;
 					}
 
 					return state;

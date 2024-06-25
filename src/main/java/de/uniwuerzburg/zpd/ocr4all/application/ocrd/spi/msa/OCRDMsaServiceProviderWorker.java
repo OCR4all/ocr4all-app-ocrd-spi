@@ -30,11 +30,11 @@ import de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.core.OCRDServiceProvider
 import de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.util.ProviderDescription;
 import de.uniwuerzburg.zpd.ocr4all.application.spi.core.CoreProcessorServiceProvider;
 import de.uniwuerzburg.zpd.ocr4all.application.spi.core.MsaProcessorServiceProvider;
-import de.uniwuerzburg.zpd.ocr4all.application.spi.core.ProcessServiceProvider;
+import de.uniwuerzburg.zpd.ocr4all.application.spi.core.ProcessorServiceProvider;
 import de.uniwuerzburg.zpd.ocr4all.application.spi.env.ConfigurationServiceProvider;
-import de.uniwuerzburg.zpd.ocr4all.application.spi.env.ProcessFramework;
 import de.uniwuerzburg.zpd.ocr4all.application.spi.env.MicroserviceArchitecture;
 import de.uniwuerzburg.zpd.ocr4all.application.spi.env.Premise;
+import de.uniwuerzburg.zpd.ocr4all.application.spi.env.ProcessFramework;
 import de.uniwuerzburg.zpd.ocr4all.application.spi.env.Target;
 import de.uniwuerzburg.zpd.ocr4all.application.spi.model.Entry;
 import de.uniwuerzburg.zpd.ocr4all.application.spi.model.Model;
@@ -57,7 +57,8 @@ import de.uniwuerzburg.zpd.ocr4all.application.spi.model.argument.ModelArgument;
  * @version 1.0
  * @since 17
  */
-public abstract class OCRDMsaServiceProviderWorker extends OCRDServiceProviderWorker implements ProcessServiceProvider {
+public abstract class OCRDMsaServiceProviderWorker extends OCRDServiceProviderWorker
+		implements ProcessorServiceProvider<ProcessFramework> {
 	/**
 	 * The api context path.
 	 */
@@ -521,12 +522,12 @@ public abstract class OCRDMsaServiceProviderWorker extends OCRDServiceProviderWo
 					private State map(de.uniwuerzburg.zpd.ocr4all.application.communication.msa.job.State state) {
 						switch (state) {
 						case canceled:
-							return ProcessServiceProvider.Processor.State.canceled;
+							return ProcessorServiceProvider.Processor.State.canceled;
 						case completed:
 							return null;
 						case interrupted:
 						default:
-							return ProcessServiceProvider.Processor.State.interrupted;
+							return ProcessorServiceProvider.Processor.State.interrupted;
 						}
 
 					}
@@ -557,8 +558,8 @@ public abstract class OCRDMsaServiceProviderWorker extends OCRDServiceProviderWo
 					/*
 					 * (non-Javadoc)
 					 * 
-					 * @see
-					 * de.uniwuerzburg.zpd.ocr4all.application.spi.ProcessServiceProvider.Processor#
+					 * @see de.uniwuerzburg.zpd.ocr4all.application.spi.ProcessorServiceProvider.
+					 * Processor#
 					 * execute(de.uniwuerzburg.zpd.ocr4all.application.spi.ProcessServiceProvider.
 					 * Processor.Callback, de.uniwuerzburg.zpd.ocr4all.application.spi.Framework,
 					 * de.uniwuerzburg.zpd.ocr4all.application.spi.model.argument.ModelArgument)
@@ -568,7 +569,7 @@ public abstract class OCRDMsaServiceProviderWorker extends OCRDServiceProviderWo
 						if (framework == null) {
 							updatedStandardError("undefined framework.");
 
-							return ProcessServiceProvider.Processor.State.interrupted;
+							return ProcessorServiceProvider.Processor.State.interrupted;
 						}
 
 						try {
@@ -576,11 +577,11 @@ public abstract class OCRDMsaServiceProviderWorker extends OCRDServiceProviderWo
 						} catch (ProviderException e) {
 							logTrouble("trouble contacting ocrd msa - " + e.getMessage());
 
-							return ProcessServiceProvider.Processor.State.interrupted;
+							return ProcessorServiceProvider.Processor.State.interrupted;
 						}
 
 						if (!initialize(getProcessorIdentifier(), callback, framework))
-							return ProcessServiceProvider.Processor.State.canceled;
+							return ProcessorServiceProvider.Processor.State.canceled;
 
 						ObjectNode arguments;
 						try {
@@ -596,7 +597,7 @@ public abstract class OCRDMsaServiceProviderWorker extends OCRDServiceProviderWo
 						} catch (Exception e) {
 							updatedStandardError(e.getMessage());
 
-							return ProcessServiceProvider.Processor.State.interrupted;
+							return ProcessorServiceProvider.Processor.State.interrupted;
 						}
 
 						final Path pathProcessor = framework.getProcessorWorkspaceRelativeProjects();
@@ -604,7 +605,7 @@ public abstract class OCRDMsaServiceProviderWorker extends OCRDServiceProviderWo
 							logTrouble("invalid working directory '" + framework.getProcessorWorkspace().toString()
 									+ "'.");
 
-							return ProcessServiceProvider.Processor.State.interrupted;
+							return ProcessorServiceProvider.Processor.State.interrupted;
 						}
 
 						/*
@@ -647,7 +648,7 @@ public abstract class OCRDMsaServiceProviderWorker extends OCRDServiceProviderWo
 									} catch (Exception e) {
 										logTrouble("could not execute processor, key " + key + " - '" + e.getMessage());
 
-										return ProcessServiceProvider.Processor.State.interrupted;
+										return ProcessorServiceProvider.Processor.State.interrupted;
 									}
 
 									final int jobId = jobResponse.getId();
@@ -699,7 +700,7 @@ public abstract class OCRDMsaServiceProviderWorker extends OCRDServiceProviderWo
 											logTrouble("could not restore the job " + jobId + ", key " + key + " - "
 													+ e.getMessage());
 
-											return ProcessServiceProvider.Processor.State.interrupted;
+											return ProcessorServiceProvider.Processor.State.interrupted;
 										}
 									}
 

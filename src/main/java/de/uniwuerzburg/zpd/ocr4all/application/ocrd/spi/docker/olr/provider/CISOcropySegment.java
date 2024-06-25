@@ -20,10 +20,10 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.docker.OCRDDockerProcessorServiceProvider;
 import de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.docker.OCRDDockerServiceProviderWorker;
 import de.uniwuerzburg.zpd.ocr4all.application.spi.OpticalLayoutRecognitionServiceProvider;
-import de.uniwuerzburg.zpd.ocr4all.application.spi.core.ProcessServiceProvider;
+import de.uniwuerzburg.zpd.ocr4all.application.spi.core.ProcessorServiceProvider;
 import de.uniwuerzburg.zpd.ocr4all.application.spi.env.ConfigurationServiceProvider;
-import de.uniwuerzburg.zpd.ocr4all.application.spi.env.ProcessFramework;
 import de.uniwuerzburg.zpd.ocr4all.application.spi.env.Premise;
+import de.uniwuerzburg.zpd.ocr4all.application.spi.env.ProcessFramework;
 import de.uniwuerzburg.zpd.ocr4all.application.spi.env.SystemCommand;
 import de.uniwuerzburg.zpd.ocr4all.application.spi.env.Target;
 import de.uniwuerzburg.zpd.ocr4all.application.spi.model.BooleanField;
@@ -414,13 +414,13 @@ public class CISOcropySegment extends OCRDDockerServiceProviderWorker
 	 * newProcessor()
 	 */
 	@Override
-	public ProcessServiceProvider.Processor<ProcessFramework> newProcessor() {
+	public ProcessorServiceProvider.Processor<ProcessFramework> newProcessor() {
 		return new OCRDDockerProcessorServiceProvider() {
 			/*
 			 * (non-Javadoc)
 			 * 
-			 * @see
-			 * de.uniwuerzburg.zpd.ocr4all.application.spi.ProcessServiceProvider.Processor#
+			 * @see de.uniwuerzburg.zpd.ocr4all.application.spi.ProcessorServiceProvider.
+			 * Processor#
 			 * execute(de.uniwuerzburg.zpd.ocr4all.application.spi.ProcessServiceProvider.
 			 * Processor.Callback, de.uniwuerzburg.zpd.ocr4all.application.spi.Framework,
 			 * de.uniwuerzburg.zpd.ocr4all.application.spi.model.argument.ModelArgument)
@@ -428,7 +428,7 @@ public class CISOcropySegment extends OCRDDockerServiceProviderWorker
 			@Override
 			public State execute(Callback callback, ProcessFramework framework, ModelArgument modelArgument) {
 				if (!initialize(getProcessorIdentifier(), callback, framework))
-					return ProcessServiceProvider.Processor.State.canceled;
+					return ProcessorServiceProvider.Processor.State.canceled;
 
 				/*
 				 * Available arguments
@@ -459,19 +459,19 @@ public class CISOcropySegment extends OCRDDockerServiceProviderWorker
 															: " '" + values.get(0).trim() + "'")
 													+ " is not supported.");
 
-									return ProcessServiceProvider.Processor.State.interrupted;
+									return ProcessorServiceProvider.Processor.State.interrupted;
 								}
 							} else if (values.size() > 1) {
 								updatedStandardError("Only one level of operation can be selected.");
 
-								return ProcessServiceProvider.Processor.State.interrupted;
+								return ProcessorServiceProvider.Processor.State.interrupted;
 							}
 						}
 					} catch (ClassCastException e) {
 						updatedStandardError(
 								"The argument '" + Field.levelOperation.getName() + "' is not of selection type.");
 
-						return ProcessServiceProvider.Processor.State.interrupted;
+						return ProcessorServiceProvider.Processor.State.interrupted;
 					}
 
 				/*
@@ -510,7 +510,7 @@ public class CISOcropySegment extends OCRDDockerServiceProviderWorker
 					} catch (ClassCastException e) {
 						updatedStandardError("The argument '" + Field.dpi.getName() + "' is not of integer type.");
 
-						return ProcessServiceProvider.Processor.State.interrupted;
+						return ProcessorServiceProvider.Processor.State.interrupted;
 					}
 
 				/*
@@ -526,7 +526,7 @@ public class CISOcropySegment extends OCRDDockerServiceProviderWorker
 					} catch (ClassCastException e) {
 						updatedStandardError("The argument '" + Field.spread.getName() + "' is not of decimal type.");
 
-						return ProcessServiceProvider.Processor.State.interrupted;
+						return ProcessorServiceProvider.Processor.State.interrupted;
 					}
 
 				if (processorArgument instanceof ProcessorArgumentLevelOperationPageTable) {
@@ -546,7 +546,7 @@ public class CISOcropySegment extends OCRDDockerServiceProviderWorker
 							updatedStandardError(
 									"The argument '" + Field.maxColSeps.getName() + "' is not of integer type.");
 
-							return ProcessServiceProvider.Processor.State.interrupted;
+							return ProcessorServiceProvider.Processor.State.interrupted;
 						}
 
 					/*
@@ -563,7 +563,7 @@ public class CISOcropySegment extends OCRDDockerServiceProviderWorker
 							updatedStandardError(
 									"The argument '" + Field.maxSeps.getName() + "' is not of integer type.");
 
-							return ProcessServiceProvider.Processor.State.interrupted;
+							return ProcessorServiceProvider.Processor.State.interrupted;
 						}
 
 					/*
@@ -580,7 +580,7 @@ public class CISOcropySegment extends OCRDDockerServiceProviderWorker
 							updatedStandardError(
 									"The argument '" + Field.csMinHeight.getName() + "' is not of integer type.");
 
-							return ProcessServiceProvider.Processor.State.interrupted;
+							return ProcessorServiceProvider.Processor.State.interrupted;
 						}
 
 					/*
@@ -597,7 +597,7 @@ public class CISOcropySegment extends OCRDDockerServiceProviderWorker
 							updatedStandardError(
 									"The argument '" + Field.hlMinWidth.getName() + "' is not of integer type.");
 
-							return ProcessServiceProvider.Processor.State.interrupted;
+							return ProcessorServiceProvider.Processor.State.interrupted;
 						}
 
 					/*
@@ -614,7 +614,7 @@ public class CISOcropySegment extends OCRDDockerServiceProviderWorker
 							updatedStandardError(
 									"The argument '" + Field.gapHeight.getName() + "' is not of decimal type.");
 
-							return ProcessServiceProvider.Processor.State.interrupted;
+							return ProcessorServiceProvider.Processor.State.interrupted;
 						}
 
 					/*
@@ -631,7 +631,7 @@ public class CISOcropySegment extends OCRDDockerServiceProviderWorker
 							updatedStandardError(
 									"The argument '" + Field.gapWidth.getName() + "' is not of decimal type.");
 
-							return ProcessServiceProvider.Processor.State.interrupted;
+							return ProcessorServiceProvider.Processor.State.interrupted;
 						}
 
 					/*
@@ -648,7 +648,7 @@ public class CISOcropySegment extends OCRDDockerServiceProviderWorker
 							updatedStandardError(
 									"The argument '" + Field.overwriteOrder.getName() + "' is not of boolean type.");
 
-							return ProcessServiceProvider.Processor.State.interrupted;
+							return ProcessorServiceProvider.Processor.State.interrupted;
 						}
 
 					/*
@@ -666,7 +666,7 @@ public class CISOcropySegment extends OCRDDockerServiceProviderWorker
 							updatedStandardError("The argument '" + Field.overwriteSeparators.getName()
 									+ "' is not of boolean type.");
 
-							return ProcessServiceProvider.Processor.State.interrupted;
+							return ProcessorServiceProvider.Processor.State.interrupted;
 						}
 
 					/*
@@ -683,7 +683,7 @@ public class CISOcropySegment extends OCRDDockerServiceProviderWorker
 							updatedStandardError(
 									"The argument '" + Field.overwriteRegions.getName() + "' is not of boolean type.");
 
-							return ProcessServiceProvider.Processor.State.interrupted;
+							return ProcessorServiceProvider.Processor.State.interrupted;
 						}
 
 					if (processorArgument instanceof ProcessorArgumentLevelOperationPage) {
@@ -703,7 +703,7 @@ public class CISOcropySegment extends OCRDDockerServiceProviderWorker
 								updatedStandardError(
 										"The argument '" + Field.maxImages.getName() + "' is not of integer type.");
 
-								return ProcessServiceProvider.Processor.State.interrupted;
+								return ProcessorServiceProvider.Processor.State.interrupted;
 							}
 					}
 				} else if (processorArgument instanceof ProcessorArgumentLevelOperationRegion) {
@@ -723,7 +723,7 @@ public class CISOcropySegment extends OCRDDockerServiceProviderWorker
 							updatedStandardError(
 									"The argument '" + Field.overwriteLines.getName() + "' is not of boolean type.");
 
-							return ProcessServiceProvider.Processor.State.interrupted;
+							return ProcessorServiceProvider.Processor.State.interrupted;
 						}
 				}
 

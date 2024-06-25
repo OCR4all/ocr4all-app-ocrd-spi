@@ -24,10 +24,10 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.docker.OCRDDockerProcessorServiceProvider;
 import de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.docker.OCRDDockerServiceProviderWorker;
 import de.uniwuerzburg.zpd.ocr4all.application.spi.OpticalCharacterRecognitionServiceProvider;
-import de.uniwuerzburg.zpd.ocr4all.application.spi.core.ProcessServiceProvider;
+import de.uniwuerzburg.zpd.ocr4all.application.spi.core.ProcessorServiceProvider;
 import de.uniwuerzburg.zpd.ocr4all.application.spi.env.ConfigurationServiceProvider;
-import de.uniwuerzburg.zpd.ocr4all.application.spi.env.ProcessFramework;
 import de.uniwuerzburg.zpd.ocr4all.application.spi.env.Premise;
+import de.uniwuerzburg.zpd.ocr4all.application.spi.env.ProcessFramework;
 import de.uniwuerzburg.zpd.ocr4all.application.spi.env.SystemCommand;
 import de.uniwuerzburg.zpd.ocr4all.application.spi.env.Target;
 import de.uniwuerzburg.zpd.ocr4all.application.spi.model.BooleanField;
@@ -527,13 +527,13 @@ public class TesserocrRecognize extends OCRDDockerServiceProviderWorker
 	 * newProcessor()
 	 */
 	@Override
-	public ProcessServiceProvider.Processor<ProcessFramework> newProcessor() {
+	public ProcessorServiceProvider.Processor<ProcessFramework> newProcessor() {
 		return new OCRDDockerProcessorServiceProvider() {
 			/*
 			 * (non-Javadoc)
 			 * 
-			 * @see
-			 * de.uniwuerzburg.zpd.ocr4all.application.spi.ProcessServiceProvider.Processor#
+			 * @see de.uniwuerzburg.zpd.ocr4all.application.spi.ProcessorServiceProvider.
+			 * Processor#
 			 * execute(de.uniwuerzburg.zpd.ocr4all.application.spi.ProcessServiceProvider.
 			 * Processor.Callback, de.uniwuerzburg.zpd.ocr4all.application.spi.Framework,
 			 * de.uniwuerzburg.zpd.ocr4all.application.spi.model.argument.ModelArgument)
@@ -541,7 +541,7 @@ public class TesserocrRecognize extends OCRDDockerServiceProviderWorker
 			@Override
 			public State execute(Callback callback, ProcessFramework framework, ModelArgument modelArgument) {
 				if (!initialize(getProcessorIdentifier(), callback, framework))
-					return ProcessServiceProvider.Processor.State.canceled;
+					return ProcessorServiceProvider.Processor.State.canceled;
 
 				/*
 				 * Available arguments
@@ -578,7 +578,7 @@ public class TesserocrRecognize extends OCRDDockerServiceProviderWorker
 					} catch (ClassCastException e) {
 						updatedStandardError("The argument '" + Field.models.getName() + "' is not of selection type.");
 
-						return ProcessServiceProvider.Processor.State.interrupted;
+						return ProcessorServiceProvider.Processor.State.interrupted;
 					}
 
 				/*
@@ -595,7 +595,7 @@ public class TesserocrRecognize extends OCRDDockerServiceProviderWorker
 						updatedStandardError(
 								"The argument '" + Field.autoModel.getName() + "' is not of boolean type.");
 
-						return ProcessServiceProvider.Processor.State.interrupted;
+						return ProcessorServiceProvider.Processor.State.interrupted;
 					}
 
 				/*
@@ -618,20 +618,20 @@ public class TesserocrRecognize extends OCRDDockerServiceProviderWorker
 															: " '" + values.get(0).trim() + "'")
 													+ " is not supported.");
 
-									return ProcessServiceProvider.Processor.State.interrupted;
+									return ProcessorServiceProvider.Processor.State.interrupted;
 								} else
 									processorArgument.setTesseractEngine(engine);
 							} else if (values.size() > 1) {
 								updatedStandardError("Only one Tesseract OCR engine can be selected.");
 
-								return ProcessServiceProvider.Processor.State.interrupted;
+								return ProcessorServiceProvider.Processor.State.interrupted;
 							}
 						}
 					} catch (ClassCastException e) {
 						updatedStandardError(
 								"The argument '" + Field.tesseractEngine.getName() + "' is not of selection type.");
 
-						return ProcessServiceProvider.Processor.State.interrupted;
+						return ProcessorServiceProvider.Processor.State.interrupted;
 					}
 
 				/*
@@ -647,7 +647,7 @@ public class TesserocrRecognize extends OCRDDockerServiceProviderWorker
 					} catch (ClassCastException e) {
 						updatedStandardError("The argument '" + Field.dpi.getName() + "' is not of integer type.");
 
-						return ProcessServiceProvider.Processor.State.interrupted;
+						return ProcessorServiceProvider.Processor.State.interrupted;
 					}
 
 				/*
@@ -663,7 +663,7 @@ public class TesserocrRecognize extends OCRDDockerServiceProviderWorker
 					} catch (ClassCastException e) {
 						updatedStandardError("The argument '" + Field.padding.getName() + "' is not of integer type.");
 
-						return ProcessServiceProvider.Processor.State.interrupted;
+						return ProcessorServiceProvider.Processor.State.interrupted;
 					}
 
 				/*
@@ -686,20 +686,20 @@ public class TesserocrRecognize extends OCRDDockerServiceProviderWorker
 															: " '" + values.get(0).trim() + "'")
 													+ " is not supported.");
 
-									return ProcessServiceProvider.Processor.State.interrupted;
+									return ProcessorServiceProvider.Processor.State.interrupted;
 								} else
 									processorArgument.setSegmentationLevel(level);
 							} else if (values.size() > 1) {
 								updatedStandardError("Only one segmentation level can be selected.");
 
-								return ProcessServiceProvider.Processor.State.interrupted;
+								return ProcessorServiceProvider.Processor.State.interrupted;
 							}
 						}
 					} catch (ClassCastException e) {
 						updatedStandardError(
 								"The argument '" + Field.segmentationLevel.getName() + "' is not of selection type.");
 
-						return ProcessServiceProvider.Processor.State.interrupted;
+						return ProcessorServiceProvider.Processor.State.interrupted;
 					}
 
 				/*
@@ -722,20 +722,20 @@ public class TesserocrRecognize extends OCRDDockerServiceProviderWorker
 															: " '" + values.get(0).trim() + "'")
 													+ " is not supported.");
 
-									return ProcessServiceProvider.Processor.State.interrupted;
+									return ProcessorServiceProvider.Processor.State.interrupted;
 								} else
 									processorArgument.setTextEquivLevel(level);
 							} else if (values.size() > 1) {
 								updatedStandardError("Only one TextEquiv level can be selected.");
 
-								return ProcessServiceProvider.Processor.State.interrupted;
+								return ProcessorServiceProvider.Processor.State.interrupted;
 							}
 						}
 					} catch (ClassCastException e) {
 						updatedStandardError(
 								"The argument '" + Field.textEquivLevel.getName() + "' is not of selection type.");
 
-						return ProcessServiceProvider.Processor.State.interrupted;
+						return ProcessorServiceProvider.Processor.State.interrupted;
 					}
 
 				/*
@@ -752,7 +752,7 @@ public class TesserocrRecognize extends OCRDDockerServiceProviderWorker
 						updatedStandardError(
 								"The argument '" + Field.overwriteSegments.getName() + "' is not of boolean type.");
 
-						return ProcessServiceProvider.Processor.State.interrupted;
+						return ProcessorServiceProvider.Processor.State.interrupted;
 					}
 
 				/*
@@ -769,7 +769,7 @@ public class TesserocrRecognize extends OCRDDockerServiceProviderWorker
 						updatedStandardError(
 								"The argument '" + Field.overwriteText.getName() + "' is not of boolean type.");
 
-						return ProcessServiceProvider.Processor.State.interrupted;
+						return ProcessorServiceProvider.Processor.State.interrupted;
 					}
 
 				/*
@@ -786,7 +786,7 @@ public class TesserocrRecognize extends OCRDDockerServiceProviderWorker
 						updatedStandardError(
 								"The argument '" + Field.shrinkPolygons.getName() + "' is not of boolean type.");
 
-						return ProcessServiceProvider.Processor.State.interrupted;
+						return ProcessorServiceProvider.Processor.State.interrupted;
 					}
 
 				/*
@@ -803,7 +803,7 @@ public class TesserocrRecognize extends OCRDDockerServiceProviderWorker
 						updatedStandardError(
 								"The argument '" + Field.blockPolygons.getName() + "' is not of boolean type.");
 
-						return ProcessServiceProvider.Processor.State.interrupted;
+						return ProcessorServiceProvider.Processor.State.interrupted;
 					}
 
 				/*
@@ -820,7 +820,7 @@ public class TesserocrRecognize extends OCRDDockerServiceProviderWorker
 						updatedStandardError(
 								"The argument '" + Field.findTables.getName() + "' is not of boolean type.");
 
-						return ProcessServiceProvider.Processor.State.interrupted;
+						return ProcessorServiceProvider.Processor.State.interrupted;
 					}
 
 				/*
@@ -837,7 +837,7 @@ public class TesserocrRecognize extends OCRDDockerServiceProviderWorker
 						updatedStandardError(
 								"The argument '" + Field.findStaves.getName() + "' is not of boolean type.");
 
-						return ProcessServiceProvider.Processor.State.interrupted;
+						return ProcessorServiceProvider.Processor.State.interrupted;
 					}
 
 				/*
@@ -853,7 +853,7 @@ public class TesserocrRecognize extends OCRDDockerServiceProviderWorker
 					} catch (ClassCastException e) {
 						updatedStandardError("The argument '" + Field.rawLines.getName() + "' is not of boolean type.");
 
-						return ProcessServiceProvider.Processor.State.interrupted;
+						return ProcessorServiceProvider.Processor.State.interrupted;
 					}
 
 				/*
@@ -870,7 +870,7 @@ public class TesserocrRecognize extends OCRDDockerServiceProviderWorker
 						updatedStandardError(
 								"The argument '" + Field.characterWhiteList.getName() + "' is not of string type.");
 
-						return ProcessServiceProvider.Processor.State.interrupted;
+						return ProcessorServiceProvider.Processor.State.interrupted;
 					}
 
 				/*
@@ -887,7 +887,7 @@ public class TesserocrRecognize extends OCRDDockerServiceProviderWorker
 						updatedStandardError(
 								"The argument '" + Field.characterBlackList.getName() + "' is not of string type.");
 
-						return ProcessServiceProvider.Processor.State.interrupted;
+						return ProcessorServiceProvider.Processor.State.interrupted;
 					}
 
 				/*
@@ -904,7 +904,7 @@ public class TesserocrRecognize extends OCRDDockerServiceProviderWorker
 						updatedStandardError(
 								"The argument '" + Field.characterUnblackList.getName() + "' is not of string type.");
 
-						return ProcessServiceProvider.Processor.State.interrupted;
+						return ProcessorServiceProvider.Processor.State.interrupted;
 					}
 
 				/*
@@ -921,7 +921,7 @@ public class TesserocrRecognize extends OCRDDockerServiceProviderWorker
 						updatedStandardError(
 								"The argument '" + Field.tesseractParameters.getName() + "' is not of string type.");
 
-						return ProcessServiceProvider.Processor.State.interrupted;
+						return ProcessorServiceProvider.Processor.State.interrupted;
 					}
 
 				/*
@@ -938,7 +938,7 @@ public class TesserocrRecognize extends OCRDDockerServiceProviderWorker
 						updatedStandardError(
 								"The argument '" + Field.xpathParameters.getName() + "' is not of string type.");
 
-						return ProcessServiceProvider.Processor.State.interrupted;
+						return ProcessorServiceProvider.Processor.State.interrupted;
 					}
 
 				/*
@@ -955,7 +955,7 @@ public class TesserocrRecognize extends OCRDDockerServiceProviderWorker
 						updatedStandardError(
 								"The argument '" + Field.xpathModel.getName() + "' is not of string type.");
 
-						return ProcessServiceProvider.Processor.State.interrupted;
+						return ProcessorServiceProvider.Processor.State.interrupted;
 					}
 
 				/*
