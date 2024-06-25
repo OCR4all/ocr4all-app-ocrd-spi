@@ -11,7 +11,7 @@ import java.nio.file.Path;
 
 import de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.msa.OCRDMsaServiceProviderWorker;
 import de.uniwuerzburg.zpd.ocr4all.application.spi.env.ConfigurationServiceProvider;
-import de.uniwuerzburg.zpd.ocr4all.application.spi.env.Framework;
+import de.uniwuerzburg.zpd.ocr4all.application.spi.env.ProcessFramework;
 
 /**
  * Defines service providers for the ocr-d microservice architecture (MSA) of
@@ -174,10 +174,10 @@ public class MsaTesserocrFontshape extends MsaTesserocrRecognize {
 	 * 
 	 * @see de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.core.
 	 * OCRDServiceProviderWorker#getOptResources(de.uniwuerzburg.zpd.ocr4all.
-	 * application.spi.env.Framework)
+	 * application.spi.env.ProcessFramework)
 	 */
 	@Override
-	protected Path getOptResources(Framework framework) {
+	protected Path getOptResources(ProcessFramework framework) {
 		return getOptResources(framework, MsaTesserocrRecognize.ServiceProviderCollection.processorIdentifier);
 	}
 

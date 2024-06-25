@@ -22,7 +22,7 @@ import de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.docker.OCRDDockerService
 import de.uniwuerzburg.zpd.ocr4all.application.spi.OpticalLayoutRecognitionServiceProvider;
 import de.uniwuerzburg.zpd.ocr4all.application.spi.core.ProcessServiceProvider;
 import de.uniwuerzburg.zpd.ocr4all.application.spi.env.ConfigurationServiceProvider;
-import de.uniwuerzburg.zpd.ocr4all.application.spi.env.Framework;
+import de.uniwuerzburg.zpd.ocr4all.application.spi.env.ProcessFramework;
 import de.uniwuerzburg.zpd.ocr4all.application.spi.env.Premise;
 import de.uniwuerzburg.zpd.ocr4all.application.spi.env.SystemCommand;
 import de.uniwuerzburg.zpd.ocr4all.application.spi.env.Target;
@@ -51,7 +51,8 @@ import de.uniwuerzburg.zpd.ocr4all.application.spi.model.argument.SelectArgument
  * @version 1.0
  * @since 1.8
  */
-public class CISOcropySegment extends OCRDDockerServiceProviderWorker implements OpticalLayoutRecognitionServiceProvider {
+public class CISOcropySegment extends OCRDDockerServiceProviderWorker
+		implements OpticalLayoutRecognitionServiceProvider {
 	/**
 	 * The prefix of the message keys in the resource bundle.
 	 */
@@ -94,7 +95,7 @@ public class CISOcropySegment extends OCRDDockerServiceProviderWorker implements
 		/*
 		 * (non-Javadoc)
 		 * 
-		 * @see de.uniwuerzburg.zpd.ocr4all.application.spi.env.Framework.
+		 * @see de.uniwuerzburg.zpd.ocr4all.application.spi.env.ProcessFramework.
 		 * ServiceProviderCollectionKey#getName()
 		 */
 		@Override
@@ -105,7 +106,7 @@ public class CISOcropySegment extends OCRDDockerServiceProviderWorker implements
 		/*
 		 * (non-Javadoc)
 		 * 
-		 * @see de.uniwuerzburg.zpd.ocr4all.application.spi.env.Framework.
+		 * @see de.uniwuerzburg.zpd.ocr4all.application.spi.env.ProcessFramework.
 		 * ServiceProviderCollectionKey#getKey()
 		 */
 		@Override
@@ -116,7 +117,7 @@ public class CISOcropySegment extends OCRDDockerServiceProviderWorker implements
 		/*
 		 * (non-Javadoc)
 		 * 
-		 * @see de.uniwuerzburg.zpd.ocr4all.application.spi.env.Framework.
+		 * @see de.uniwuerzburg.zpd.ocr4all.application.spi.env.ProcessFramework.
 		 * ServiceProviderCollectionKey#getDefaultValue()
 		 */
 		@Override
@@ -225,9 +226,8 @@ public class CISOcropySegment extends OCRDDockerServiceProviderWorker implements
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.docker.OCRDDockerServiceProviderWorker#
-	 * processorIdentifier()
+	 * @see de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.docker.
+	 * OCRDDockerServiceProviderWorker# processorIdentifier()
 	 */
 	@Override
 	protected ConfigurationServiceProvider.CollectionKey processorIdentifier() {
@@ -237,9 +237,8 @@ public class CISOcropySegment extends OCRDDockerServiceProviderWorker implements
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.docker.OCRDDockerServiceProviderWorker#
-	 * processorDescription()
+	 * @see de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.docker.
+	 * OCRDDockerServiceProviderWorker# processorDescription()
 	 */
 	@Override
 	protected ConfigurationServiceProvider.CollectionKey processorDescription() {
@@ -415,7 +414,7 @@ public class CISOcropySegment extends OCRDDockerServiceProviderWorker implements
 	 * newProcessor()
 	 */
 	@Override
-	public ProcessServiceProvider.Processor<Framework> newProcessor() {
+	public ProcessServiceProvider.Processor<ProcessFramework> newProcessor() {
 		return new OCRDDockerProcessorServiceProvider() {
 			/*
 			 * (non-Javadoc)
@@ -427,7 +426,7 @@ public class CISOcropySegment extends OCRDDockerServiceProviderWorker implements
 			 * de.uniwuerzburg.zpd.ocr4all.application.spi.model.argument.ModelArgument)
 			 */
 			@Override
-			public State execute(Callback callback, Framework framework, ModelArgument modelArgument) {
+			public State execute(Callback callback, ProcessFramework framework, ModelArgument modelArgument) {
 				if (!initialize(getProcessorIdentifier(), callback, framework))
 					return ProcessServiceProvider.Processor.State.canceled;
 
@@ -731,9 +730,10 @@ public class CISOcropySegment extends OCRDDockerServiceProviderWorker implements
 				/*
 				 * Runs the processor
 				 */
-				return run(framework, processorArgument, availableArguments, dockerProcess, () -> isCanceled(), () -> complete(),
-						message -> updatedStandardOutput(message), message -> updatedStandardError(message),
-						progress -> callback.updatedProgress(progress), 0.01F);
+				return run(framework, processorArgument, availableArguments, dockerProcess, () -> isCanceled(),
+						() -> complete(), message -> updatedStandardOutput(message),
+						message -> updatedStandardError(message), progress -> callback.updatedProgress(progress),
+						0.01F);
 			}
 
 		};

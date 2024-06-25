@@ -26,7 +26,7 @@ import de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.docker.OCRDDockerService
 import de.uniwuerzburg.zpd.ocr4all.application.spi.OpticalCharacterRecognitionServiceProvider;
 import de.uniwuerzburg.zpd.ocr4all.application.spi.core.ProcessServiceProvider;
 import de.uniwuerzburg.zpd.ocr4all.application.spi.env.ConfigurationServiceProvider;
-import de.uniwuerzburg.zpd.ocr4all.application.spi.env.Framework;
+import de.uniwuerzburg.zpd.ocr4all.application.spi.env.ProcessFramework;
 import de.uniwuerzburg.zpd.ocr4all.application.spi.env.Premise;
 import de.uniwuerzburg.zpd.ocr4all.application.spi.env.SystemCommand;
 import de.uniwuerzburg.zpd.ocr4all.application.spi.env.Target;
@@ -109,7 +109,7 @@ public class TesserocrRecognize extends OCRDDockerServiceProviderWorker
 		/*
 		 * (non-Javadoc)
 		 * 
-		 * @see de.uniwuerzburg.zpd.ocr4all.application.spi.env.Framework.
+		 * @see de.uniwuerzburg.zpd.ocr4all.application.spi.env.ProcessFramework.
 		 * ServiceProviderCollectionKey#getName()
 		 */
 		@Override
@@ -120,7 +120,7 @@ public class TesserocrRecognize extends OCRDDockerServiceProviderWorker
 		/*
 		 * (non-Javadoc)
 		 * 
-		 * @see de.uniwuerzburg.zpd.ocr4all.application.spi.env.Framework.
+		 * @see de.uniwuerzburg.zpd.ocr4all.application.spi.env.ProcessFramework.
 		 * ServiceProviderCollectionKey#getKey()
 		 */
 		@Override
@@ -131,7 +131,7 @@ public class TesserocrRecognize extends OCRDDockerServiceProviderWorker
 		/*
 		 * (non-Javadoc)
 		 * 
-		 * @see de.uniwuerzburg.zpd.ocr4all.application.spi.env.Framework.
+		 * @see de.uniwuerzburg.zpd.ocr4all.application.spi.env.ProcessFramework.
 		 * ServiceProviderCollectionKey#getDefaultValue()
 		 */
 		@Override
@@ -527,7 +527,7 @@ public class TesserocrRecognize extends OCRDDockerServiceProviderWorker
 	 * newProcessor()
 	 */
 	@Override
-	public ProcessServiceProvider.Processor<Framework> newProcessor() {
+	public ProcessServiceProvider.Processor<ProcessFramework> newProcessor() {
 		return new OCRDDockerProcessorServiceProvider() {
 			/*
 			 * (non-Javadoc)
@@ -539,7 +539,7 @@ public class TesserocrRecognize extends OCRDDockerServiceProviderWorker
 			 * de.uniwuerzburg.zpd.ocr4all.application.spi.model.argument.ModelArgument)
 			 */
 			@Override
-			public State execute(Callback callback, Framework framework, ModelArgument modelArgument) {
+			public State execute(Callback callback, ProcessFramework framework, ModelArgument modelArgument) {
 				if (!initialize(getProcessorIdentifier(), callback, framework))
 					return ProcessServiceProvider.Processor.State.canceled;
 

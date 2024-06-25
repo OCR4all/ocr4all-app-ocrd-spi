@@ -20,7 +20,8 @@ import de.uniwuerzburg.zpd.ocr4all.application.spi.env.ConfigurationServiceProvi
  * <li>tesserocr-segment-region-json-id: ocrd-tesserocr-segment-region</li>
  * <li>tesserocr-segment-region-json-description: ocr-d tesserocr segment region
  * processor</li>
- * <li>see {@link OCRDDockerJsonServiceProviderWorker} for remainder settings</li>
+ * <li>see {@link OCRDDockerJsonServiceProviderWorker} for remainder
+ * settings</li>
  * </ul>
  *
  * @author <a href="mailto:herbert.baier@uni-wuerzburg.de">Herbert Baier</a>
@@ -66,7 +67,7 @@ public class JsonTesserocrSegmentRegion extends OCRDDockerJsonServiceProviderWor
 		/*
 		 * (non-Javadoc)
 		 * 
-		 * @see de.uniwuerzburg.zpd.ocr4all.application.spi.env.Framework.
+		 * @see de.uniwuerzburg.zpd.ocr4all.application.spi.env.ProcessFramework.
 		 * ServiceProviderCollectionKey#getName()
 		 */
 		@Override
@@ -77,7 +78,7 @@ public class JsonTesserocrSegmentRegion extends OCRDDockerJsonServiceProviderWor
 		/*
 		 * (non-Javadoc)
 		 * 
-		 * @see de.uniwuerzburg.zpd.ocr4all.application.spi.env.Framework.
+		 * @see de.uniwuerzburg.zpd.ocr4all.application.spi.env.ProcessFramework.
 		 * ServiceProviderCollectionKey#getKey()
 		 */
 		@Override
@@ -88,7 +89,7 @@ public class JsonTesserocrSegmentRegion extends OCRDDockerJsonServiceProviderWor
 		/*
 		 * (non-Javadoc)
 		 * 
-		 * @see de.uniwuerzburg.zpd.ocr4all.application.spi.env.Framework.
+		 * @see de.uniwuerzburg.zpd.ocr4all.application.spi.env.ProcessFramework.
 		 * ServiceProviderCollectionKey#getDefaultValue()
 		 */
 		@Override
@@ -110,9 +111,8 @@ public class JsonTesserocrSegmentRegion extends OCRDDockerJsonServiceProviderWor
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.docker.OCRDDockerServiceProviderWorker#
-	 * processorIdentifier()
+	 * @see de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.docker.
+	 * OCRDDockerServiceProviderWorker# processorIdentifier()
 	 */
 	@Override
 	protected ConfigurationServiceProvider.CollectionKey processorIdentifier() {
@@ -122,9 +122,8 @@ public class JsonTesserocrSegmentRegion extends OCRDDockerJsonServiceProviderWor
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.docker.OCRDDockerServiceProviderWorker#
-	 * processorDescription()
+	 * @see de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.docker.
+	 * OCRDDockerServiceProviderWorker# processorDescription()
 	 */
 	@Override
 	protected ConfigurationServiceProvider.CollectionKey processorDescription() {

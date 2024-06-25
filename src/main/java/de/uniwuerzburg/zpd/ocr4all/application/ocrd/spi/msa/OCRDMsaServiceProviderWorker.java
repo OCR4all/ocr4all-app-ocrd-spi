@@ -32,7 +32,7 @@ import de.uniwuerzburg.zpd.ocr4all.application.spi.core.CoreProcessorServiceProv
 import de.uniwuerzburg.zpd.ocr4all.application.spi.core.MsaProcessorServiceProvider;
 import de.uniwuerzburg.zpd.ocr4all.application.spi.core.ProcessServiceProvider;
 import de.uniwuerzburg.zpd.ocr4all.application.spi.env.ConfigurationServiceProvider;
-import de.uniwuerzburg.zpd.ocr4all.application.spi.env.Framework;
+import de.uniwuerzburg.zpd.ocr4all.application.spi.env.ProcessFramework;
 import de.uniwuerzburg.zpd.ocr4all.application.spi.env.MicroserviceArchitecture;
 import de.uniwuerzburg.zpd.ocr4all.application.spi.env.Premise;
 import de.uniwuerzburg.zpd.ocr4all.application.spi.env.Target;
@@ -146,7 +146,7 @@ public abstract class OCRDMsaServiceProviderWorker extends OCRDServiceProviderWo
 		/*
 		 * (non-Javadoc)
 		 * 
-		 * @see de.uniwuerzburg.zpd.ocr4all.application.spi.env.Framework.
+		 * @see de.uniwuerzburg.zpd.ocr4all.application.spi.env.ProcessFramework.
 		 * ServiceProviderCollectionKey#getName()
 		 */
 		@Override
@@ -157,7 +157,7 @@ public abstract class OCRDMsaServiceProviderWorker extends OCRDServiceProviderWo
 		/*
 		 * (non-Javadoc)
 		 * 
-		 * @see de.uniwuerzburg.zpd.ocr4all.application.spi.env.Framework.
+		 * @see de.uniwuerzburg.zpd.ocr4all.application.spi.env.ProcessFramework.
 		 * ServiceProviderCollectionKey#getKey()
 		 */
 		@Override
@@ -168,7 +168,7 @@ public abstract class OCRDMsaServiceProviderWorker extends OCRDServiceProviderWo
 		/*
 		 * (non-Javadoc)
 		 * 
-		 * @see de.uniwuerzburg.zpd.ocr4all.application.spi.env.Framework.
+		 * @see de.uniwuerzburg.zpd.ocr4all.application.spi.env.ProcessFramework.
 		 * ServiceProviderCollectionKey#getDefaultValue()
 		 */
 		@Override
@@ -490,7 +490,7 @@ public abstract class OCRDMsaServiceProviderWorker extends OCRDServiceProviderWo
 	 * newProcessor()
 	 */
 	@Override
-	public Processor<Framework> newProcessor() {
+	public Processor<ProcessFramework> newProcessor() {
 		return providerDescription == null || !providerDescription.isModelFactorySet() ? null
 				: new MsaProcessorServiceProvider(microserviceArchitecture.getEventController()) {
 					/**
@@ -564,7 +564,7 @@ public abstract class OCRDMsaServiceProviderWorker extends OCRDServiceProviderWo
 					 * de.uniwuerzburg.zpd.ocr4all.application.spi.model.argument.ModelArgument)
 					 */
 					@Override
-					public State execute(Callback callback, Framework framework, ModelArgument modelArgument) {
+					public State execute(Callback callback, ProcessFramework framework, ModelArgument modelArgument) {
 						if (framework == null) {
 							updatedStandardError("undefined framework.");
 

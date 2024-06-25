@@ -28,7 +28,7 @@ import de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.util.ProviderDescription
 import de.uniwuerzburg.zpd.ocr4all.application.spi.core.ProcessServiceProvider;
 import de.uniwuerzburg.zpd.ocr4all.application.spi.core.ServiceProviderCore;
 import de.uniwuerzburg.zpd.ocr4all.application.spi.env.ConfigurationServiceProvider;
-import de.uniwuerzburg.zpd.ocr4all.application.spi.env.Framework;
+import de.uniwuerzburg.zpd.ocr4all.application.spi.env.ProcessFramework;
 import de.uniwuerzburg.zpd.ocr4all.application.spi.env.Target;
 import de.uniwuerzburg.zpd.ocr4all.application.spi.model.Field;
 import de.uniwuerzburg.zpd.ocr4all.application.spi.model.SelectField;
@@ -92,7 +92,7 @@ public abstract class OCRDServiceProviderWorker extends ServiceProviderCore {
 		/*
 		 * (non-Javadoc)
 		 * 
-		 * @see de.uniwuerzburg.zpd.ocr4all.application.spi.env.Framework.
+		 * @see de.uniwuerzburg.zpd.ocr4all.application.spi.env.ProcessFramework.
 		 * ServiceProviderCollectionKey#getName()
 		 */
 		@Override
@@ -103,7 +103,7 @@ public abstract class OCRDServiceProviderWorker extends ServiceProviderCore {
 		/*
 		 * (non-Javadoc)
 		 * 
-		 * @see de.uniwuerzburg.zpd.ocr4all.application.spi.env.Framework.
+		 * @see de.uniwuerzburg.zpd.ocr4all.application.spi.env.ProcessFramework.
 		 * ServiceProviderCollectionKey#getKey()
 		 */
 		@Override
@@ -114,7 +114,7 @@ public abstract class OCRDServiceProviderWorker extends ServiceProviderCore {
 		/*
 		 * (non-Javadoc)
 		 * 
-		 * @see de.uniwuerzburg.zpd.ocr4all.application.spi.env.Framework.
+		 * @see de.uniwuerzburg.zpd.ocr4all.application.spi.env.ProcessFramework.
 		 * ServiceProviderCollectionKey#getDefaultValue()
 		 */
 		@Override
@@ -295,7 +295,7 @@ public abstract class OCRDServiceProviderWorker extends ServiceProviderCore {
 	 * @return The opt resources folder.
 	 * @since 1.8
 	 */
-	protected Path getOptResources(Framework framework) {
+	protected Path getOptResources(ProcessFramework framework) {
 		return framework == null ? null : getOptResources(configuration, framework.getTarget());
 	}
 
@@ -308,7 +308,7 @@ public abstract class OCRDServiceProviderWorker extends ServiceProviderCore {
 	 * @return The opt resources folder.
 	 * @since 1.8
 	 */
-	protected Path getOptResources(Framework framework,
+	protected Path getOptResources(ProcessFramework framework,
 			ConfigurationServiceProvider.CollectionKey processorIdentifier) {
 		return framework == null ? null : getOptResources(configuration, framework.getTarget(), processorIdentifier);
 	}
@@ -475,7 +475,7 @@ public abstract class OCRDServiceProviderWorker extends ServiceProviderCore {
 	 * @return The processor execution state.
 	 * @since 1.8
 	 */
-	protected ProcessServiceProvider.Processor.State run(Framework framework, Object arguments,
+	protected ProcessServiceProvider.Processor.State run(ProcessFramework framework, Object arguments,
 			ProcessorRunningState runningState, ProcessorExecution execution, Message standardOutput,
 			Message standardError, Progress progress, float baseProgress, ProcessorLogic processorLogic) {
 		String argumentsJsonSerialization = null;
