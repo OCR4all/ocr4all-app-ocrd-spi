@@ -106,7 +106,7 @@ public abstract class OCRDMsaServiceProviderWorker extends OCRDServiceProviderWo
 			+ "description/json/{processor}";
 
 	/**
-	 * The processor json description request mapping.
+	 * The processor json execute request mapping.
 	 */
 	private static final String executeRequestMapping = processorControllerContextPath + "execute";
 
