@@ -185,7 +185,7 @@ public abstract class OCRDMsaServiceProviderWorker extends OCRDServiceProviderWo
 	protected final org.slf4j.Logger logger;
 
 	/**
-	 * The ProviderDescription.
+	 * The Provider description.
 	 */
 	private ProviderDescription providerDescription = null;
 
