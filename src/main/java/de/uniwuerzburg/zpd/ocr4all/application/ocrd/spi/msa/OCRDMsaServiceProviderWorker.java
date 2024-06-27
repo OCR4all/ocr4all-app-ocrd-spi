@@ -261,8 +261,10 @@ public abstract class OCRDMsaServiceProviderWorker extends OCRDServiceProviderWo
 		if (host == null)
 			throw new ProviderException("unknown host configuration for msa id " + hostId + ".");
 
-		restClient = RestClient.create(
-				configuration.getValue(ServiceProviderCollection.applicationLayerProtocol) + "://" + host.getUrl());
+		final String url = configuration.getValue(ServiceProviderCollection.applicationLayerProtocol) + "://"
+				+ host.getUrl();
+
+		restClient = RestClient.create(url);
 
 		try {
 			providerDescription = new ProviderDescription(restClient.get()
@@ -275,7 +277,8 @@ public abstract class OCRDMsaServiceProviderWorker extends OCRDServiceProviderWo
 								+ response.getStatusText() + "): " + response.getHeaders());
 					}).body(DescriptionResponse.class).getDescription());
 		} catch (Exception e) {
-			logger.warn("provider " + getProcessorIdentifier() + " could not be initialized - " + e.getMessage());
+			logger.warn(getProcessorIdentifier() + " provider could not be initialized (" + url + "/"
+					+ jsonDescriptionRequestMapping + "/" + getProcessorIdentifier() + ")- " + e.getMessage());
 
 			throw e;
 		}
