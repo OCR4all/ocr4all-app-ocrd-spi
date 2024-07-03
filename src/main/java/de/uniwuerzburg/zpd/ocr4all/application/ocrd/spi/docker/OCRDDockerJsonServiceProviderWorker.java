@@ -19,6 +19,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.util.ProviderDescription;
 import de.uniwuerzburg.zpd.ocr4all.application.spi.core.CoreProcessorServiceProvider;
+import de.uniwuerzburg.zpd.ocr4all.application.spi.core.ProcessorCore;
 import de.uniwuerzburg.zpd.ocr4all.application.spi.core.ProcessorServiceProvider;
 import de.uniwuerzburg.zpd.ocr4all.application.spi.env.ConfigurationServiceProvider;
 import de.uniwuerzburg.zpd.ocr4all.application.spi.env.ProcessFramework;
@@ -45,7 +46,7 @@ import de.uniwuerzburg.zpd.ocr4all.application.spi.util.SystemProcess;
  * @since 1.8
  */
 public abstract class OCRDDockerJsonServiceProviderWorker extends OCRDDockerServiceProviderWorker
-		implements ProcessorServiceProvider<ProcessFramework> {
+		implements ProcessorServiceProvider<ProcessorCore.LockSnapshotCallback, ProcessFramework> {
 	/**
 	 * Defines service provider collection with keys and default values. Collection
 	 * blank values are not allowed and their values are trimmed.
@@ -378,7 +379,7 @@ public abstract class OCRDDockerJsonServiceProviderWorker extends OCRDDockerServ
 	 * newProcessor()
 	 */
 	@Override
-	public Processor<ProcessFramework> newProcessor() {
+	public Processor<ProcessorCore.LockSnapshotCallback, ProcessFramework> newProcessor() {
 		return providerDescription == null || !providerDescription.isModelFactorySet() ? null
 				: new OCRDDockerProcessorServiceProvider() {
 					/*
@@ -391,7 +392,7 @@ public abstract class OCRDDockerJsonServiceProviderWorker extends OCRDDockerServ
 					 * de.uniwuerzburg.zpd.ocr4all.application.spi.model.argument.ModelArgument)
 					 */
 					@Override
-					public State execute(Callback callback, ProcessFramework framework, ModelArgument modelArgument) {
+					public State execute(LockSnapshotCallback callback, ProcessFramework framework, ModelArgument modelArgument) {
 						if (!initialize(getProcessorIdentifier(), callback, framework))
 							return ProcessorServiceProvider.Processor.State.canceled;
 
@@ -421,6 +422,7 @@ public abstract class OCRDDockerJsonServiceProviderWorker extends OCRDDockerServ
 								progress -> callback.updatedProgress(progress), 0.01F);
 
 					}
+
 				};
 	}
 

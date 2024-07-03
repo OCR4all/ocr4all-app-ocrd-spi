@@ -30,6 +30,7 @@ import de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.core.OCRDServiceProvider
 import de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.util.ProviderDescription;
 import de.uniwuerzburg.zpd.ocr4all.application.spi.core.CoreProcessorServiceProvider;
 import de.uniwuerzburg.zpd.ocr4all.application.spi.core.MsaProcessorServiceProvider;
+import de.uniwuerzburg.zpd.ocr4all.application.spi.core.ProcessorCore;
 import de.uniwuerzburg.zpd.ocr4all.application.spi.core.ProcessorServiceProvider;
 import de.uniwuerzburg.zpd.ocr4all.application.spi.env.ConfigurationServiceProvider;
 import de.uniwuerzburg.zpd.ocr4all.application.spi.env.MicroserviceArchitecture;
@@ -58,7 +59,7 @@ import de.uniwuerzburg.zpd.ocr4all.application.spi.model.argument.ModelArgument;
  * @since 17
  */
 public abstract class OCRDMsaServiceProviderWorker extends OCRDServiceProviderWorker
-		implements ProcessorServiceProvider<ProcessFramework> {
+		implements ProcessorServiceProvider<ProcessorCore.LockSnapshotCallback, ProcessFramework> {
 	/**
 	 * The api context path.
 	 */
@@ -494,7 +495,7 @@ public abstract class OCRDMsaServiceProviderWorker extends OCRDServiceProviderWo
 	 * newProcessor()
 	 */
 	@Override
-	public Processor<ProcessFramework> newProcessor() {
+	public Processor<ProcessorCore.LockSnapshotCallback, ProcessFramework> newProcessor() {
 		return providerDescription == null || !providerDescription.isModelFactorySet() ? null
 				: new MsaProcessorServiceProvider(microserviceArchitecture.getEventController()) {
 					/**
@@ -568,7 +569,8 @@ public abstract class OCRDMsaServiceProviderWorker extends OCRDServiceProviderWo
 					 * de.uniwuerzburg.zpd.ocr4all.application.spi.model.argument.ModelArgument)
 					 */
 					@Override
-					public State execute(Callback callback, ProcessFramework framework, ModelArgument modelArgument) {
+					public State execute(LockSnapshotCallback callback, ProcessFramework framework,
+							ModelArgument modelArgument) {
 						if (framework == null) {
 							updatedStandardError("undefined framework.");
 
