@@ -352,7 +352,9 @@ public abstract class OCRDDockerJsonServiceProviderWorker extends OCRDDockerServ
 	 *         is required.
 	 * @since 1.8
 	 */
-	protected List<Argument> extraArguments(CoreProcessorServiceProvider processor, List<String> arguments) {
+	protected List<Argument> extraArguments(
+			CoreProcessorServiceProvider<ProcessorCore.LockSnapshotCallback, ProcessFramework> processor,
+			List<String> arguments) {
 		return null;
 	}
 
@@ -368,7 +370,8 @@ public abstract class OCRDDockerJsonServiceProviderWorker extends OCRDDockerServ
 	 * @since 1.8
 	 */
 	protected Hashtable<String, ProviderDescription.ModelFactory.ModelArgumentCallback> getProcessorCallbacks(
-			CoreProcessorServiceProvider processor, List<String> arguments) {
+			CoreProcessorServiceProvider<ProcessorCore.LockSnapshotCallback, ProcessFramework> processor,
+			List<String> arguments) {
 		return null;
 	}
 
@@ -392,7 +395,8 @@ public abstract class OCRDDockerJsonServiceProviderWorker extends OCRDDockerServ
 					 * de.uniwuerzburg.zpd.ocr4all.application.spi.model.argument.ModelArgument)
 					 */
 					@Override
-					public State execute(LockSnapshotCallback callback, ProcessFramework framework, ModelArgument modelArgument) {
+					public State execute(LockSnapshotCallback callback, ProcessFramework framework,
+							ModelArgument modelArgument) {
 						if (!initialize(getProcessorIdentifier(), callback, framework))
 							return ProcessorServiceProvider.Processor.State.canceled;
 
