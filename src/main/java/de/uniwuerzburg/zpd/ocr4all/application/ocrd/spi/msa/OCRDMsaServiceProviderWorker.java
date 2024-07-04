@@ -101,6 +101,11 @@ public abstract class OCRDMsaServiceProviderWorker extends OCRDServiceProviderWo
 	public static final String expungeJobRequestMapping = schedulerControllerContextPath + "expunge/{id}";
 
 	/**
+	 * The cancel job request mapping.
+	 */
+	public static final String cancelJobRequestMapping = "/cancel/{id}";
+
+	/**
 	 * The processor json description request mapping.
 	 */
 	private static final String jsonDescriptionRequestMapping = processorControllerContextPath
@@ -508,6 +513,11 @@ public abstract class OCRDMsaServiceProviderWorker extends OCRDServiceProviderWo
 					private Thread thread = null;
 
 					/**
+					 * The job id. 0 if not set.
+					 */
+					private int jobId = 0;
+
+					/**
 					 * Logs the trouble.
 					 * 
 					 * @param message The trouble message.
@@ -527,7 +537,8 @@ public abstract class OCRDMsaServiceProviderWorker extends OCRDServiceProviderWo
 					 *         Otherwise, the processor trouble execution state.
 					 * @since 17
 					 */
-					private ProcessorCore.State map(de.uniwuerzburg.zpd.ocr4all.application.communication.msa.job.State state) {
+					private ProcessorCore.State map(
+							de.uniwuerzburg.zpd.ocr4all.application.communication.msa.job.State state) {
 						switch (state) {
 						case canceled:
 							return ProcessorCore.State.canceled;
@@ -660,7 +671,7 @@ public abstract class OCRDMsaServiceProviderWorker extends OCRDServiceProviderWo
 										return ProcessorCore.State.interrupted;
 									}
 
-									final int jobId = jobResponse.getId();
+									jobId = jobResponse.getId();
 
 									logger.debug(
 											getProcessorIdentifier() + ": running job " + jobId + ", key " + key + ".");
@@ -771,6 +782,38 @@ public abstract class OCRDMsaServiceProviderWorker extends OCRDServiceProviderWo
 									}
 								});
 					}
+
+					/*
+					 * (non-Javadoc)
+					 * 
+					 * @see
+					 * de.uniwuerzburg.zpd.ocr4all.application.spi.core.CoreProcessorServiceProvider
+					 * #cancel()
+					 */
+					@Override
+					public void cancel() {
+						super.cancel();
+
+						if (jobId > 0)
+							try {
+								restClient.get().uri(cancelJobRequestMapping, jobId).retrieve()
+										.onStatus(HttpStatusCode::is4xxClientError, (request, response) -> {
+											throw new ProviderException(
+													"HTTP client error status " + response.getStatusCode() + " ("
+															+ response.getStatusText() + "): " + response.getHeaders());
+										}).onStatus(HttpStatusCode::is5xxServerError, (request, response) -> {
+											throw new ProviderException(
+													"HTTP server error status " + response.getStatusCode() + " ("
+															+ response.getStatusText() + "): " + response.getHeaders());
+										}).toBodilessEntity();
+
+							} catch (Exception e) {
+								logTrouble(
+										"could not cancel the job " + jobId + ", key " + key + " - " + e.getMessage());
+							}
+
+					}
+
 				};
 	}
 }

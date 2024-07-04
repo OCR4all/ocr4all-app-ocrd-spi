@@ -22,8 +22,8 @@ import de.uniwuerzburg.zpd.ocr4all.application.spi.core.CoreProcessorServiceProv
 import de.uniwuerzburg.zpd.ocr4all.application.spi.core.ProcessorCore;
 import de.uniwuerzburg.zpd.ocr4all.application.spi.core.ProcessorServiceProvider;
 import de.uniwuerzburg.zpd.ocr4all.application.spi.env.ConfigurationServiceProvider;
-import de.uniwuerzburg.zpd.ocr4all.application.spi.env.ProcessFramework;
 import de.uniwuerzburg.zpd.ocr4all.application.spi.env.Premise;
+import de.uniwuerzburg.zpd.ocr4all.application.spi.env.ProcessFramework;
 import de.uniwuerzburg.zpd.ocr4all.application.spi.env.SystemCommand;
 import de.uniwuerzburg.zpd.ocr4all.application.spi.env.Target;
 import de.uniwuerzburg.zpd.ocr4all.application.spi.model.Entry;
@@ -398,7 +398,7 @@ public abstract class OCRDDockerJsonServiceProviderWorker extends OCRDDockerServ
 					public State execute(LockSnapshotCallback callback, ProcessFramework framework,
 							ModelArgument modelArgument) {
 						if (!initialize(getProcessorIdentifier(), callback, framework))
-							return ProcessorServiceProvider.Processor.State.canceled;
+							return ProcessorCore.State.canceled;
 
 						ObjectNode arguments;
 						try {
@@ -414,7 +414,7 @@ public abstract class OCRDDockerJsonServiceProviderWorker extends OCRDDockerServ
 						} catch (Exception e) {
 							updatedStandardError(e.getMessage());
 
-							return ProcessorServiceProvider.Processor.State.interrupted;
+							return ProcessorCore.State.interrupted;
 						}
 
 						/*
