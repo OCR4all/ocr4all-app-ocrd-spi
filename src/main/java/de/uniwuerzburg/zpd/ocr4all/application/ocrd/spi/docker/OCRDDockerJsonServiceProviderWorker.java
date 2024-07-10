@@ -19,10 +19,11 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.util.ProviderDescription;
 import de.uniwuerzburg.zpd.ocr4all.application.spi.core.CoreProcessorServiceProvider;
-import de.uniwuerzburg.zpd.ocr4all.application.spi.core.ProcessServiceProvider;
+import de.uniwuerzburg.zpd.ocr4all.application.spi.core.ProcessorCore;
+import de.uniwuerzburg.zpd.ocr4all.application.spi.core.ProcessorServiceProvider;
 import de.uniwuerzburg.zpd.ocr4all.application.spi.env.ConfigurationServiceProvider;
-import de.uniwuerzburg.zpd.ocr4all.application.spi.env.Framework;
 import de.uniwuerzburg.zpd.ocr4all.application.spi.env.Premise;
+import de.uniwuerzburg.zpd.ocr4all.application.spi.env.ProcessFramework;
 import de.uniwuerzburg.zpd.ocr4all.application.spi.env.SystemCommand;
 import de.uniwuerzburg.zpd.ocr4all.application.spi.env.Target;
 import de.uniwuerzburg.zpd.ocr4all.application.spi.model.Entry;
@@ -45,7 +46,7 @@ import de.uniwuerzburg.zpd.ocr4all.application.spi.util.SystemProcess;
  * @since 1.8
  */
 public abstract class OCRDDockerJsonServiceProviderWorker extends OCRDDockerServiceProviderWorker
-		implements ProcessServiceProvider {
+		implements ProcessorServiceProvider<ProcessorCore.LockSnapshotCallback, ProcessFramework> {
 	/**
 	 * Defines service provider collection with keys and default values. Collection
 	 * blank values are not allowed and their values are trimmed.
@@ -82,7 +83,7 @@ public abstract class OCRDDockerJsonServiceProviderWorker extends OCRDDockerServ
 		/*
 		 * (non-Javadoc)
 		 * 
-		 * @see de.uniwuerzburg.zpd.ocr4all.application.spi.env.Framework.
+		 * @see de.uniwuerzburg.zpd.ocr4all.application.spi.env.ProcessFramework.
 		 * ServiceProviderCollectionKey#getName()
 		 */
 		@Override
@@ -93,7 +94,7 @@ public abstract class OCRDDockerJsonServiceProviderWorker extends OCRDDockerServ
 		/*
 		 * (non-Javadoc)
 		 * 
-		 * @see de.uniwuerzburg.zpd.ocr4all.application.spi.env.Framework.
+		 * @see de.uniwuerzburg.zpd.ocr4all.application.spi.env.ProcessFramework.
 		 * ServiceProviderCollectionKey#getKey()
 		 */
 		@Override
@@ -104,7 +105,7 @@ public abstract class OCRDDockerJsonServiceProviderWorker extends OCRDDockerServ
 		/*
 		 * (non-Javadoc)
 		 * 
-		 * @see de.uniwuerzburg.zpd.ocr4all.application.spi.env.Framework.
+		 * @see de.uniwuerzburg.zpd.ocr4all.application.spi.env.ProcessFramework.
 		 * ServiceProviderCollectionKey#getDefaultValue()
 		 */
 		@Override
@@ -351,7 +352,9 @@ public abstract class OCRDDockerJsonServiceProviderWorker extends OCRDDockerServ
 	 *         is required.
 	 * @since 1.8
 	 */
-	protected List<Argument> extraArguments(CoreProcessorServiceProvider processor, List<String> arguments) {
+	protected List<Argument> extraArguments(
+			CoreProcessorServiceProvider<ProcessorCore.LockSnapshotCallback, ProcessFramework> processor,
+			List<String> arguments) {
 		return null;
 	}
 
@@ -367,7 +370,8 @@ public abstract class OCRDDockerJsonServiceProviderWorker extends OCRDDockerServ
 	 * @since 1.8
 	 */
 	protected Hashtable<String, ProviderDescription.ModelFactory.ModelArgumentCallback> getProcessorCallbacks(
-			CoreProcessorServiceProvider processor, List<String> arguments) {
+			CoreProcessorServiceProvider<ProcessorCore.LockSnapshotCallback, ProcessFramework> processor,
+			List<String> arguments) {
 		return null;
 	}
 
@@ -378,22 +382,23 @@ public abstract class OCRDDockerJsonServiceProviderWorker extends OCRDDockerServ
 	 * newProcessor()
 	 */
 	@Override
-	public Processor newProcessor() {
+	public Processor<ProcessorCore.LockSnapshotCallback, ProcessFramework> newProcessor() {
 		return providerDescription == null || !providerDescription.isModelFactorySet() ? null
 				: new OCRDDockerProcessorServiceProvider() {
 					/*
 					 * (non-Javadoc)
 					 * 
-					 * @see
-					 * de.uniwuerzburg.zpd.ocr4all.application.spi.ProcessServiceProvider.Processor#
+					 * @see de.uniwuerzburg.zpd.ocr4all.application.spi.ProcessorServiceProvider.
+					 * Processor#
 					 * execute(de.uniwuerzburg.zpd.ocr4all.application.spi.ProcessServiceProvider.
 					 * Processor.Callback, de.uniwuerzburg.zpd.ocr4all.application.spi.Framework,
 					 * de.uniwuerzburg.zpd.ocr4all.application.spi.model.argument.ModelArgument)
 					 */
 					@Override
-					public State execute(Callback callback, Framework framework, ModelArgument modelArgument) {
+					public State execute(LockSnapshotCallback callback, ProcessFramework framework,
+							ModelArgument modelArgument) {
 						if (!initialize(getProcessorIdentifier(), callback, framework))
-							return ProcessServiceProvider.Processor.State.canceled;
+							return ProcessorCore.State.canceled;
 
 						ObjectNode arguments;
 						try {
@@ -409,7 +414,7 @@ public abstract class OCRDDockerJsonServiceProviderWorker extends OCRDDockerServ
 						} catch (Exception e) {
 							updatedStandardError(e.getMessage());
 
-							return ProcessServiceProvider.Processor.State.interrupted;
+							return ProcessorCore.State.interrupted;
 						}
 
 						/*
@@ -421,6 +426,7 @@ public abstract class OCRDDockerJsonServiceProviderWorker extends OCRDDockerServ
 								progress -> callback.updatedProgress(progress), 0.01F);
 
 					}
+
 				};
 	}
 

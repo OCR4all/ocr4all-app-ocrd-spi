@@ -11,12 +11,13 @@ import java.io.IOException;
 import java.util.List;
 
 import de.uniwuerzburg.zpd.ocr4all.application.spi.core.CoreProcessorServiceProvider;
-import de.uniwuerzburg.zpd.ocr4all.application.spi.core.ProcessServiceProvider;
+import de.uniwuerzburg.zpd.ocr4all.application.spi.core.ProcessorCore;
+import de.uniwuerzburg.zpd.ocr4all.application.spi.env.ProcessFramework;
 import de.uniwuerzburg.zpd.ocr4all.application.spi.util.SystemProcess;
 
 /**
  * Defines processors for docker service providers for OCRD. When implementing
- * the required method {@link ProcessServiceProvider.Processor#execute}, this
+ * the required method <code>execute</code>, this
  * class should be initialized by calling the method
  * {@link CoreProcessorServiceProvider#initialize} at the beginning and
  * completed by calling the method
@@ -26,7 +27,8 @@ import de.uniwuerzburg.zpd.ocr4all.application.spi.util.SystemProcess;
  * @version 1.0
  * @since 1.8
  */
-public abstract class OCRDDockerProcessorServiceProvider extends CoreProcessorServiceProvider {
+public abstract class OCRDDockerProcessorServiceProvider
+		extends CoreProcessorServiceProvider<ProcessorCore.LockSnapshotCallback, ProcessFramework> {
 	/**
 	 * The docker process.
 	 */

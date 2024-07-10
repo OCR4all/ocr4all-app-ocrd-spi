@@ -23,9 +23,9 @@ import java.util.Set;
 import com.fasterxml.jackson.core.JsonProcessingException;
 
 import de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.core.OCRDServiceProviderWorker;
-import de.uniwuerzburg.zpd.ocr4all.application.spi.core.ProcessServiceProvider;
+import de.uniwuerzburg.zpd.ocr4all.application.spi.core.ProcessorCore;
 import de.uniwuerzburg.zpd.ocr4all.application.spi.env.ConfigurationServiceProvider;
-import de.uniwuerzburg.zpd.ocr4all.application.spi.env.Framework;
+import de.uniwuerzburg.zpd.ocr4all.application.spi.env.ProcessFramework;
 import de.uniwuerzburg.zpd.ocr4all.application.spi.env.SystemCommand;
 import de.uniwuerzburg.zpd.ocr4all.application.spi.util.MetsUtils;
 import de.uniwuerzburg.zpd.ocr4all.application.spi.util.SPIUtils;
@@ -94,7 +94,7 @@ public abstract class OCRDDockerServiceProviderWorker extends OCRDServiceProvide
 		/*
 		 * (non-Javadoc)
 		 * 
-		 * @see de.uniwuerzburg.zpd.ocr4all.application.spi.env.Framework.
+		 * @see de.uniwuerzburg.zpd.ocr4all.application.spi.env.ProcessFramework.
 		 * ServiceProviderCollectionKey#getName()
 		 */
 		@Override
@@ -105,7 +105,7 @@ public abstract class OCRDDockerServiceProviderWorker extends OCRDServiceProvide
 		/*
 		 * (non-Javadoc)
 		 * 
-		 * @see de.uniwuerzburg.zpd.ocr4all.application.spi.env.Framework.
+		 * @see de.uniwuerzburg.zpd.ocr4all.application.spi.env.ProcessFramework.
 		 * ServiceProviderCollectionKey#getKey()
 		 */
 		@Override
@@ -116,7 +116,7 @@ public abstract class OCRDDockerServiceProviderWorker extends OCRDServiceProvide
 		/*
 		 * (non-Javadoc)
 		 * 
-		 * @see de.uniwuerzburg.zpd.ocr4all.application.spi.env.Framework.
+		 * @see de.uniwuerzburg.zpd.ocr4all.application.spi.env.ProcessFramework.
 		 * ServiceProviderCollectionKey#getDefaultValue()
 		 */
 		@Override
@@ -313,7 +313,7 @@ public abstract class OCRDDockerServiceProviderWorker extends OCRDServiceProvide
 	 * @return The docker process.
 	 * @since 1.8
 	 */
-	protected SystemProcess getDockerProcess(Framework framework) {
+	protected SystemProcess getDockerProcess(ProcessFramework framework) {
 		String dockerCommand = configuration.getSystemCommand(SystemCommand.Type.docker).getCommand().toString();
 
 		return new SystemProcess(framework == null ? null : framework.getProcessorWorkspace(), dockerCommand);
@@ -367,7 +367,7 @@ public abstract class OCRDDockerServiceProviderWorker extends OCRDServiceProvide
 	 *                                 problems.
 	 * @since 1.8
 	 */
-	private List<String> getProcessorArguments(Framework framework, boolean isResources, String dockerName,
+	private List<String> getProcessorArguments(ProcessFramework framework, boolean isResources, String dockerName,
 			Object arguments, MetsUtils.FrameworkFileGroup metsFileGroup) throws JsonProcessingException {
 		// Get the effective system user/group id
 		String uid = configuration.getValue(ServiceProviderCollection.uid);
@@ -426,10 +426,10 @@ public abstract class OCRDDockerServiceProviderWorker extends OCRDServiceProvide
 	 * @return The processor execution state.
 	 * @since 1.8
 	 */
-	protected ProcessServiceProvider.Processor.State run(Framework framework, Object arguments,
-			Set<String> unnecessaryArguments, OCRDDockerProcessorServiceProvider.DockerProcess dockerProcess,
-			ProcessorRunningState runningState, ProcessorExecution execution, Message standardOutput,
-			Message standardError, Progress progress, float baseProgress) {
+	protected ProcessorCore.State run(ProcessFramework framework, Object arguments, Set<String> unnecessaryArguments,
+			OCRDDockerProcessorServiceProvider.DockerProcess dockerProcess, ProcessorRunningState runningState,
+			ProcessorExecution execution, Message standardOutput, Message standardError, Progress progress,
+			float baseProgress) {
 
 		return run(framework, false, arguments, unnecessaryArguments, dockerProcess, runningState, execution,
 				standardOutput, standardError, progress, baseProgress);
@@ -454,7 +454,7 @@ public abstract class OCRDDockerServiceProviderWorker extends OCRDServiceProvide
 	 * @return The processor execution state.
 	 * @since 1.8
 	 */
-	protected ProcessServiceProvider.Processor.State run(Framework framework, boolean isResources, Object arguments,
+	protected ProcessorCore.State run(ProcessFramework framework, boolean isResources, Object arguments,
 			Set<String> unnecessaryArguments, OCRDDockerProcessorServiceProvider.DockerProcess dockerProcess,
 			ProcessorRunningState runningState, ProcessorExecution execution, Message standardOutput,
 			Message standardError, Progress progress, float baseProgress) {
@@ -474,7 +474,7 @@ public abstract class OCRDDockerServiceProviderWorker extends OCRDServiceProvide
 						standardError
 								.update("troubles running " + getProcessorDescription() + " - " + e.getMessage() + ".");
 
-						return ProcessServiceProvider.Processor.State.interrupted;
+						return ProcessorCore.State.interrupted;
 					}
 
 					dockerProcess
@@ -488,7 +488,7 @@ public abstract class OCRDDockerServiceProviderWorker extends OCRDServiceProvide
 					standardOutput.update("Execute docker process '" + dockerProcess.getProcess().getCommand()
 							+ "' with parameters: " + processorArguments + ".");
 
-					ProcessServiceProvider.Processor.State state = null;
+					ProcessorCore.State state = null;
 
 					try {
 						dockerProcess.getProcess().execute(processorArguments);
@@ -496,12 +496,12 @@ public abstract class OCRDDockerServiceProviderWorker extends OCRDServiceProvide
 						updateProcessorMessages(dockerProcess.getProcess(), standardOutput, standardError);
 
 						if (runningState.isCanceled())
-							state = ProcessServiceProvider.Processor.State.canceled;
+							state = ProcessorCore.State.canceled;
 						else if (dockerProcess.getProcess().getExitValue() != 0) {
 							standardError.update("Cannot run " + getProcessorDescription() + ", exit code "
 									+ dockerProcess.getProcess().getExitValue() + ".");
 
-							state = ProcessServiceProvider.Processor.State.interrupted;
+							state = ProcessorCore.State.interrupted;
 						}
 					} catch (IOException e) {
 						updateProcessorMessages(dockerProcess.getProcess(), standardOutput, standardError);
@@ -509,7 +509,7 @@ public abstract class OCRDDockerServiceProviderWorker extends OCRDServiceProvide
 						standardError
 								.update("troubles running " + getProcessorDescription() + " - " + e.getMessage() + ".");
 
-						state = ProcessServiceProvider.Processor.State.interrupted;
+						state = ProcessorCore.State.interrupted;
 					}
 
 					return state;

@@ -25,10 +25,10 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.util.ProviderDescription;
-import de.uniwuerzburg.zpd.ocr4all.application.spi.core.ProcessServiceProvider;
+import de.uniwuerzburg.zpd.ocr4all.application.spi.core.ProcessorCore;
 import de.uniwuerzburg.zpd.ocr4all.application.spi.core.ServiceProviderCore;
 import de.uniwuerzburg.zpd.ocr4all.application.spi.env.ConfigurationServiceProvider;
-import de.uniwuerzburg.zpd.ocr4all.application.spi.env.Framework;
+import de.uniwuerzburg.zpd.ocr4all.application.spi.env.ProcessFramework;
 import de.uniwuerzburg.zpd.ocr4all.application.spi.env.Target;
 import de.uniwuerzburg.zpd.ocr4all.application.spi.model.Field;
 import de.uniwuerzburg.zpd.ocr4all.application.spi.model.SelectField;
@@ -92,7 +92,7 @@ public abstract class OCRDServiceProviderWorker extends ServiceProviderCore {
 		/*
 		 * (non-Javadoc)
 		 * 
-		 * @see de.uniwuerzburg.zpd.ocr4all.application.spi.env.Framework.
+		 * @see de.uniwuerzburg.zpd.ocr4all.application.spi.env.ProcessFramework.
 		 * ServiceProviderCollectionKey#getName()
 		 */
 		@Override
@@ -103,7 +103,7 @@ public abstract class OCRDServiceProviderWorker extends ServiceProviderCore {
 		/*
 		 * (non-Javadoc)
 		 * 
-		 * @see de.uniwuerzburg.zpd.ocr4all.application.spi.env.Framework.
+		 * @see de.uniwuerzburg.zpd.ocr4all.application.spi.env.ProcessFramework.
 		 * ServiceProviderCollectionKey#getKey()
 		 */
 		@Override
@@ -114,7 +114,7 @@ public abstract class OCRDServiceProviderWorker extends ServiceProviderCore {
 		/*
 		 * (non-Javadoc)
 		 * 
-		 * @see de.uniwuerzburg.zpd.ocr4all.application.spi.env.Framework.
+		 * @see de.uniwuerzburg.zpd.ocr4all.application.spi.env.ProcessFramework.
 		 * ServiceProviderCollectionKey#getDefaultValue()
 		 */
 		@Override
@@ -295,7 +295,7 @@ public abstract class OCRDServiceProviderWorker extends ServiceProviderCore {
 	 * @return The opt resources folder.
 	 * @since 1.8
 	 */
-	protected Path getOptResources(Framework framework) {
+	protected Path getOptResources(ProcessFramework framework) {
 		return framework == null ? null : getOptResources(configuration, framework.getTarget());
 	}
 
@@ -308,7 +308,7 @@ public abstract class OCRDServiceProviderWorker extends ServiceProviderCore {
 	 * @return The opt resources folder.
 	 * @since 1.8
 	 */
-	protected Path getOptResources(Framework framework,
+	protected Path getOptResources(ProcessFramework framework,
 			ConfigurationServiceProvider.CollectionKey processorIdentifier) {
 		return framework == null ? null : getOptResources(configuration, framework.getTarget(), processorIdentifier);
 	}
@@ -475,9 +475,9 @@ public abstract class OCRDServiceProviderWorker extends ServiceProviderCore {
 	 * @return The processor execution state.
 	 * @since 1.8
 	 */
-	protected ProcessServiceProvider.Processor.State run(Framework framework, Object arguments,
-			ProcessorRunningState runningState, ProcessorExecution execution, Message standardOutput,
-			Message standardError, Progress progress, float baseProgress, ProcessorLogic processorLogic) {
+	protected ProcessorCore.State run(ProcessFramework framework, Object arguments, ProcessorRunningState runningState,
+			ProcessorExecution execution, Message standardOutput, Message standardError, Progress progress,
+			float baseProgress, ProcessorLogic processorLogic) {
 		String argumentsJsonSerialization = null;
 		if (arguments != null)
 			try {
@@ -489,7 +489,7 @@ public abstract class OCRDServiceProviderWorker extends ServiceProviderCore {
 			}
 
 		if (runningState.isCanceled())
-			return ProcessServiceProvider.Processor.State.canceled;
+			return ProcessorCore.State.canceled;
 
 		progress.update(baseProgress);
 
@@ -498,21 +498,20 @@ public abstract class OCRDServiceProviderWorker extends ServiceProviderCore {
 		if (processorWorkspaceRelativePath == null) {
 			standardError.update("Inconsistent processor workspace path.");
 
-			return ProcessServiceProvider.Processor.State.interrupted;
+			return ProcessorCore.State.interrupted;
 		}
 
 		final Path metsPath = framework.getMets();
 		if (metsPath == null) {
 			standardError.update("Missed required mets file path.");
 
-			return ProcessServiceProvider.Processor.State.interrupted;
+			return ProcessorCore.State.interrupted;
 		}
 
 		final MetsUtils.FrameworkFileGroup metsFileGroup = MetsUtils.getFileGroup(framework);
 
 		// Perform processor logic
-		ProcessServiceProvider.Processor.State state = processorLogic.execute(metsFileGroup,
-				argumentsJsonSerialization);
+		ProcessorCore.State state = processorLogic.execute(metsFileGroup, argumentsJsonSerialization);
 
 		if (state == null)
 			progress.update(0.097F);
@@ -533,7 +532,7 @@ public abstract class OCRDServiceProviderWorker extends ServiceProviderCore {
 					.update("troubles updating " + getProcessorDescription() + " xml files - " + e.getMessage() + ".");
 
 			if (state == null)
-				state = ProcessServiceProvider.Processor.State.interrupted;
+				state = ProcessorCore.State.interrupted;
 		}
 
 		if (state == null)
@@ -550,7 +549,7 @@ public abstract class OCRDServiceProviderWorker extends ServiceProviderCore {
 					+ " output directory to snapshot sandbox - " + e.getMessage() + ".");
 
 			if (state == null)
-				state = ProcessServiceProvider.Processor.State.interrupted;
+				state = ProcessorCore.State.interrupted;
 		}
 
 		if (state == null)
@@ -568,7 +567,7 @@ public abstract class OCRDServiceProviderWorker extends ServiceProviderCore {
 					.update("troubles updating " + getProcessorDescription() + " mets file - " + e.getMessage() + ".");
 
 			if (state == null)
-				state = ProcessServiceProvider.Processor.State.interrupted;
+				state = ProcessorCore.State.interrupted;
 		}
 
 		return state == null ? execution.complete() : state;
@@ -593,7 +592,7 @@ public abstract class OCRDServiceProviderWorker extends ServiceProviderCore {
 		 *         Otherwise, the processor trouble execution state.
 		 * @since 17
 		 */
-		public ProcessServiceProvider.Processor.State execute(MetsUtils.FrameworkFileGroup metsFileGroup,
+		public ProcessorCore.State execute(MetsUtils.FrameworkFileGroup metsFileGroup,
 				String argumentsJsonSerialization);
 	}
 
@@ -648,7 +647,7 @@ public abstract class OCRDServiceProviderWorker extends ServiceProviderCore {
 		 * @return The process execution state.
 		 * @since 1.8
 		 */
-		public ProcessServiceProvider.Processor.State complete();
+		public ProcessorCore.State complete();
 	}
 
 }

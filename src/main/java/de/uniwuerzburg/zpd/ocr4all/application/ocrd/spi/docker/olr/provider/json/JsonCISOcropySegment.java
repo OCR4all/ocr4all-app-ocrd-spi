@@ -18,8 +18,8 @@ import de.uniwuerzburg.zpd.ocr4all.application.spi.env.ConfigurationServiceProvi
  * <ul>
  * <li>cis-ocropy-segment-json-id: ocrd-cis-ocropy-segment</li>
  * <li>cis-ocropy-segment-json-description: ocr-d cis ocropy segment processor
- * <li>see {@link OCRDDockerJsonServiceProviderWorker} for remainder settings</li>
- * </li>
+ * <li>see {@link OCRDDockerJsonServiceProviderWorker} for remainder
+ * settings</li></li>
  * </ul>
  *
  * @author <a href="mailto:herbert.baier@uni-wuerzburg.de">Herbert Baier</a>
@@ -65,7 +65,7 @@ public class JsonCISOcropySegment extends OCRDDockerJsonServiceProviderWorker
 		/*
 		 * (non-Javadoc)
 		 * 
-		 * @see de.uniwuerzburg.zpd.ocr4all.application.spi.env.Framework.
+		 * @see de.uniwuerzburg.zpd.ocr4all.application.spi.env.ProcessFramework.
 		 * ServiceProviderCollectionKey#getName()
 		 */
 		@Override
@@ -76,7 +76,7 @@ public class JsonCISOcropySegment extends OCRDDockerJsonServiceProviderWorker
 		/*
 		 * (non-Javadoc)
 		 * 
-		 * @see de.uniwuerzburg.zpd.ocr4all.application.spi.env.Framework.
+		 * @see de.uniwuerzburg.zpd.ocr4all.application.spi.env.ProcessFramework.
 		 * ServiceProviderCollectionKey#getKey()
 		 */
 		@Override
@@ -87,7 +87,7 @@ public class JsonCISOcropySegment extends OCRDDockerJsonServiceProviderWorker
 		/*
 		 * (non-Javadoc)
 		 * 
-		 * @see de.uniwuerzburg.zpd.ocr4all.application.spi.env.Framework.
+		 * @see de.uniwuerzburg.zpd.ocr4all.application.spi.env.ProcessFramework.
 		 * ServiceProviderCollectionKey#getDefaultValue()
 		 */
 		@Override
@@ -109,9 +109,8 @@ public class JsonCISOcropySegment extends OCRDDockerJsonServiceProviderWorker
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.docker.OCRDDockerServiceProviderWorker#
-	 * processorIdentifier()
+	 * @see de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.docker.
+	 * OCRDDockerServiceProviderWorker# processorIdentifier()
 	 */
 	@Override
 	protected ConfigurationServiceProvider.CollectionKey processorIdentifier() {
@@ -121,9 +120,8 @@ public class JsonCISOcropySegment extends OCRDDockerJsonServiceProviderWorker
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.docker.OCRDDockerServiceProviderWorker#
-	 * processorDescription()
+	 * @see de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.docker.
+	 * OCRDDockerServiceProviderWorker# processorDescription()
 	 */
 	@Override
 	protected ConfigurationServiceProvider.CollectionKey processorDescription() {

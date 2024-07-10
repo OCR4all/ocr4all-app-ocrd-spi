@@ -21,10 +21,11 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.docker.OCRDDockerProcessorServiceProvider;
 import de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.docker.OCRDDockerServiceProviderWorker;
 import de.uniwuerzburg.zpd.ocr4all.application.spi.OpticalCharacterRecognitionServiceProvider;
-import de.uniwuerzburg.zpd.ocr4all.application.spi.core.ProcessServiceProvider;
+import de.uniwuerzburg.zpd.ocr4all.application.spi.core.ProcessorCore;
+import de.uniwuerzburg.zpd.ocr4all.application.spi.core.ProcessorServiceProvider;
 import de.uniwuerzburg.zpd.ocr4all.application.spi.env.ConfigurationServiceProvider;
-import de.uniwuerzburg.zpd.ocr4all.application.spi.env.Framework;
 import de.uniwuerzburg.zpd.ocr4all.application.spi.env.Premise;
+import de.uniwuerzburg.zpd.ocr4all.application.spi.env.ProcessFramework;
 import de.uniwuerzburg.zpd.ocr4all.application.spi.env.SystemCommand;
 import de.uniwuerzburg.zpd.ocr4all.application.spi.env.Target;
 import de.uniwuerzburg.zpd.ocr4all.application.spi.model.DecimalField;
@@ -52,7 +53,8 @@ import de.uniwuerzburg.zpd.ocr4all.application.spi.model.argument.StringArgument
  * @version 1.0
  * @since 1.8
  */
-public class CalamariRecognize extends OCRDDockerServiceProviderWorker implements OpticalCharacterRecognitionServiceProvider {
+public class CalamariRecognize extends OCRDDockerServiceProviderWorker
+		implements OpticalCharacterRecognitionServiceProvider {
 	/**
 	 * The prefix of the message keys in the resource bundle.
 	 */
@@ -105,7 +107,7 @@ public class CalamariRecognize extends OCRDDockerServiceProviderWorker implement
 		/*
 		 * (non-Javadoc)
 		 * 
-		 * @see de.uniwuerzburg.zpd.ocr4all.application.spi.env.Framework.
+		 * @see de.uniwuerzburg.zpd.ocr4all.application.spi.env.ProcessFramework.
 		 * ServiceProviderCollectionKey#getName()
 		 */
 		@Override
@@ -116,7 +118,7 @@ public class CalamariRecognize extends OCRDDockerServiceProviderWorker implement
 		/*
 		 * (non-Javadoc)
 		 * 
-		 * @see de.uniwuerzburg.zpd.ocr4all.application.spi.env.Framework.
+		 * @see de.uniwuerzburg.zpd.ocr4all.application.spi.env.ProcessFramework.
 		 * ServiceProviderCollectionKey#getKey()
 		 */
 		@Override
@@ -127,7 +129,7 @@ public class CalamariRecognize extends OCRDDockerServiceProviderWorker implement
 		/*
 		 * (non-Javadoc)
 		 * 
-		 * @see de.uniwuerzburg.zpd.ocr4all.application.spi.env.Framework.
+		 * @see de.uniwuerzburg.zpd.ocr4all.application.spi.env.ProcessFramework.
 		 * ServiceProviderCollectionKey#getDefaultValue()
 		 */
 		@Override
@@ -231,9 +233,8 @@ public class CalamariRecognize extends OCRDDockerServiceProviderWorker implement
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.docker.OCRDDockerServiceProviderWorker#
-	 * processorIdentifier()
+	 * @see de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.docker.
+	 * OCRDDockerServiceProviderWorker# processorIdentifier()
 	 */
 	@Override
 	protected ConfigurationServiceProvider.CollectionKey processorIdentifier() {
@@ -243,9 +244,8 @@ public class CalamariRecognize extends OCRDDockerServiceProviderWorker implement
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.docker.OCRDDockerServiceProviderWorker#
-	 * processorDescription()
+	 * @see de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.docker.
+	 * OCRDDockerServiceProviderWorker# processorDescription()
 	 */
 	@Override
 	protected ConfigurationServiceProvider.CollectionKey processorDescription() {
@@ -419,21 +419,22 @@ public class CalamariRecognize extends OCRDDockerServiceProviderWorker implement
 	 * newProcessor()
 	 */
 	@Override
-	public ProcessServiceProvider.Processor newProcessor() {
+	public ProcessorServiceProvider.Processor<ProcessorCore.LockSnapshotCallback, ProcessFramework> newProcessor() {
 		return new OCRDDockerProcessorServiceProvider() {
 			/*
 			 * (non-Javadoc)
 			 * 
-			 * @see
-			 * de.uniwuerzburg.zpd.ocr4all.application.spi.ProcessServiceProvider.Processor#
+			 * @see de.uniwuerzburg.zpd.ocr4all.application.spi.ProcessorServiceProvider.
+			 * Processor#
 			 * execute(de.uniwuerzburg.zpd.ocr4all.application.spi.ProcessServiceProvider.
 			 * Processor.Callback, de.uniwuerzburg.zpd.ocr4all.application.spi.Framework,
 			 * de.uniwuerzburg.zpd.ocr4all.application.spi.model.argument.ModelArgument)
 			 */
 			@Override
-			public State execute(Callback callback, Framework framework, ModelArgument modelArgument) {
+			public State execute(LockSnapshotCallback callback, ProcessFramework framework,
+					ModelArgument modelArgument) {
 				if (!initialize(getProcessorIdentifier(), callback, framework))
-					return ProcessServiceProvider.Processor.State.canceled;
+					return ProcessorServiceProvider.Processor.State.canceled;
 
 				/*
 				 * Available arguments
@@ -462,13 +463,13 @@ public class CalamariRecognize extends OCRDDockerServiceProviderWorker implement
 							else if (values.size() > 1) {
 								updatedStandardError("Only one level of text equivalence can be selected.");
 
-								return ProcessServiceProvider.Processor.State.interrupted;
+								return ProcessorServiceProvider.Processor.State.interrupted;
 							}
 						}
 					} catch (ClassCastException e) {
 						updatedStandardError("The argument '" + Field.model.getName() + "' is not of selection type.");
 
-						return ProcessServiceProvider.Processor.State.interrupted;
+						return ProcessorServiceProvider.Processor.State.interrupted;
 					}
 
 				/*
@@ -484,7 +485,7 @@ public class CalamariRecognize extends OCRDDockerServiceProviderWorker implement
 					} catch (ClassCastException e) {
 						updatedStandardError("The argument '" + Field.voter.getName() + "' is not of string type.");
 
-						return ProcessServiceProvider.Processor.State.interrupted;
+						return ProcessorServiceProvider.Processor.State.interrupted;
 					}
 
 				/*
@@ -507,19 +508,19 @@ public class CalamariRecognize extends OCRDDockerServiceProviderWorker implement
 															: " '" + values.get(0).trim() + "'")
 													+ " is not supported.");
 
-									return ProcessServiceProvider.Processor.State.interrupted;
+									return ProcessorServiceProvider.Processor.State.interrupted;
 								}
 							} else if (values.size() > 1) {
 								updatedStandardError("Only one level of text equivalence can be selected.");
 
-								return ProcessServiceProvider.Processor.State.interrupted;
+								return ProcessorServiceProvider.Processor.State.interrupted;
 							}
 						}
 					} catch (ClassCastException e) {
 						updatedStandardError("The argument '" + Field.levelTextEquivalence.getName()
 								+ "' is not of selection type.");
 
-						return ProcessServiceProvider.Processor.State.interrupted;
+						return ProcessorServiceProvider.Processor.State.interrupted;
 					}
 
 				/*
@@ -536,7 +537,7 @@ public class CalamariRecognize extends OCRDDockerServiceProviderWorker implement
 						updatedStandardError(
 								"The argument '" + Field.glyphConfidenceCutoff.getName() + "' is not of decimal type.");
 
-						return ProcessServiceProvider.Processor.State.interrupted;
+						return ProcessorServiceProvider.Processor.State.interrupted;
 					}
 
 				/*

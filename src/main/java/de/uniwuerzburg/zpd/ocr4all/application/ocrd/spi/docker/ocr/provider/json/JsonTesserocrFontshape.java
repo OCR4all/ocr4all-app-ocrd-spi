@@ -10,7 +10,7 @@ package de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.docker.ocr.provider.jso
 import java.nio.file.Path;
 
 import de.uniwuerzburg.zpd.ocr4all.application.spi.env.ConfigurationServiceProvider;
-import de.uniwuerzburg.zpd.ocr4all.application.spi.env.Framework;
+import de.uniwuerzburg.zpd.ocr4all.application.spi.env.ProcessFramework;
 
 /**
  * Defines service providers for ocr-d Tesserocr font shape with JSON support.
@@ -69,7 +69,7 @@ public class JsonTesserocrFontshape extends JsonTesserocrRecognize {
 		/*
 		 * (non-Javadoc)
 		 * 
-		 * @see de.uniwuerzburg.zpd.ocr4all.application.spi.env.Framework.
+		 * @see de.uniwuerzburg.zpd.ocr4all.application.spi.env.ProcessFramework.
 		 * ServiceProviderCollectionKey#getName()
 		 */
 		@Override
@@ -80,7 +80,7 @@ public class JsonTesserocrFontshape extends JsonTesserocrRecognize {
 		/*
 		 * (non-Javadoc)
 		 * 
-		 * @see de.uniwuerzburg.zpd.ocr4all.application.spi.env.Framework.
+		 * @see de.uniwuerzburg.zpd.ocr4all.application.spi.env.ProcessFramework.
 		 * ServiceProviderCollectionKey#getKey()
 		 */
 		@Override
@@ -91,7 +91,7 @@ public class JsonTesserocrFontshape extends JsonTesserocrRecognize {
 		/*
 		 * (non-Javadoc)
 		 * 
-		 * @see de.uniwuerzburg.zpd.ocr4all.application.spi.env.Framework.
+		 * @see de.uniwuerzburg.zpd.ocr4all.application.spi.env.ProcessFramework.
 		 * ServiceProviderCollectionKey#getDefaultValue()
 		 */
 		@Override
@@ -113,9 +113,8 @@ public class JsonTesserocrFontshape extends JsonTesserocrRecognize {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.docker.OCRDDockerServiceProviderWorker#
-	 * processorIdentifier()
+	 * @see de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.docker.
+	 * OCRDDockerServiceProviderWorker# processorIdentifier()
 	 */
 	@Override
 	protected ConfigurationServiceProvider.CollectionKey processorIdentifier() {
@@ -125,9 +124,8 @@ public class JsonTesserocrFontshape extends JsonTesserocrRecognize {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.docker.OCRDDockerServiceProviderWorker#
-	 * processorDescription()
+	 * @see de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.docker.
+	 * OCRDDockerServiceProviderWorker# processorDescription()
 	 */
 	@Override
 	protected ConfigurationServiceProvider.CollectionKey processorDescription() {
@@ -137,7 +135,8 @@ public class JsonTesserocrFontshape extends JsonTesserocrRecognize {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.docker.ocr.provider.json.
+	 * @see
+	 * de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.docker.ocr.provider.json.
 	 * JsonTesserocrRecognize#getDefaultModel()
 	 */
 	@Override
@@ -170,12 +169,13 @@ public class JsonTesserocrFontshape extends JsonTesserocrRecognize {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.docker.OCRDDockerServiceProviderWorker#
-	 * getOptResources(de.uniwuerzburg.zpd.ocr4all.application.spi.env.Framework)
+	 * @see de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.docker.
+	 * OCRDDockerServiceProviderWorker#
+	 * getOptResources(de.uniwuerzburg.zpd.ocr4all.application.spi.env.
+	 * ProcessFramework)
 	 */
 	@Override
-	protected Path getOptResources(Framework framework) {
+	protected Path getOptResources(ProcessFramework framework) {
 		return getOptResources(framework, JsonTesserocrRecognize.ServiceProviderCollection.processorIdentifier);
 	}
 

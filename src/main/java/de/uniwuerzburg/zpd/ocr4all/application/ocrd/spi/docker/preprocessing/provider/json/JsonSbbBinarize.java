@@ -21,14 +21,16 @@ import de.uniwuerzburg.zpd.ocr4all.application.spi.env.ConfigurationServiceProvi
  * <li>sbb-binarize-json-id: ocrd-sbb-binarize</li>
  * <li>sbb-binarize-json-description: ocr-d sbb image binarization processor
  * using pre-trained models</li>
- * <li>see {@link OCRDDockerJsonServiceProviderWorker} for remainder settings</li>
+ * <li>see {@link OCRDDockerJsonServiceProviderWorker} for remainder
+ * settings</li>
  * </ul>
  *
  * @author <a href="mailto:herbert.baier@uni-wuerzburg.de">Herbert Baier</a>
  * @version 1.0
  * @since 1.8
  */
-public class JsonSbbBinarize extends OCRDDockerJsonServiceProviderOptResourceWorker implements PreprocessingServiceProvider {
+public class JsonSbbBinarize extends OCRDDockerJsonServiceProviderOptResourceWorker
+		implements PreprocessingServiceProvider {
 	/**
 	 * The model argument.
 	 */
@@ -71,7 +73,7 @@ public class JsonSbbBinarize extends OCRDDockerJsonServiceProviderOptResourceWor
 		/*
 		 * (non-Javadoc)
 		 * 
-		 * @see de.uniwuerzburg.zpd.ocr4all.application.spi.env.Framework.
+		 * @see de.uniwuerzburg.zpd.ocr4all.application.spi.env.ProcessFramework.
 		 * ServiceProviderCollectionKey#getName()
 		 */
 		@Override
@@ -82,7 +84,7 @@ public class JsonSbbBinarize extends OCRDDockerJsonServiceProviderOptResourceWor
 		/*
 		 * (non-Javadoc)
 		 * 
-		 * @see de.uniwuerzburg.zpd.ocr4all.application.spi.env.Framework.
+		 * @see de.uniwuerzburg.zpd.ocr4all.application.spi.env.ProcessFramework.
 		 * ServiceProviderCollectionKey#getKey()
 		 */
 		@Override
@@ -93,7 +95,7 @@ public class JsonSbbBinarize extends OCRDDockerJsonServiceProviderOptResourceWor
 		/*
 		 * (non-Javadoc)
 		 * 
-		 * @see de.uniwuerzburg.zpd.ocr4all.application.spi.env.Framework.
+		 * @see de.uniwuerzburg.zpd.ocr4all.application.spi.env.ProcessFramework.
 		 * ServiceProviderCollectionKey#getDefaultValue()
 		 */
 		@Override
@@ -115,9 +117,8 @@ public class JsonSbbBinarize extends OCRDDockerJsonServiceProviderOptResourceWor
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.docker.OCRDDockerServiceProviderWorker#
-	 * processorIdentifier()
+	 * @see de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.docker.
+	 * OCRDDockerServiceProviderWorker# processorIdentifier()
 	 */
 	@Override
 	protected ConfigurationServiceProvider.CollectionKey processorIdentifier() {
@@ -127,9 +128,8 @@ public class JsonSbbBinarize extends OCRDDockerJsonServiceProviderOptResourceWor
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.docker.OCRDDockerServiceProviderWorker#
-	 * processorDescription()
+	 * @see de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.docker.
+	 * OCRDDockerServiceProviderWorker# processorDescription()
 	 */
 	@Override
 	protected ConfigurationServiceProvider.CollectionKey processorDescription() {
