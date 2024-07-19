@@ -561,7 +561,7 @@ public abstract class OCRDMsaServiceProviderWorker extends OCRDServiceProviderWo
 					@Override
 					protected void handle(EventSPI event) {
 						final String message = "received event " + event.getType().name() + " (" + event.getCreatedAt()
-								+ ") - " + event.getMessage();
+								+ ") - " + event.getMessage().getContent();
 
 						logger.debug(getProcessorIdentifier() + ": " + message);
 
