@@ -5,6 +5,7 @@ de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.msa.olr.MsaTesserocrSegmentWord
 de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.msa.olr.MsaTesserocrSegmentLine
 de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.msa.olr.MsaTesserocrSegmentRegion
 de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.msa.olr.MsaEynollahSegment
+de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.msa.olr.MsaKrakenSegment
 # docker json processors
 #de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.docker.olr.provider.json.JsonTesserocrSegment
 #de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.docker.olr.provider.json.JsonTesserocrSegmentLine
