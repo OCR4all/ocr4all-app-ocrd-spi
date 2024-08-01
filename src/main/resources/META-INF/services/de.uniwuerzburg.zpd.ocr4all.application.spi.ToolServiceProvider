@@ -1,6 +1,8 @@
 # msa processors
 de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.msa.tool.MsaFileformatTransform
 de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.msa.tool.MsaPageToPDF
+de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.msa.tool.MsaPageToTEI
+de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.msa.tool.MsaMetsModsToTEI
 # docker json processors
 #de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.docker.tool.provider.json.JsonFileformatTransform
 #de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.docker.tool.provider.json.JsonPageToPDF
