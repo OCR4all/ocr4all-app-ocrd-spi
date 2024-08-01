@@ -2,6 +2,7 @@
 de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.msa.ocr.MsaCalamariRecognize
 de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.msa.ocr.MsaTesserocrRecognize
 de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.msa.ocr.MsaTesserocrFontshape
+de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.msa.ocr.MsaKrakenRecognize
 # docker json processors
 #de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.docker.ocr.provider.json.JsonCalamariRecognize
 #de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.docker.ocr.provider.json.JsonTesserocrFontshape
