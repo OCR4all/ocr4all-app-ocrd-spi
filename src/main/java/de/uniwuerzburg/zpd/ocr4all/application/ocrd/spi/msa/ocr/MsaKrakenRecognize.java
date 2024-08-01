@@ -286,6 +286,9 @@ public class MsaKrakenRecognize extends OCRDMsaServiceProviderWorker
 						if (value == null)
 							value = stringField.getValue().orElse(null);
 
+						if (value != null && value.endsWith("." + defaultModelExtension))
+							value = value.substring(0, value.length() - defaultModelExtension.length() - 1);
+
 						final List<SelectField.Item> models = new ArrayList<SelectField.Item>();
 						for (String model : getModels(configuration, target))
 							models.add(new SelectField.Option(model.equals(value), model, null));
@@ -338,7 +341,7 @@ public class MsaKrakenRecognize extends OCRDMsaServiceProviderWorker
 						// a single model is expected
 						if (selectArgument.getValues().isPresent())
 							return Arrays.asList(new StringArgument[] { new StringArgument(selectArgument.getArgument(),
-									selectArgument.getValues().get().get(0)) });
+									selectArgument.getValues().get().get(0) + "." + defaultModelExtension) });
 					}
 
 					return null;
