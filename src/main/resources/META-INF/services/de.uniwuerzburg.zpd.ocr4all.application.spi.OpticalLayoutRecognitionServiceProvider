@@ -1,11 +1,13 @@
 # msa processors
 de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.msa.olr.MsaCISOcropySegment
+de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.msa.olr.MsaCISOcropyResegment
 de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.msa.olr.MsaTesserocrSegment
 de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.msa.olr.MsaTesserocrSegmentWord
 de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.msa.olr.MsaTesserocrSegmentLine
 de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.msa.olr.MsaTesserocrSegmentRegion
 de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.msa.olr.MsaEynollahSegment
 de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.msa.olr.MsaKrakenSegment
+de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.msa.olr.MsaSegmentRepair
 # docker json processors
 #de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.docker.olr.provider.json.JsonTesserocrSegment
 #de.uniwuerzburg.zpd.ocr4all.application.ocrd.spi.docker.olr.provider.json.JsonTesserocrSegmentLine
